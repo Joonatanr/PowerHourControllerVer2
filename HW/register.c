@@ -31,12 +31,25 @@ Private const eUSCI_UART_Config uartConfig =
         EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
 };
 
+/*****************************************************************************************************
+ *
+ * Function Prototypes
+ *
+ *****************************************************************************************************/
+
 Private void clocks_init(void);
 Private void ports_init(void);
 Private void TA0_0_IRQHandler(void);
 Private void timerA_init(void);
 Private void uart_init(void);
 
+Private void spi_init(void);
+
+/*****************************************************************************************************
+ *
+ * Public Functions
+ *
+ *****************************************************************************************************/
 
 Public void register_init(void)
 {
@@ -51,6 +64,9 @@ Public void register_init(void)
 
     //Initialise UART
     uart_init();
+
+    //Initialise SPI for LCD display.
+    spi_init();
 
     //Not quite sure what this does yet.
     MAP_Interrupt_enableSleepOnIsrExit();
@@ -70,6 +86,11 @@ Public void register_enable_low_powermode(void)
     }
 }
 
+/*****************************************************************************************************
+ *
+ * Private Functions
+ *
+ *****************************************************************************************************/
 
 Private void clocks_init(void)
 {
@@ -140,6 +161,12 @@ Private void uart_init(void)
     /* Enabling interrupts */
     MAP_UART_enableInterrupt(EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
     MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
+}
+
+/* TODO : Finish this. */
+Private void spi_init(void)
+{
+
 }
 
 
