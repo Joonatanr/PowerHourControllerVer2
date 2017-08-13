@@ -24,4 +24,6 @@ extern void set_led_two_blue(U8 state);
 extern U8 isBtnOne(void);
 extern U8 isBtnTwo(void);
 
+extern void delay_msec(U16 msec);
+
 #endif /* HW_REGISTER_H_ */

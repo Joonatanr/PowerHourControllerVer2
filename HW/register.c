@@ -6,7 +6,9 @@
  */
 
 #include "register.h"
+#include "display_drv.h"
 #include <driverlib.h>
+#include <spi_drv.h>
 
 Private const Timer_A_UpModeConfig timer_config =
 {
@@ -43,7 +45,13 @@ Private void TA0_0_IRQHandler(void);
 Private void timerA_init(void);
 Private void uart_init(void);
 
-Private void spi_init(void);
+/*****************************************************************************************************
+ *
+ * Private variables.
+ *
+ *****************************************************************************************************/
+
+Public volatile U16 priv_delay_counter = 0u;
 
 /*****************************************************************************************************
  *
@@ -73,6 +81,9 @@ Public void register_init(void)
 
     //Enable interrupts in general.
     Interrupt_enableMaster();
+
+    //Initialise display driver.
+    display_init();
 }
 
 Public void register_enable_low_powermode(void)
@@ -84,6 +95,12 @@ Public void register_enable_low_powermode(void)
     {
         MAP_PCM_gotoLPM0();
     }
+}
+
+Public void delay_msec(U16 msec)
+{
+    priv_delay_counter = msec / 10;
+    while(priv_delay_counter > 0u);
 }
 
 /*****************************************************************************************************
@@ -146,8 +163,13 @@ Private void timerA_init(void)
 Private void TA0_0_IRQHandler(void)
 {
     Timer_A_clearCaptureCompareInterrupt(TIMER_A0_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_0);
+    if (priv_delay_counter > 0u)
+    {
+        priv_delay_counter--;
+    }
     timer_10msec_callback();
 }
+
 
 
 Private void uart_init(void)
@@ -161,12 +183,6 @@ Private void uart_init(void)
     /* Enabling interrupts */
     MAP_UART_enableInterrupt(EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
     MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
-}
-
-/* TODO : Finish this. */
-Private void spi_init(void)
-{
-
 }
 
 

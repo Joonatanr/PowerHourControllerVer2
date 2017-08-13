@@ -8,20 +8,25 @@
 #include "typedefs.h"
 #include "register.h"
 #include "comm.h"
+#include "display_drv.h"
 
 Private void timer_10msec(void);
 Private void timer_1sec(void);
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_10msec;
-
 Private U8 timer_sec_counter = 0u;
+
 
 void main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;           // Stop watchdog timer
 
     register_init();
+
+    delay_msec(200);
+    //Execute test sequence for testing the functionality of the LCD display.
+    display_test_sequence();
 
     //Currently this function never returns.
     register_enable_low_powermode();
@@ -71,3 +76,5 @@ Private void timer_1sec(void)
         comm_send_char('O');
     }
 }
+
+
