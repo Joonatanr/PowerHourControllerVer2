@@ -145,6 +145,9 @@ Private void ports_init(void)
     // Set pin 1.7 as A0 pin.
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN7);
 
+    // Set pin 2.5 as reset pin.
+    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN5);
+
     //Clear other LEDs.
     GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -268,6 +271,18 @@ Public void set_cs_pin(U8 state)
     else
     {
         GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN3);
+    }
+}
+
+Public void set_disp_reset_pin(U8 state)
+{
+    if (state)
+    {
+        GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN5);
+    }
+    else
+    {
+        GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN5);
     }
 }
 

@@ -35,9 +35,8 @@ Public void spi_init(void)
     SPI_enableModule(EUSCI_B0_BASE);
 
     /* Enabling interrupts */
-    /*SPI_enableInterrupt(EUSCI_B0_BASE, EUSCI_B_SPI_RECEIVE_INTERRUPT);*/
-    /*Interrupt_enableInterrupt(INT_EUSCIB0);*/
-    /*Interrupt_enableSleepOnIsrExit();*/
+    SPI_enableInterrupt(EUSCI_B0_BASE, EUSCI_B_SPI_RECEIVE_INTERRUPT);
+    Interrupt_enableInterrupt(INT_EUSCIB0);
 }
 
 Public void spi_transmit(U8 * data, U16 data_len)
@@ -52,20 +51,31 @@ Public void spi_transmit(U8 * data, U16 data_len)
     }
 }
 
+volatile Boolean isReadyToTransmit = TRUE;
+
+
+//******************************************************************************
+//
+//This is the EUSCI_B0 interrupt vector service routine.
+//
+//******************************************************************************
+void EUSCIB0_IRQHandler(void)
+{
+    uint32_t status = SPI_getEnabledInterruptStatus(EUSCI_B0_BASE);
+
+    SPI_clearInterruptFlag(EUSCI_B0_BASE, status);
+
+    if (status & EUSCI_B_SPI_RECEIVE_INTERRUPT)
+    {
+        isReadyToTransmit = TRUE;
+    }
+}
 
 Public void spi_transmit_byte(U8 byte, Boolean reg_select)
 {
-    /* Polling to see if the TX buffer is ready */
-    while (!(SPI_getInterruptStatus(EUSCI_B0_BASE, EUSCI_B_SPI_TRANSMIT_INTERRUPT)));
-
-    //Lets try waiting until receive has finished.
-    //while (!(SPI_getInterruptStatus(EUSCI_B0_BASE, EUSCI_B_SPI_RECEIVE_INTERRUPT)));
-    //while (SPI_isBusy(EUSCI_B0_BASE));
-
-    //TODO : This is for very initial test only, must find another way definitely.
-    delay_msec(20);
-
     //Set A0 pin to proper state.
+    while(!isReadyToTransmit);
+
     if (reg_select)
     {
         set_reg_select(1u);
@@ -75,9 +85,9 @@ Public void spi_transmit_byte(U8 byte, Boolean reg_select)
         set_reg_select(0u);
     }
 
+    isReadyToTransmit = FALSE;
     //Transmit data to slave.
     SPI_transmitData(EUSCI_B0_BASE, byte);
-
 }
 
 
