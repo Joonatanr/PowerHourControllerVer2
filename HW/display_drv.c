@@ -20,14 +20,16 @@ Private void set_page_address(U8 page);
 Private void set_column(U8 column);
 Private void clear_display(void);
 Private void write_data(U8 data);
-
 Private void display_reset(void);
+
+Private U8 display_buffer[NUMBER_OF_COLUMNS][NUMBER_OF_PAGES];
 
 
 /* Set up A0 pin for display. */
 Public void display_init(void)
 {
     //Set the chip select pin as high initially.
+    memset(display_buffer, 0x00u, sizeof(display_buffer));
     display_reset();
     set_cs_pin(1u);
 }
@@ -37,7 +39,6 @@ Public void display_test_sequence(void)
     U8 ix;
 
     //Low CS, means that it is active.
-    //GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN3);
     set_cs_pin(0u);
 
     //Display start line set.
@@ -83,19 +84,9 @@ Public void display_test_sequence(void)
 
     //Lets try writing something.
 
-
     //Set to page address 2.
     set_page_address(4u);
     set_column(0u);
-
-    for (ix = 0u; ix < 128u; ix++)
-    {
-        //Write data.
-        //disp_command(0x00u, TRUE);
-        write_data(0x00u);
-    }
-
-    set_column(8u);
 
     for (ix = 0u; ix < 128u; ix++)
     {
