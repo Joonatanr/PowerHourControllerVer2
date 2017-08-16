@@ -24,7 +24,7 @@ void main(void)
 
     register_init();
 
-    delay_msec(200);
+    delay_msec(500);
     //Execute test sequence for testing the functionality of the LCD display.
     display_test_sequence();
 

@@ -13,7 +13,7 @@
 
 Public void spi_init(void);
 Public void spi_transmit(U8 * data, U16 data_len);
-Public void spi_transmit_byte(U8 byte);
+Public void spi_transmit_byte(U8 byte, Boolean reg_select);
 
 
 #endif /* HW_SPI_DRV_H_ */

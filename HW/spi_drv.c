@@ -7,6 +7,7 @@
 
 #include <driverlib.h>
 #include <spi_drv.h>
+#include "register.h"
 
 /* SPI Master Configuration Parameter */
 const eUSCI_SPI_MasterConfig spiMasterConfig =
@@ -27,13 +28,6 @@ Public void spi_init(void)
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1,
             GPIO_PIN5 | GPIO_PIN6 , GPIO_PRIMARY_MODULE_FUNCTION);
 
-    // Set pin 4.3 as CS pin.
-    GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN3);
-
-    /* We should give a falling edge to CS pin, not entirely sure if this is necessary. */
-    /* Possibly we might have to catch the transmit interrupt and then control CS??? Not yet sure how this works. */
-    GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN3);
-
     /* Configuring SPI in 3wire master mode */
     SPI_initMaster(EUSCI_B0_BASE, &spiMasterConfig);
 
@@ -52,24 +46,38 @@ Public void spi_transmit(U8 * data, U16 data_len)
 
     while (data_len > 0)
     {
-        spi_transmit_byte(*data_ptr);
+        spi_transmit_byte(*data_ptr, FALSE);
         data_ptr++;
         data_len--;
     }
 }
 
 
-Public void spi_transmit_byte(U8 byte)
+Public void spi_transmit_byte(U8 byte, Boolean reg_select)
 {
-    uint32_t jj;
-
     /* Polling to see if the TX buffer is ready */
-    while (!(SPI_getInterruptStatus(EUSCI_B0_BASE,EUSCI_B_SPI_TRANSMIT_INTERRUPT)));
-    /* Transmitting data to slave */
+    while (!(SPI_getInterruptStatus(EUSCI_B0_BASE, EUSCI_B_SPI_TRANSMIT_INTERRUPT)));
+
+    //Lets try waiting until receive has finished.
+    //while (!(SPI_getInterruptStatus(EUSCI_B0_BASE, EUSCI_B_SPI_RECEIVE_INTERRUPT)));
+    //while (SPI_isBusy(EUSCI_B0_BASE));
+
+    //TODO : This is for very initial test only, must find another way definitely.
+    delay_msec(20);
+
+    //Set A0 pin to proper state.
+    if (reg_select)
+    {
+        set_reg_select(1u);
+    }
+    else
+    {
+        set_reg_select(0u);
+    }
+
+    //Transmit data to slave.
     SPI_transmitData(EUSCI_B0_BASE, byte);
 
-    /* Delay between transmissions for slave to process information */
-    for(jj=50;jj<50;jj++);
 }
 
 

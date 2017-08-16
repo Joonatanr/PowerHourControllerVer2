@@ -139,6 +139,12 @@ Private void ports_init(void)
     //Lets set up S1 and S2 as input pins.
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1 | GPIO_PIN4);
 
+    // Set pin 4.3 as CS pin.
+    GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN3);
+
+    // Set pin 1.7 as A0 pin.
+    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN7);
+
     //Clear other LEDs.
     GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -236,6 +242,32 @@ Public void set_led_two_blue(U8 state)
     else
     {
         GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN2);
+    }
+}
+
+/* Set function for the RS or A0 pin. */
+Public void set_reg_select(U8 state)
+{
+    if (state)
+    {
+        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN7);
+    }
+    else
+    {
+        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN7);
+    }
+}
+
+/* Set function for Chip Select pin. */
+Public void set_cs_pin(U8 state)
+{
+    if (state)
+    {
+        GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN3);
+    }
+    else
+    {
+        GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN3);
     }
 }
 

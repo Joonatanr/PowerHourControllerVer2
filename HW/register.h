@@ -21,6 +21,10 @@ extern void set_led_one(U8 state);
 extern void set_led_two_red(U8 state);
 extern void set_led_two_green(U8 state);
 extern void set_led_two_blue(U8 state);
+
+extern void set_reg_select(U8 state);
+extern void set_cs_pin(U8 state);
+
 extern U8 isBtnOne(void);
 extern U8 isBtnTwo(void);
 
