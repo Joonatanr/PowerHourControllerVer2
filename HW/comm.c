@@ -11,7 +11,6 @@
 #include "comm.h"
 #include <uart.h>
 
-#define UART_BUF_LEN 32
 
 Private U8 priv_receive_buffer[UART_BUF_LEN];
 Private U8 priv_receive_cnt;
@@ -24,6 +23,16 @@ Public void comm_send_char(char c)
 
     //So should we also wait until data has been sent out???
     //We should not send any chars out if UART is busy.
+}
+
+Public void comm_send_str(const char * str)
+{
+    const char * ps = str;
+    while(*ps)
+    {
+        comm_send_char(*ps);
+        ps++;
+    }
 }
 
 /* EUSCI A0 UART ISR */
@@ -39,22 +48,22 @@ Public void EUSCIA0_IRQHandler(void)
     {
         //MAP_UART_transmitData(EUSCI_A0_BASE, MAP_UART_receiveData(EUSCI_A0_BASE));
         c = UART_receiveData(EUSCI_A0_BASE);
-    }
 
-    if ((priv_receive_cnt < UART_BUF_LEN) && (priv_receive_flag == 0u))
-    {
-        priv_receive_buffer[priv_receive_cnt] = c;
-        priv_receive_cnt++;
-
-        if (c == '\n')
+        if ((priv_receive_cnt < UART_BUF_LEN) && (priv_receive_flag == 0u))
         {
-            //We got new data that needs to be processed.
-            priv_receive_flag = 1u;
+            priv_receive_buffer[priv_receive_cnt] = c;
+            priv_receive_cnt++;
+
+            if (c == '\n')
+            {
+                //We got new data that needs to be processed.
+                priv_receive_flag = 1u;
+            }
         }
-    }
-    else
-    {
-        //Silently discard data to prevent buffer overflow.
+        else
+        {
+            //Silently discard data to prevent buffer overflow.
+        }
     }
 }
 

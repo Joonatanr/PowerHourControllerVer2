@@ -13,6 +13,7 @@
 typedef void (*TimerHandler)(void);
 
 extern TimerHandler timer_10msec_callback;
+extern TimerHandler timer_40msec_callback;
 
 extern void register_init(void);
 extern void register_enable_low_powermode(void);

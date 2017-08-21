@@ -9,14 +9,21 @@
 #include "register.h"
 #include "comm.h"
 #include "display_drv.h"
+#include "parser.h"
 
-Private void timer_10msec(void);
+Private void timer_hi_prio(void);
+Private void timer_lo_prio(void);
+
 Private void timer_1sec(void);
 
 //Callback for register.c
-Public TimerHandler timer_10msec_callback = timer_10msec;
-Private U8 timer_sec_counter = 0u;
+Public TimerHandler timer_10msec_callback = timer_hi_prio;
+Public TimerHandler timer_40msec_callback = timer_lo_prio;
 
+Private U8 timer_sec_counter = 0u;
+Private U8 priv_uart_buffer[UART_BUF_LEN];
+
+//volatile Boolean myTestFlag = FALSE;
 
 void main(void)
 {
@@ -33,7 +40,8 @@ void main(void)
 }
 
 //Periodically called from interrupt context.
-Private void timer_10msec(void)
+//Called every 10msec.
+Private void timer_hi_prio(void)
 {
     if (isBtnOne())
     {
@@ -53,27 +61,63 @@ Private void timer_10msec(void)
         set_led_two_red(0x00u);
     }
 
-    if (++timer_sec_counter >= 100u)
-    {
-        timer_sec_counter = 0;
-        timer_1sec();
-    }
 }
 
 /* Maybe this should not be called from interrupt context??? */
+//TODO : Might need to remove this.
 Private void timer_1sec(void)
 {
     static U8 led_state = 0x00u;
 
     led_state = !led_state;
     set_led_one(led_state);
-    if (led_state)
+/*
+    if(led_state)
     {
-        comm_send_char('X');
+        comm_send_str("Hi! ");
     }
     else
     {
-        comm_send_char('O');
+        comm_send_str("World");
+    }
+*/
+}
+
+Rectangle test_rect;
+
+//This is called every 40 milliseconds.
+//Maybe this should be called more frequently?
+Private void timer_lo_prio(void)
+{
+    U8 msg_len;
+
+    msg_len = comm_receiveData(priv_uart_buffer);
+
+    if (msg_len > 0u)
+    {
+        if (priv_uart_buffer[0] == 'R')
+        {
+            if (parseRectangle((char *)priv_uart_buffer, &test_rect))
+            {
+                display_drawRectangle(test_rect.location, test_rect.size);
+                comm_send_str("OK");
+
+            }
+            else
+            {
+                comm_send_str("ERROR");
+            }
+        }
+    }
+
+    //TODO : Call display cyclic function.
+    display_cyclic_40msec();
+
+    //1 second timer.
+    if (++timer_sec_counter >= 25u)
+    {
+        timer_sec_counter = 0;
+        timer_1sec();
     }
 }
 

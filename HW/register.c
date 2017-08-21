@@ -10,11 +10,24 @@
 #include <driverlib.h>
 #include <spi_drv.h>
 
-Private const Timer_A_UpModeConfig timer_config =
+//Hi priority timer runs at 10msec interval (might need to be faster)
+Private const Timer_A_UpModeConfig hi_prio_timer_config =
 {
      .captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE, /* We enable capture compare, since this is a periodic timer. */
      .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
      .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_16, //Currently divided by 16.
+     .timerClear = TIMER_A_DO_CLEAR,
+     .timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE, //Disable general interrupt.
+     .timerPeriod = 7500u
+};
+
+
+//Lo priority timer runs at 40msec interval
+Private const Timer_A_UpModeConfig lo_prio_timer_config =
+{
+     .captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE, /* We enable capture compare, since this is a periodic timer. */
+     .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
+     .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_64, //Currently divided by 64.
      .timerClear = TIMER_A_DO_CLEAR,
      .timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE, //Disable general interrupt.
      .timerPeriod = 7500u
@@ -42,6 +55,7 @@ Private const eUSCI_UART_Config uartConfig =
 Private void clocks_init(void);
 Private void ports_init(void);
 Private void TA0_0_IRQHandler(void);
+Private void TA1_0_IRQHandler(void);
 Private void timerA_init(void);
 Private void uart_init(void);
 
@@ -89,11 +103,9 @@ Public void register_init(void)
 Public void register_enable_low_powermode(void)
 {
     //Go to low power mode with interrupts.
-    //PCM_gotoLPM3();
-
     while(1)
     {
-        MAP_PCM_gotoLPM0();
+        PCM_gotoLPM0();
     }
 }
 
@@ -159,16 +171,31 @@ Private void ports_init(void)
 
 Private void timerA_init(void)
 {
-    //Set up timer
-    Timer_A_configureUpMode(TIMER_A0_BASE, &timer_config);
+    //Set up timer for high priority interrupts.
+    Timer_A_configureUpMode(TIMER_A0_BASE, &hi_prio_timer_config);
     Timer_A_registerInterrupt(TIMER_A0_BASE, TIMER_A_CCR0_INTERRUPT, TA0_0_IRQHandler);
     Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
 
     //Enable this interrupt in NVIC.
+    Interrupt_setPriority(INT_TA0_0, 254u); //TODO : Definately should review this.
+
+    //Set offset, so that interrupts will not
+    TA0CCR0 = 2500u;
+
     Interrupt_enableInterrupt(INT_TA0_0);
+
+
+    //TODO : Set up timer for low priority interrupts.
+    Timer_A_configureUpMode(TIMER_A1_BASE, &lo_prio_timer_config);
+    Timer_A_registerInterrupt(TIMER_A1_BASE, TIMER_A_CCR0_INTERRUPT, TA1_0_IRQHandler);
+    Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);
+
+    Interrupt_setPriority(INT_TA1_0, 255u);
+    Interrupt_enableInterrupt(INT_TA1_0);
 }
 
 /* This should be fired every 10 msec */
+//Hi priority interrupt handler.
 Private void TA0_0_IRQHandler(void)
 {
     Timer_A_clearCaptureCompareInterrupt(TIMER_A0_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_0);
@@ -179,6 +206,12 @@ Private void TA0_0_IRQHandler(void)
     timer_10msec_callback();
 }
 
+//Fired every 40 mseconds, this is lo prio interrupt handler.
+Private void TA1_0_IRQHandler(void)
+{
+    Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_0);
+    timer_40msec_callback();
+}
 
 
 Private void uart_init(void)

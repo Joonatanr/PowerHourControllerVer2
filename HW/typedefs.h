@@ -15,6 +15,24 @@ typedef unsigned char   U8;
 typedef unsigned short  U16;
 typedef unsigned int    U32;
 
+typedef struct
+{
+    U8 x;
+    U8 y;
+} Point;
+
+typedef struct
+{
+    U8 height;
+    U8 width;
+} Size;
+
+typedef struct
+{
+    Point location;
+    Size  size;
+} Rectangle;
+
 typedef enum { FALSE, TRUE } Boolean;
 
 //////// masking

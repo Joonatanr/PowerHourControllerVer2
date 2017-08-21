@@ -10,9 +10,10 @@
 
 #include "typedefs.h"
 
-Public void display_init(void);
-Public void display_test_sequence(void);
-
+extern void display_init(void);
+extern void display_test_sequence(void);
+extern void display_cyclic_40msec(void);
+extern void display_drawRectangle(Point p, Size s);
 
 
 #endif /* HW_DISPLAY_DRV_H_ */
