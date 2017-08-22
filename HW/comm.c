@@ -9,6 +9,7 @@
  * Unfortunately driverlib already has a source file named uart.c */
 
 #include "comm.h"
+#include "parser.h"
 #include <uart.h>
 
 
@@ -33,6 +34,20 @@ Public void comm_send_str(const char * str)
         comm_send_char(*ps);
         ps++;
     }
+}
+
+
+Public void comm_send_number(long nr)
+{
+    U32 len = long2string(nr, sY);
+    sY[len] = 0;
+    comm_send_str(sY);
+}
+
+Public void comm_send_rn(void)
+{
+    comm_send_char('\r');
+    comm_send_char('\n');
 }
 
 /* EUSCI A0 UART ISR */

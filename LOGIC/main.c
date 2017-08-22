@@ -18,7 +18,7 @@ Private void timer_1sec(void);
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
-Public TimerHandler timer_40msec_callback = timer_lo_prio;
+Public TimerHandler timer_50msec_callback = timer_lo_prio;
 
 Private U8 timer_sec_counter = 0u;
 Private U8 priv_uart_buffer[UART_BUF_LEN];
@@ -33,7 +33,7 @@ void main(void)
 
     delay_msec(500);
     //Execute test sequence for testing the functionality of the LCD display.
-    display_test_sequence();
+    display_start();
 
     //Currently this function never returns.
     register_enable_low_powermode();
@@ -68,9 +68,13 @@ Private void timer_hi_prio(void)
 Private void timer_1sec(void)
 {
     static U8 led_state = 0x00u;
+    //static long test_num = 0;
 
     led_state = !led_state;
     set_led_one(led_state);
+
+    //comm_send_number(test_num);
+    //test_num++;
 /*
     if(led_state)
     {
@@ -85,7 +89,7 @@ Private void timer_1sec(void)
 
 Rectangle test_rect;
 
-//This is called every 40 milliseconds.
+//This is called every 50 milliseconds.
 //Maybe this should be called more frequently?
 Private void timer_lo_prio(void)
 {
@@ -102,19 +106,36 @@ Private void timer_lo_prio(void)
                 display_drawRectangle(test_rect.location, test_rect.size);
                 comm_send_str("OK");
 
+                comm_send_str("X : ");
+                comm_send_number(test_rect.location.x);
+
+                comm_send_str(", Y : ");
+                comm_send_number(test_rect.location.y);
+
+                comm_send_str(", Height: ");
+                comm_send_number(test_rect.size.height);
+
+                comm_send_str(", Width: ");
+                comm_send_number(test_rect.size.width);
+
+                comm_send_rn();
             }
             else
             {
                 comm_send_str("ERROR");
             }
         }
+        else if(priv_uart_buffer[0] == 'C')
+        {
+            display_clear();
+        }
     }
 
     //TODO : Call display cyclic function.
-    display_cyclic_40msec();
+    display_cyclic_50msec();
 
     //1 second timer.
-    if (++timer_sec_counter >= 25u)
+    if (++timer_sec_counter >= 20u)
     {
         timer_sec_counter = 0;
         timer_1sec();

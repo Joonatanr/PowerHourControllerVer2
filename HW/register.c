@@ -30,7 +30,7 @@ Private const Timer_A_UpModeConfig lo_prio_timer_config =
      .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_64, //Currently divided by 64.
      .timerClear = TIMER_A_DO_CLEAR,
      .timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE, //Disable general interrupt.
-     .timerPeriod = 7500u
+     .timerPeriod = 9375u //Configured for 50 msec interval.
 };
 
 Private const eUSCI_UART_Config uartConfig =
@@ -206,11 +206,11 @@ Private void TA0_0_IRQHandler(void)
     timer_10msec_callback();
 }
 
-//Fired every 40 mseconds, this is lo prio interrupt handler.
+//Fired every 50 mseconds, this is lo prio interrupt handler.
 Private void TA1_0_IRQHandler(void)
 {
     Timer_A_clearCaptureCompareInterrupt(TIMER_A1_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_0);
-    timer_40msec_callback();
+    timer_50msec_callback();
 }
 
 
