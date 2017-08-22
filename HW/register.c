@@ -22,7 +22,7 @@ Private const Timer_A_UpModeConfig hi_prio_timer_config =
 };
 
 
-//Lo priority timer runs at 40msec interval
+//Lo priority timer runs at 50msec interval
 Private const Timer_A_UpModeConfig lo_prio_timer_config =
 {
      .captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE, /* We enable capture compare, since this is a periodic timer. */
@@ -129,13 +129,13 @@ Private void clocks_init(void)
     CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
 
     /* Initializing the clock source as follows:
-     *      MCLK = MODOSC/4 = 6MHz
+     *      MCLK = MODOSC/2 = 12MHz
      *      ACLK = REFO/2 = 16kHz   --- Not used, should remove.
      *      HSMCLK = DCO/2 = 6Mhz
      *      SMCLK = DCO =  12MHz
      *      BCLK  = REFO = 32kHz    --- Not used, should remove.
      */
-    MAP_CS_initClockSignal(CS_MCLK,     CS_MODOSC_SELECT,   CS_CLOCK_DIVIDER_4);
+    MAP_CS_initClockSignal(CS_MCLK,     CS_MODOSC_SELECT,   CS_CLOCK_DIVIDER_2);
     MAP_CS_initClockSignal(CS_ACLK,     CS_REFOCLK_SELECT,  CS_CLOCK_DIVIDER_2);
     MAP_CS_initClockSignal(CS_HSMCLK,   CS_DCOCLK_SELECT,   CS_CLOCK_DIVIDER_2);
     MAP_CS_initClockSignal(CS_SMCLK,    CS_DCOCLK_SELECT,   CS_CLOCK_DIVIDER_1);
