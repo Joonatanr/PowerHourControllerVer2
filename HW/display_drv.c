@@ -197,6 +197,7 @@ Public void display_clear(void)
  *
  *****************************************************************************************************/
 
+//TODO : Replace this with macro.
 Private void disp_command(U8 cmd, Boolean reg_select)
 {
     spi_transmit_byte(cmd, reg_select);

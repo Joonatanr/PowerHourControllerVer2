@@ -14,7 +14,7 @@ const eUSCI_SPI_MasterConfig spiMasterConfig =
 {
         EUSCI_B_SPI_CLOCKSOURCE_SMCLK,             // SMCLK Clock Source
         12000000,                                  // SMCLK = DCO = 12MHZ
-        200000,                                    // SPICLK = 200khz
+        1000000,                                   // SPICLK = 1MHz
         EUSCI_B_SPI_MSB_FIRST,                     // MSB First
         EUSCI_B_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,    // Phase
         EUSCI_B_SPI_CLOCKPOLARITY_INACTIVITY_HIGH, // High polarity
@@ -71,17 +71,32 @@ void EUSCIB0_IRQHandler(void)
     }
 }
 
+
 Public void spi_transmit_byte(U8 byte, Boolean reg_select)
 {
+    static Boolean reg_select_state = FALSE;
+
     //Set A0 pin to proper state.
-    while(!isReadyToTransmit);
+    if(reg_select != reg_select_state)
+    {
+        //We need to change A0 pin.
+        while(!isReadyToTransmit);
+    }
+    else
+    {
+        /* USCI_B0 TX buffer ready? */
+        /* We don't need for previous transmission to finish, we just need to make sure that register is ready. */
+        while (!(SPI_getInterruptStatus(EUSCI_B0_BASE, EUSCI_B_SPI_TRANSMIT_INTERRUPT)));
+    }
 
     if (reg_select)
     {
+        reg_select_state = TRUE;
         set_reg_select(1u);
     }
     else
     {
+        reg_select_state = FALSE;
         set_reg_select(0u);
     }
 
