@@ -10,10 +10,27 @@
 
 #include "typedefs.h"
 
+typedef enum
+{
+    PATTERN_WHITE,
+    PATTERN_BLACK,
+    PATTERN_GRAY,
+    NUMBER_OF_PATTERNS,
+} FillPatternType;
+
+typedef struct
+{
+    Size bmp_size;
+    const U8 * bmp_data;
+} Bitmap;
+
 extern void display_init(void);
 extern void display_start(void);
 extern void display_cyclic_50msec(void);
-extern void display_drawRectangle(Point p, Size s);
+
+extern void display_fillRectangle(Point p, Size s, FillPatternType pattern);
+extern void display_drawBitmap (const Bitmap * bmp, Point location);
+
 Public void display_clear(void);
 
 
