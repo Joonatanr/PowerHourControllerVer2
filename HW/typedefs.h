@@ -33,6 +33,13 @@ typedef struct
     Size  size;
 } Rectangle;
 
+typedef struct
+{
+    Size bmp_size;
+    const U8 * bmp_data;
+} Bitmap;
+
+
 typedef enum { FALSE, TRUE } Boolean;
 
 //////// masking
