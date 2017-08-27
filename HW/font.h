@@ -10,11 +10,13 @@
 
 
 #include "typedefs.h"
+#include "bitmaps.h"
 
 typedef enum
 {
     FONT_SMALL_FONT,
     FONT_LARGE_FONT,
+    FONT_NUMBERS_LARGE,
     NUMBER_OF_FONTS
 } FontType;
 

@@ -9,6 +9,7 @@
 #define HW_DISPLAY_DRV_H_
 
 #include "typedefs.h"
+#include "bitmaps.h"
 #include "font.h"
 
 typedef enum

@@ -10,6 +10,8 @@
 #include "comm.h"
 #include "display_drv.h"
 #include "parser.h"
+#include "clockDisplay.h"
+
 
 Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
@@ -29,11 +31,20 @@ void main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;           // Stop watchdog timer
 
+    //Initialise HW layer.
     register_init();
 
+    //Initialise logic layer.
+    clockDisplay_init();
+
     delay_msec(500);
+
+    //Start HW layer.
     //Execute test sequence for testing the functionality of the LCD display.
     display_start();
+
+    //Start LOGIC layer.
+    clockDisplay_start();
 
     //Currently this function never returns.
     register_enable_low_powermode();
@@ -43,6 +54,8 @@ void main(void)
 //Called every 10msec.
 Private void timer_hi_prio(void)
 {
+    //All high priority tasks should be put in here.
+    //This means hardware tasks, such as reading buttons, changing PWM etc.
     if (isBtnOne())
     {
         set_led_two_blue(0x01u);
@@ -63,28 +76,14 @@ Private void timer_hi_prio(void)
 
 }
 
-/* Maybe this should not be called from interrupt context??? */
 //TODO : Might need to remove this.
 Private void timer_1sec(void)
 {
     static U8 led_state = 0x00u;
-    //static long test_num = 0;
 
     led_state = !led_state;
     set_led_one(led_state);
-
-    //comm_send_number(test_num);
-    //test_num++;
-/*
-    if(led_state)
-    {
-        comm_send_str("Hi! ");
-    }
-    else
-    {
-        comm_send_str("World");
-    }
-*/
+    clockDisplay_cyclic1000msec();
 }
 
 Rectangle test_rect;
@@ -135,15 +134,16 @@ Private void timer_lo_prio(void)
         }
     }
 
-    //TODO : Call display cyclic function.
-    display_cyclic_50msec();
-
     //1 second timer.
     if (++timer_sec_counter >= 20u)
     {
         timer_sec_counter = 0;
         timer_1sec();
     }
+
+    // Make sure this is called at the very end, so that all logic
+    // tasks can write to the display without problems.
+    display_cyclic_50msec();
 }
 
 

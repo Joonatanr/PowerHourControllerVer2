@@ -144,7 +144,7 @@ Public void display_start(void)
 
     display_clear();
     //display_drawBitmap(&test_palmtree_bmp, 0,0);
-    display_drawBitmap(&test_girl_bitmap, 0,0);
+    //display_drawBitmap(&test_girl_bitmap, 0,0);
 
     //display_drawString("Hello World! \n Yolotron", 10u, ROW_3, FONT_LARGE_FONT);
     //display_drawString("Yoloswag", 1u, ROW_5, FONT_SMALL_FONT);

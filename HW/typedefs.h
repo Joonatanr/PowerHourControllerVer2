@@ -33,13 +33,6 @@ typedef struct
     Size  size;
 } Rectangle;
 
-typedef struct
-{
-    U16 height;
-    U16 width;
-    const U8 * bmp_data;
-} Bitmap;
-
 
 typedef enum { FALSE, TRUE } Boolean;
 
