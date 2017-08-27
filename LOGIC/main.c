@@ -107,7 +107,7 @@ Private void timer_lo_prio(void)
                                       test_rect.location.y,
                                       test_rect.size.height,
                                       test_rect.size.width,
-                                      PATTERN_BLACK);
+                                      PATTERN_GRAY);
                 comm_send_str("OK");
 
                 comm_send_str("X : ");

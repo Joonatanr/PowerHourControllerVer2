@@ -143,10 +143,10 @@ Public void display_start(void)
     delay_msec(500);
 
     display_clear();
-    //display_drawBitmap(&test_palmtree_bmp, (Point){0,0});
-    //display_drawBitmap(&test_girl_bitmap, 0,0);
+    //display_drawBitmap(&test_palmtree_bmp, 0,0);
+    display_drawBitmap(&test_girl_bitmap, 0,0);
 
-    display_drawString("Hello World! \n Yolotron", 10u, ROW_3, FONT_LARGE_FONT);
+    //display_drawString("Hello World! \n Yolotron", 10u, ROW_3, FONT_LARGE_FONT);
     //display_drawString("Yoloswag", 1u, ROW_5, FONT_SMALL_FONT);
     //display_drawChar('H',24u, ROW_3);
 
@@ -342,18 +342,14 @@ Private void drawPattern(Point * p, Size * s, const FillPattern * pattern_ptr)
                 mask &= (0xffu >> (7u - (bottom_row % 8u)));
             }
 
-            pattern_segment = 0u;
-
             for (column = p->x; column <= right_column; column++)
             {
                 //We are drawing a pattern.
-                value = *data;
-                if (++pattern_segment >= pattern_ptr->number_of_segments)
-                {
-                    pattern_segment = 0u;
-                }
+                pattern_segment = column % pattern_ptr->number_of_segments;
                 data = pattern_ptr->pattern + pattern_segment;
-
+                value = *data;
+                //priv_display_buffer[column][curr_page] |= (mask & value);
+                priv_display_buffer[column][curr_page] &= (~mask);
                 priv_display_buffer[column][curr_page] |= (mask & value);
             }
 
@@ -438,6 +434,8 @@ Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
                     priv_split_buffer[column] = (*data) >> (8u - y_offset);
                 }
 
+                //priv_display_buffer[column][curr_page] |= (mask & value);
+                priv_display_buffer[column][curr_page] &= (~mask);
                 priv_display_buffer[column][curr_page] |= (mask & value);
                 data++;
             }
