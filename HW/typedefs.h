@@ -17,14 +17,14 @@ typedef unsigned int    U32;
 
 typedef struct
 {
-    U8 x;
-    U8 y;
+    U16 x;
+    U16 y;
 } Point;
 
 typedef struct
 {
-    U8 height;
-    U8 width;
+    U16 height;
+    U16 width;
 } Size;
 
 typedef struct
@@ -35,7 +35,8 @@ typedef struct
 
 typedef struct
 {
-    Size bmp_size;
+    U16 height;
+    U16 width;
     const U8 * bmp_data;
 } Bitmap;
 

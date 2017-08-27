@@ -20,7 +20,9 @@ typedef enum
 
 extern const Bitmap large_font_bitmap;
 
-extern void font_getFontChar(char asc, Bitmap * dest, FontType font);
+extern void font_getFontChar(char asc, Bitmap * dest);
+extern void font_setFont(FontType font);
+extern U16 font_getFontHeight(void);
 
 
 #endif /* HW_FONT_H_ */

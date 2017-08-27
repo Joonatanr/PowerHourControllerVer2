@@ -40,8 +40,8 @@ typedef struct
  *
  *****************************************************************************************************/
 
-Private void drawImage(Point p, Size s, const Bitmap * bmp);
-Private void drawPattern(Point p, Size s, const FillPattern * patternType);
+Private void drawImage(Point * p, Size * s, const Bitmap * bmp);
+Private void drawPattern(Point * p, Size * s, const FillPattern * patternType);
 Private void disp_command(U8 cmd, Boolean reg_select);
 Private void set_page_address(U8 page);
 Private void set_column(U8 column);
@@ -143,9 +143,11 @@ Public void display_start(void)
     delay_msec(500);
 
     display_clear();
-    //display_drawBitmap(&large_font_bitmap, (Point){0,0});
-    //display_drawBitmap(&test_girl_bitmap, (Point){0,2});
-    display_drawString("!Hello World!", 10u, ROW_3, FONT_SMALL_FONT);
+    //display_drawBitmap(&test_palmtree_bmp, (Point){0,0});
+    //display_drawBitmap(&test_girl_bitmap, 0,0);
+
+    display_drawString("Hello World! \n Yolotron", 10u, ROW_3, FONT_LARGE_FONT);
+    //display_drawString("Yoloswag", 1u, ROW_5, FONT_SMALL_FONT);
     //display_drawChar('H',24u, ROW_3);
 
     isDisplayReady = TRUE;
@@ -194,70 +196,76 @@ Public void display_cyclic_50msec(void)
 
 Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font)
 {
-    //TODO : Should take different font sizes into account.
     const char * ps = str;
     U8 x = xloc;
     U8 y = yloc;
+    Size char_size;
+
+    font_setFont(font);
+    char_size.height = font_getFontHeight();
 
     while (*ps)
     {
         if (*ps == '\n')
         {
             x = xloc;
-            //TODO : Fix this into a normal solution.
-            if (font == FONT_SMALL_FONT)
-            {
-                y += 8u;
-            }
-            else
-            {
-                y+=16u;
-            }
+            y += char_size.height;
         }
         else
         {
-            display_drawChar(*ps, x, yloc, font);
-            if (font == FONT_SMALL_FONT)
-            {
-                x += 6u;
-            }
-            else
-            {
-                x += 16u;
-            }
+            display_drawChar(*ps, x, y, &char_size);
+            x += char_size.width + 1u; //TODO : Make it possible to change spaces between characters.
         }
         ps++;
     }
 }
 
-
-Public void display_drawChar(char c, U8 xloc, U8 yloc, FontType font)
+//Returns width of character, this must be changed later to more complex handling.
+//TODO
+Public void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize)
 {
     Bitmap myBitMap;
-    Point myPoint;
-    myPoint.x = xloc;
-    myPoint.y = yloc;
 
-    font_getFontChar(c, &myBitMap, font);
-    display_drawBitmap(&myBitMap, myPoint);
+    font_getFontChar(c, &myBitMap);
+    display_drawBitmap(&myBitMap, xloc, yloc);
+
+    destSize->height = myBitMap.height;
+    destSize->width = myBitMap.width;
 }
 
 
-Public void display_drawBitmap (const Bitmap * bmp, Point location)
+Public void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y)
 {
+    Size mySize;
+    Point myPoint;
+
+    mySize.height = bmp->height;
+    mySize.width = bmp->width;
+    myPoint.x = x;
+    myPoint.y = y;
+
     if (bmp != NULL)
     {
-        drawImage(location, bmp->bmp_size, bmp);
+        drawImage(&myPoint, &mySize, bmp);
     }
 }
 
 
 //Draw rectangle into frame buffer and invalidate pages that contain the rectangle.
-Public void display_fillRectangle(Point p, Size s, FillPatternType patternType)
+Public void display_fillRectangle(U16 x, U16 y, U16 height, U16 width, FillPatternType patternType)
 {
+    Size mySize;
+    Point myPoint;
+
+    mySize.height = height;
+    mySize.width = width;
+
+    myPoint.x = x;
+    myPoint.y = y;
+
     if (patternType < NUMBER_OF_PATTERNS)
     {
-        drawPattern(p, s, &priv_fill_patterns[patternType]);
+        drawPattern(&myPoint, &mySize, &priv_fill_patterns[patternType]);
     }
 }
 
@@ -283,7 +291,7 @@ Public void display_clear(void)
  *
  *****************************************************************************************************/
 
-Private void drawPattern(Point p, Size s, const FillPattern * pattern_ptr)
+Private void drawPattern(Point * p, Size * s, const FillPattern * pattern_ptr)
 {
     U8 curr_page, bottom_page, top_page;
     U8 column, right_column, bottom_row;
@@ -298,13 +306,13 @@ Private void drawPattern(Point p, Size s, const FillPattern * pattern_ptr)
 
     data = pattern_ptr->pattern;
 
-    if ((p.x < NUMBER_OF_COLUMNS) && (p.y < NUMBER_OF_ROWS))
+    if ((p->x < NUMBER_OF_COLUMNS) && (p->y < NUMBER_OF_ROWS))
     {
-        bottom_row = p.y + s.height - 1;
-        right_column = p.x + s.width;
+        bottom_row = p->y + s->height - 1;
+        right_column = p->x + s->width;
 
         bottom_page = bottom_row >> 3u; //Divide with 8
-        top_page = p.y >> 3u; //Divide with 8
+        top_page = p->y >> 3u; //Divide with 8
 
         if (bottom_page >= NUMBER_OF_PAGES )
         {
@@ -316,10 +324,10 @@ Private void drawPattern(Point p, Size s, const FillPattern * pattern_ptr)
             right_column = NUMBER_OF_COLUMNS - 1;
         }
 
-        left_segment = GET_SEGMENT(p.x);
+        left_segment = GET_SEGMENT(p->x);
         right_segment = GET_SEGMENT(right_column);
 
-        y_offset = p.y % 8u;
+        y_offset = p->y % 8u;
 
         for (curr_page = top_page; curr_page <= bottom_page; curr_page++)
         {
@@ -336,7 +344,7 @@ Private void drawPattern(Point p, Size s, const FillPattern * pattern_ptr)
 
             pattern_segment = 0u;
 
-            for (column = p.x; column <= right_column; column++)
+            for (column = p->x; column <= right_column; column++)
             {
                 //We are drawing a pattern.
                 value = *data;
@@ -360,7 +368,7 @@ Private void drawPattern(Point p, Size s, const FillPattern * pattern_ptr)
 
 
 //Draw an image in a rectangular area.
-Private void drawImage(Point p, Size s, const Bitmap * bmp)
+Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
 {
     U8 curr_page, bottom_page, top_page;
     U8 column, right_column, bottom_row;
@@ -375,13 +383,13 @@ Private void drawImage(Point p, Size s, const Bitmap * bmp)
     //We start drawing a bitmap.
     data = bmp->bmp_data;
 
-    if ((p.x < NUMBER_OF_COLUMNS) && (p.y < NUMBER_OF_ROWS))
+    if ((p->x < NUMBER_OF_COLUMNS) && (p->y < NUMBER_OF_ROWS))
     {
-        bottom_row = p.y + s.height - 1;
-        right_column = p.x + s.width - 1;
+        bottom_row = p->y + s->height - 1;
+        right_column = p->x + s->width - 1;
 
         bottom_page = bottom_row >> 3u; //Divide with 8
-        top_page = p.y >> 3u; //Divide with 8
+        top_page = p->y >> 3u; //Divide with 8
 
         if (bottom_page >= NUMBER_OF_PAGES )
         {
@@ -393,10 +401,10 @@ Private void drawImage(Point p, Size s, const Bitmap * bmp)
             right_column = NUMBER_OF_COLUMNS - 1;
         }
 
-        left_segment = GET_SEGMENT(p.x);
+        left_segment = GET_SEGMENT(p->x);
         right_segment = GET_SEGMENT(right_column);
 
-        y_offset = p.y % 8u;
+        y_offset = p->y % 8u;
 
         for (curr_page = top_page; curr_page <= bottom_page; curr_page++)
         {
@@ -415,7 +423,7 @@ Private void drawImage(Point p, Size s, const Bitmap * bmp)
                 }
             }
 
-            for (column = p.x; column <= right_column; column++)
+            for (column = p->x; column <= right_column; column++)
             {
                 //We are drawing a bitmap.
                 //We need to extract the value to be written to the display.

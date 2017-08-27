@@ -103,7 +103,11 @@ Private void timer_lo_prio(void)
         {
             if (parseRectangle((char *)priv_uart_buffer, &test_rect))
             {
-                display_fillRectangle(test_rect.location, test_rect.size, PATTERN_BLACK);
+                display_fillRectangle(test_rect.location.x,
+                                      test_rect.location.y,
+                                      test_rect.size.height,
+                                      test_rect.size.width,
+                                      PATTERN_BLACK);
                 comm_send_str("OK");
 
                 comm_send_str("X : ");
