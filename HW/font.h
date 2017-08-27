@@ -17,6 +17,7 @@ typedef enum
     FONT_SMALL_FONT,
     FONT_LARGE_FONT,
     FONT_NUMBERS_LARGE,
+    FONT_NUMBERS_HUGE,
     NUMBER_OF_FONTS
 } FontType;
 
@@ -24,7 +25,7 @@ extern const Bitmap large_font_bitmap;
 
 extern void font_getFontChar(char asc, Bitmap * dest);
 extern void font_setFont(FontType font);
-extern U16 font_getFontHeight(void);
+extern U16  font_getFontHeight(FontType font);
 
 
 #endif /* HW_FONT_H_ */

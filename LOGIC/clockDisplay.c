@@ -22,10 +22,27 @@ Private timekeeper_struct priv_timekeeper;
 Private Boolean priv_isTimekeeperEnabled;
 Private char priv_timer_str[10];
 
+#define CLOCK_FONT FONT_NUMBERS_HUGE
+//Private U8 priv_timer_yloc;
+//Private const U8 priv_timer_xloc = 1u;
+Private Rectangle priv_timer_rect;
+
 Public void clockDisplay_init(void)
 {
+    U8 font_height;
+
     priv_timekeeper.min = 0u;
     priv_timekeeper.sec = 0u;
+
+    font_height = font_getFontHeight(CLOCK_FONT);
+
+    priv_timer_rect.location.x = 1u;
+
+    priv_timer_rect.location.y = NUMBER_OF_ROWS >> 1u; //Divide by 2.
+    priv_timer_rect.location.y -= (font_height >> 1u);
+
+    priv_timer_rect.size.height = font_height;
+    priv_timer_rect.size.width = 15u * 5u; //TODO : This should be changed, once font handling has been improved.
 }
 
 Public void clockDisplay_start(void)
@@ -50,8 +67,17 @@ Public void clockDisplay_cyclic1000msec(void)
         }
 
         //Currently for testing.
-        display_fillRectangle(0u, 0u, 16u, 50u , PATTERN_WHITE);
-        display_drawString(priv_timer_str, 0u, 0u, FONT_NUMBERS_LARGE);
+        //TODO : This is quite inefficient, should change it to a better solution.
+        display_fillRectangle(priv_timer_rect.location.x,
+                              priv_timer_rect.location.y,
+                              priv_timer_rect.size.height,
+                              priv_timer_rect.size.width,
+                              PATTERN_WHITE);
+
+        display_drawString(priv_timer_str,
+                           priv_timer_rect.location.x,
+                           priv_timer_rect.location.y,
+                           CLOCK_FONT);
     }
 }
 

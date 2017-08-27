@@ -11,13 +11,6 @@
 #include "bitmaps.h"
 #include "register.h"
 
-#define NUMBER_OF_PAGES 8u
-#define NUMBER_OF_COLUMNS 128u
-#define NUMBER_OF_ROWS (NUMBER_OF_PAGES * 8u)
-
-#define GET_SEGMENT(column) ((column) >> 3u) //Divided by 8, since there are 8 columns per segment.
-#define GET_FIRST_COLUMN(segment) ((segment) << 3u) //Multiplied with 8, returns the first column index of a segment.
-
 
 /*****************************************************************************************************
  *
@@ -202,7 +195,7 @@ Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font
     Size char_size;
 
     font_setFont(font);
-    char_size.height = font_getFontHeight();
+    char_size.height = font_getFontHeight(font);
 
     while (*ps)
     {
@@ -214,7 +207,10 @@ Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font
         else
         {
             display_drawChar(*ps, x, y, &char_size);
-            x += char_size.width + 1u; //TODO : Make it possible to change spaces between characters.
+            x += char_size.width; //TODO : Make it possible to change spaces between characters.
+            //Draw a blank line in between the characters.
+            display_fillRectangle(x, y, char_size.height, 1u, PATTERN_WHITE);
+            x += 1u;
         }
         ps++;
     }

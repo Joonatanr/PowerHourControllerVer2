@@ -29,6 +29,13 @@ typedef enum
 #define ROW_6 48
 #define ROW_7 56
 
+#define NUMBER_OF_PAGES 8u
+#define NUMBER_OF_COLUMNS 128u
+#define NUMBER_OF_ROWS (NUMBER_OF_PAGES * 8u)
+
+#define GET_SEGMENT(column) ((column) >> 3u) //Divided by 8, since there are 8 columns per segment.
+#define GET_FIRST_COLUMN(segment) ((segment) << 3u) //Multiplied with 8, returns the first column index of a segment.
+
 extern void display_init(void);
 extern void display_start(void);
 extern void display_cyclic_50msec(void);
