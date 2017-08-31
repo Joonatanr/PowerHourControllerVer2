@@ -49,6 +49,14 @@ Private controllerState priv_timer_state;
 Private U8 priv_special_task_counter;
 Private char priv_timer_str[10];
 
+Private void setUpperText(const char * str);
+Private void setLowerText(const char * str);
+
+Private void clearUpperText(void);
+Private void clearLowerText(void);
+
+Private void drawTimer(void);
+
 #define CLOCK_FONT FONT_NUMBERS_HUGE
 //Private U8 priv_timer_yloc;
 //Private const U8 priv_timer_xloc = 1u;
@@ -115,6 +123,8 @@ Public void clockDisplay_cyclic1000msec(void)
         else if(priv_timekeeper.sec == 10u)
         {
             clearBeerShot();
+            //setUpperText("PROOSIT! TEST");
+            //setLowerText("Viinaminut TEST");
         }
         else if((priv_timekeeper.sec <= 50u) && (priv_timekeeper.sec > 10u))
         {
@@ -122,18 +132,18 @@ Public void clockDisplay_cyclic1000msec(void)
             drawBeerShot();
         }
 
-        //Currently for testing.
-        //TODO : This is quite inefficient, should change it to a better solution.
-        display_fillRectangle(priv_timer_rect.location.x,
-                              priv_timer_rect.location.y,
-                              priv_timer_rect.size.height,
-                              priv_timer_rect.size.width,
-                              PATTERN_WHITE);
+        if (priv_timekeeper.sec == 20u)
+        {
+            setUpperText("Täitke pitsid!");
+        }
 
-        display_drawString(priv_timer_str,
-                           priv_timer_rect.location.x,
-                           priv_timer_rect.location.y,
-                           CLOCK_FONT);
+        if (priv_timekeeper.sec == 58u)
+        {
+            setUpperText("Proosit!");
+        }
+
+        drawTimer();
+
         break;
     case CONTROLLER_SPECIAL_TASK:
         //We still increment timer.
@@ -191,7 +201,50 @@ Private void enterSpecialTask(void)
 
     display_clear();
     //TODO : Replace this with actual task, good enough for testing.
-    display_drawString("Naised paljaks!", 64, 4, FONT_SMALL_FONT);
     display_drawBitmap(&test_girl_bitmap, 0u, 0u);
+    display_drawString("Naised paljaks!", 64, 4, FONT_SMALL_FONT);
 }
+
+Private void drawTimer(void)
+{
+    //Currently for testing.
+    //TODO : This is quite inefficient, should change it to a better solution.
+    display_fillRectangle(priv_timer_rect.location.x,
+                          priv_timer_rect.location.y,
+                          priv_timer_rect.size.height,
+                          priv_timer_rect.size.width,
+                          PATTERN_WHITE);
+
+    display_drawString(priv_timer_str,
+                       priv_timer_rect.location.x,
+                       priv_timer_rect.location.y,
+                       CLOCK_FONT);
+}
+
+
+Private void setUpperText(const char * str)
+{
+    clearUpperText();
+    display_drawString(str, 2u, 0u, FONT_LARGE_FONT);
+}
+
+//TODO : Replace this area with defined points.
+Private void clearUpperText(void)
+{
+    display_fillRectangle(2u, 0u, 10u, 80u, PATTERN_WHITE);
+}
+
+Private void setLowerText(const char * str)
+{
+    clearLowerText();
+    display_drawString(str, 2u, 50u, FONT_LARGE_FONT);
+}
+
+Private void clearLowerText(void)
+{
+    display_fillRectangle(2u, 0u, 50u, 80u, PATTERN_WHITE);
+}
+
+
+
 
