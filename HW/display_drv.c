@@ -138,7 +138,7 @@ Public void display_start(void)
     display_clear();
     //display_drawBitmap(&test_palmtree_bmp, 0,0);
     //display_drawBitmap(&test_girl_bitmap, 0,0);
-
+    //delay_msec(2000);
     //display_drawString("Hello World! \n Yolotron", 10u, ROW_3, FONT_LARGE_FONT);
     //display_drawString("Yoloswag", 1u, ROW_5, FONT_SMALL_FONT);
     //display_drawChar('H',24u, ROW_3);
@@ -421,7 +421,11 @@ Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
                 //We need to extract the value to be written to the display.
                 value = (*data) << y_offset;
 
-                if(curr_page != top_page)
+                if(curr_page == top_page)
+                {
+                    priv_split_buffer[column] = 0x00u; //TODO : Must get rid of this split buffer somehow.
+                }
+                else
                 {
                     value |= priv_split_buffer[column]; //Should contain the top bits for the bitmap image. If it is top page, then these bits are ignored anyway.
                 }
