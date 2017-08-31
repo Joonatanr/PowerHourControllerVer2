@@ -13,6 +13,7 @@
 #include "bitmaps.h"
 
 extern const Bitmap * ShotGlassAnimation_GetFirst(void);
+extern const Bitmap * ShotGlassAnimation_GetLast(void);
 extern const Bitmap * ShotGlassAnimation_GetNext(void);
 
 

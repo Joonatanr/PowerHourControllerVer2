@@ -40,7 +40,7 @@ typedef enum
 Private void incrementTimer(void);
 Private void convertTimerString(timekeeper_struct * t, char * dest_str);
 
-Private void drawBeerShot(void);
+Private void drawBeerShot(Boolean isFull);
 Private void clearBeerShot(void);
 Private void enterSpecialTask(void);
 
@@ -129,7 +129,11 @@ Public void clockDisplay_cyclic1000msec(void)
         else if((priv_timekeeper.sec <= 50u) && (priv_timekeeper.sec > 10u))
         {
             //Basically we increment the animation.
-            drawBeerShot();
+            drawBeerShot(FALSE);
+        }
+        else if(priv_timekeeper.sec == 51u)
+        {
+            drawBeerShot(TRUE);
         }
 
         if (priv_timekeeper.sec == 20u)
@@ -179,10 +183,19 @@ Private void convertTimerString(timekeeper_struct * t, char * dest_str)
     dest_str[5] = 0;
 }
 
-Private void drawBeerShot(void)
+Private void drawBeerShot(Boolean isFull)
 {
    //display_drawBitmap(&beershot_bmp, BEERSHOT_X, BEERSHOT_Y);
-   const Bitmap * bmp_ptr = ShotGlassAnimation_GetNext();
+   const Bitmap * bmp_ptr;
+
+   if(isFull)
+   {
+       bmp_ptr = ShotGlassAnimation_GetLast();
+   }
+   else
+   {
+       bmp_ptr = ShotGlassAnimation_GetNext();
+   }
    display_drawBitmap(bmp_ptr, BEERSHOT_X, BEERSHOT_Y);
 }
 
@@ -202,7 +215,7 @@ Private void enterSpecialTask(void)
     display_clear();
     //TODO : Replace this with actual task, good enough for testing.
     display_drawBitmap(&test_girl_bitmap, 0u, 0u);
-    display_drawString("Naised paljaks!", 64, 4, FONT_SMALL_FONT);
+    display_drawString("Naised paljaks!", 50, 4, FONT_LARGE_FONT);
 }
 
 Private void drawTimer(void)

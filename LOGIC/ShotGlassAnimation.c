@@ -276,6 +276,12 @@ Public const Bitmap * ShotGlassAnimation_GetFirst(void)
     return priv_animation_bmps[priv_animation_index];
 }
 
+Public const Bitmap * ShotGlassAnimation_GetLast(void)
+{
+    priv_animation_index = NUMBER_OF_ANIMATION_FRAMES - 1u;
+    return priv_animation_bmps[priv_animation_index];
+}
+
 Public const Bitmap * ShotGlassAnimation_GetNext(void)
 {
     priv_animation_index++;
