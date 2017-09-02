@@ -15,6 +15,7 @@
 extern const Bitmap * ShotGlassAnimation_GetFirst(void);
 extern const Bitmap * ShotGlassAnimation_GetLast(void);
 extern const Bitmap * ShotGlassAnimation_GetNext(void);
+extern const Bitmap * ShotGlassAnimation_GetPrev(void);
 
 
 #endif /* LOGIC_SHOTGLASSANIMATION_H_ */

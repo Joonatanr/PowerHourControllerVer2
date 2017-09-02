@@ -53,4 +53,6 @@ typedef enum { FALSE, TRUE } Boolean;
 #define Private static
 #define Public
 
+#define NUMBER_OF_ITEMS(arr) (sizeof((arr)) / sizeof((arr)[0]))
+
 #endif /* TYPEDEFS_H_ */

@@ -16,6 +16,19 @@
 #define SPECIAL_TASK_FREQUENCY 4u //TODO : This is not finished yet, current implementation is a placeholder.
 #define SPECIAL_TASK_LENGTH 15u //in seconds.
 
+//Text box definitions.
+#define UPPER_TEXT_XLOC 2u
+#define UPPER_TEXT_YLOC 0u
+#define UPPER_TEXT_HEIGHT 12u
+#define UPPER_TEXT_WIDTH 50u
+#define UPPER_TEXT_FONT FONT_LARGE_FONT
+
+#define LOWER_TEXT_XLOC 2u
+#define LOWER_TEXT_YLOC 50u
+#define LOWER_TEXT_HEIGHT 12u
+#define LOWER_TEXT_WIDTH 50u
+#define LOWER_TEXT_FONT FONT_LARGE_FONT
+
 /*****************************************************************************************************
  *
  * Private type definitions
@@ -30,6 +43,46 @@ typedef enum
     CONTROLLER_NUMBER_OF_STATES
 } controllerState;
 
+typedef enum
+{
+    BEERSHOT_NO_ACTION,         //No action with bitmap.
+    BEERSHOT_EMPTY,             //Draw initial beershot bitmap.
+    BEERSHOT_BEGIN_FILLING,     //Initiate filling animation.
+    BEERSHOT_FULL,              //Draw full beershot.
+    BEERSHOT_BEGIN_EMPTYING,    //Initiate emptying animation.
+} beerShotAction;
+
+typedef enum
+{
+    BEERSHOT_FROZEN,    //Nothing currently to draw.
+    BEERSHOT_FILLING,
+    BEERSHOT_EMPTYING
+} beershotState;
+
+typedef struct
+{
+    U8 second;                  // When the event should be triggered.
+    const char * upperText;     // Text to be written to upper part of display.
+    const char * lowerText;     // Text to be written to lower part of display.
+    beerShotAction shot_action;   // Action to be performed on bitmap.
+} ControllerEvent;
+
+Private const ControllerEvent priv_normal_minute_events[] =
+{
+     { .second = 7u,  .upperText = "",              .lowerText = "",        .shot_action = BEERSHOT_EMPTY            },
+     { .second = 20u, .upperText = "Fill shots",    .lowerText = NULL,      .shot_action = BEERSHOT_BEGIN_FILLING    },
+     { .second = 45u, .upperText = "Ready",         .lowerText = NULL,      .shot_action = BEERSHOT_FULL             },
+     { .second = 59u, .upperText = "Proosit!",      .lowerText = "Cheers!", .shot_action = BEERSHOT_BEGIN_EMPTYING   },
+};
+
+Private const ControllerEvent priv_initial_event =
+{
+ .second = 1u,
+ .upperText = "Begin!",
+ .lowerText = NULL,
+ .shot_action = BEERSHOT_EMPTY
+};
+
 
 /*****************************************************************************************************
  *
@@ -40,7 +93,7 @@ typedef enum
 Private void incrementTimer(void);
 Private void convertTimerString(timekeeper_struct * t, char * dest_str);
 
-Private void drawBeerShot(Boolean isFull);
+Private void drawBeerShot(beerShotAction action);
 Private void clearBeerShot(void);
 Private void enterSpecialTask(void);
 
@@ -56,6 +109,9 @@ Private void clearUpperText(void);
 Private void clearLowerText(void);
 
 Private void drawTimer(void);
+
+Private beershotState priv_beer_state;
+
 
 #define CLOCK_FONT FONT_NUMBERS_HUGE
 //Private U8 priv_timer_yloc;
@@ -90,7 +146,10 @@ Public void clockDisplay_start(void)
 
 Public void clockDisplay_cyclic1000msec(void)
 {
-    static Boolean isFirst = TRUE; //TODO : This is placeholder, must improve.
+    U8 ix;
+    const ControllerEvent * event_ptr = NULL;
+    beerShotAction action = BEERSHOT_NO_ACTION;
+    static Boolean isFirstRun = TRUE;
 
     switch(priv_timer_state)
     {
@@ -99,53 +158,43 @@ Public void clockDisplay_cyclic1000msec(void)
         break;
     case CONTROLLER_COUNTING:
         incrementTimer();
+
+        if (isFirstRun)
+        {
+            event_ptr = &priv_initial_event;
+            isFirstRun = FALSE;
+        }
+        else
+        {
+            for (ix = 0u; ix < NUMBER_OF_ITEMS(priv_normal_minute_events); ix++)
+            {
+                event_ptr = &priv_normal_minute_events[ix];
+                if (event_ptr->second == priv_timekeeper.sec)
+                {
+                    break;
+                }
+                event_ptr = NULL;
+            }
+        }
+
+        if (event_ptr != NULL)
+        {
+           if (event_ptr->upperText != NULL)
+           {
+               setUpperText(event_ptr->upperText);
+           }
+
+           if (event_ptr->lowerText != NULL)
+           {
+               setLowerText(event_ptr->lowerText);
+           }
+
+           action = event_ptr->shot_action;
+        }
+
+        drawBeerShot(action);
+
         convertTimerString(&priv_timekeeper, priv_timer_str);
-
-        if(isFirst)
-        {
-            isFirst = FALSE;
-            clearBeerShot();
-        }
-
-        if ((priv_timekeeper.sec == 0u) && (priv_timekeeper.min > 0))
-        {
-            if ((priv_timekeeper.min % SPECIAL_TASK_FREQUENCY) == 0u)
-            {
-                //We do special task.
-                enterSpecialTask();
-                break;
-            }
-            else
-            {
-                //TODO : Insert beep here.
-            }
-        }
-        else if(priv_timekeeper.sec == 10u)
-        {
-            clearBeerShot();
-            //setUpperText("PROOSIT! TEST");
-            //setLowerText("Viinaminut TEST");
-        }
-        else if((priv_timekeeper.sec <= 50u) && (priv_timekeeper.sec > 10u))
-        {
-            //Basically we increment the animation.
-            drawBeerShot(FALSE);
-        }
-        else if(priv_timekeeper.sec == 51u)
-        {
-            drawBeerShot(TRUE);
-        }
-
-        if (priv_timekeeper.sec == 20u)
-        {
-            setUpperText("Täitke pitsid!");
-        }
-
-        if (priv_timekeeper.sec == 58u)
-        {
-            setUpperText("Proosit!");
-        }
-
         drawTimer();
 
         break;
@@ -183,20 +232,60 @@ Private void convertTimerString(timekeeper_struct * t, char * dest_str)
     dest_str[5] = 0;
 }
 
-Private void drawBeerShot(Boolean isFull)
-{
-   //display_drawBitmap(&beershot_bmp, BEERSHOT_X, BEERSHOT_Y);
-   const Bitmap * bmp_ptr;
 
-   if(isFull)
+Private void drawBeerShot(beerShotAction action)
+{
+   const Bitmap * bmp_ptr = NULL;
+
+   switch(action)
    {
-       bmp_ptr = ShotGlassAnimation_GetLast();
+       case BEERSHOT_EMPTY:
+           bmp_ptr = ShotGlassAnimation_GetFirst();
+           priv_beer_state = BEERSHOT_FROZEN;
+           break;
+       case BEERSHOT_FULL:
+           bmp_ptr = ShotGlassAnimation_GetLast();
+           priv_beer_state = BEERSHOT_FROZEN;
+           break;
+       case BEERSHOT_BEGIN_FILLING:
+           bmp_ptr = ShotGlassAnimation_GetFirst();
+           priv_beer_state = BEERSHOT_FILLING;
+           break;
+       case BEERSHOT_BEGIN_EMPTYING:
+           bmp_ptr = ShotGlassAnimation_GetLast();
+           priv_beer_state = BEERSHOT_EMPTYING;
+           break;
+       case BEERSHOT_NO_ACTION:
+       default:
+           break;
    }
-   else
+
+   switch(priv_beer_state)
    {
-       bmp_ptr = ShotGlassAnimation_GetNext();
+       case(BEERSHOT_FROZEN):
+           //Nothing new to draw.
+           break;
+       case(BEERSHOT_EMPTYING):
+           if(bmp_ptr == NULL)
+           {
+               bmp_ptr = ShotGlassAnimation_GetPrev();
+           }
+           break;
+       case(BEERSHOT_FILLING):
+           if(bmp_ptr == NULL)
+           {
+               bmp_ptr = ShotGlassAnimation_GetNext();
+           }
+           break;
+       default:
+           break;
    }
-   display_drawBitmap(bmp_ptr, BEERSHOT_X, BEERSHOT_Y);
+
+   //If bmp_ptr is not NULL, then we have something to draw.
+   if (bmp_ptr != NULL)
+   {
+       display_drawBitmap(bmp_ptr, BEERSHOT_X, BEERSHOT_Y);
+   }
 }
 
 Private void clearBeerShot(void)
@@ -235,27 +324,28 @@ Private void drawTimer(void)
 }
 
 
+
 Private void setUpperText(const char * str)
 {
     clearUpperText();
-    display_drawString(str, 2u, 0u, FONT_LARGE_FONT);
+    display_drawString(str, UPPER_TEXT_XLOC, UPPER_TEXT_YLOC, UPPER_TEXT_FONT);
 }
 
 //TODO : Replace this area with defined points.
 Private void clearUpperText(void)
 {
-    display_fillRectangle(2u, 0u, 10u, 80u, PATTERN_WHITE);
+    display_fillRectangle(UPPER_TEXT_XLOC, UPPER_TEXT_YLOC, UPPER_TEXT_HEIGHT, UPPER_TEXT_WIDTH, PATTERN_WHITE);
 }
 
 Private void setLowerText(const char * str)
 {
     clearLowerText();
-    display_drawString(str, 2u, 50u, FONT_LARGE_FONT);
+    display_drawString(str, LOWER_TEXT_XLOC, LOWER_TEXT_YLOC, LOWER_TEXT_FONT);
 }
 
 Private void clearLowerText(void)
 {
-    display_fillRectangle(2u, 0u, 50u, 80u, PATTERN_WHITE);
+    display_fillRectangle(LOWER_TEXT_XLOC, LOWER_TEXT_YLOC, LOWER_TEXT_HEIGHT, LOWER_TEXT_WIDTH, PATTERN_WHITE);
 }
 
 
