@@ -37,10 +37,9 @@ void main(void)
     //Initialise logic layer.
     clockDisplay_init();
 
-    delay_msec(500);
+    delay_msec(250);
 
     //Start HW layer.
-    //Execute test sequence for testing the functionality of the LCD display.
     display_start();
 
     //Start LOGIC layer.

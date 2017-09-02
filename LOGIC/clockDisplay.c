@@ -13,21 +13,21 @@
 #define BEERSHOT_X 86
 #define BEERSHOT_Y 1
 
-#define SPECIAL_TASK_FREQUENCY 4u //TODO : This is not finished yet, current implementation is a placeholder.
+#define SPECIAL_TASK_FREQUENCY 2u //TODO : This is not finished yet, current implementation is a placeholder.
 #define SPECIAL_TASK_LENGTH 15u //in seconds.
 
 //Text box definitions.
 #define UPPER_TEXT_XLOC 2u
-#define UPPER_TEXT_YLOC 0u
-#define UPPER_TEXT_HEIGHT 12u
-#define UPPER_TEXT_WIDTH 50u
-#define UPPER_TEXT_FONT FONT_LARGE_FONT
+#define UPPER_TEXT_YLOC 2u
+#define UPPER_TEXT_HEIGHT 13u
+#define UPPER_TEXT_WIDTH 80u
+#define UPPER_TEXT_FONT FONT_MEDIUM_FONT
 
 #define LOWER_TEXT_XLOC 2u
-#define LOWER_TEXT_YLOC 50u
-#define LOWER_TEXT_HEIGHT 12u
-#define LOWER_TEXT_WIDTH 50u
-#define LOWER_TEXT_FONT FONT_LARGE_FONT
+#define LOWER_TEXT_YLOC 51u
+#define LOWER_TEXT_HEIGHT 13u
+#define LOWER_TEXT_WIDTH 80u
+#define LOWER_TEXT_FONT FONT_MEDIUM_FONT
 
 /*****************************************************************************************************
  *
@@ -39,7 +39,7 @@ typedef enum
 {
     CONTROLLER_INIT,
     CONTROLLER_COUNTING,
-    CONTROLLER_SPECIAL_TASK,
+    CONTROLLER_OVERRIDDEN,
     CONTROLLER_NUMBER_OF_STATES
 } controllerState;
 
@@ -50,6 +50,10 @@ typedef enum
     BEERSHOT_BEGIN_FILLING,     //Initiate filling animation.
     BEERSHOT_FULL,              //Draw full beershot.
     BEERSHOT_BEGIN_EMPTYING,    //Initiate emptying animation.
+
+    //TODO
+    OVERRIDE_FUNCTION,          //Overrides ordinary function, displays bitmap instead.
+    RESTORE_FUNCTION,           //Restore normal handling.
 } beerShotAction;
 
 typedef enum
@@ -59,29 +63,18 @@ typedef enum
     BEERSHOT_EMPTYING
 } beershotState;
 
+typedef Boolean (*OverrideFunc)(U8 sec); //Returns TRUE, if done with override.
+
 typedef struct
 {
-    U8 second;                  // When the event should be triggered.
-    const char * upperText;     // Text to be written to upper part of display.
-    const char * lowerText;     // Text to be written to lower part of display.
-    beerShotAction shot_action;   // Action to be performed on bitmap.
+    U8 second;                      // When the event should be triggered.
+    const char * upperText;         // Text to be written to upper part of display.
+    const char * lowerText;         // Text to be written to lower part of display.
+    beerShotAction shot_action;     // Action to be performed on bitmap.
+    OverrideFunc    func;           // Optional parameter - This function will override all behaviour, used for special actions.
 } ControllerEvent;
 
-Private const ControllerEvent priv_normal_minute_events[] =
-{
-     { .second = 7u,  .upperText = "",              .lowerText = "",        .shot_action = BEERSHOT_EMPTY            },
-     { .second = 20u, .upperText = "Fill shots",    .lowerText = NULL,      .shot_action = BEERSHOT_BEGIN_FILLING    },
-     { .second = 45u, .upperText = "Ready",         .lowerText = NULL,      .shot_action = BEERSHOT_FULL             },
-     { .second = 59u, .upperText = "Proosit!",      .lowerText = "Cheers!", .shot_action = BEERSHOT_BEGIN_EMPTYING   },
-};
 
-Private const ControllerEvent priv_initial_event =
-{
- .second = 1u,
- .upperText = "Begin!",
- .lowerText = NULL,
- .shot_action = BEERSHOT_EMPTY
-};
 
 
 /*****************************************************************************************************
@@ -94,12 +87,11 @@ Private void incrementTimer(void);
 Private void convertTimerString(timekeeper_struct * t, char * dest_str);
 
 Private void drawBeerShot(beerShotAction action);
-Private void clearBeerShot(void);
-Private void enterSpecialTask(void);
+Private Boolean girlsSpecialIntro(U8 sec);
+Private Boolean girlsSpecialTask(U8 sec);
 
 Private timekeeper_struct priv_timekeeper;
 Private controllerState priv_timer_state;
-Private U8 priv_special_task_counter;
 Private char priv_timer_str[10];
 
 Private void setUpperText(const char * str);
@@ -110,13 +102,49 @@ Private void clearLowerText(void);
 
 Private void drawTimer(void);
 
-Private beershotState priv_beer_state;
 
+/*****************************************************************************************************
+ *
+ * Private variable declarations.
+ *
+ *****************************************************************************************************/
+
+Private const ControllerEvent priv_initial_event =
+{
+ .second = 1u,
+ .upperText = "Begin!",
+ .lowerText = NULL,
+ .shot_action = BEERSHOT_EMPTY
+};
+
+
+Private const ControllerEvent priv_normal_minute_events[] =
+{
+     { .second = 7u,  .upperText = "",              .lowerText = "",        .shot_action = BEERSHOT_EMPTY            , .func = NULL },
+     { .second = 20u, .upperText = "Fill shots",    .lowerText = NULL,      .shot_action = BEERSHOT_BEGIN_FILLING    , .func = NULL },
+     { .second = 45u, .upperText = "Ready",         .lowerText = NULL,      .shot_action = BEERSHOT_FULL             , .func = NULL },
+     { .second = 59u, .upperText = "Proosit!",      .lowerText = "Cheers!", .shot_action = BEERSHOT_BEGIN_EMPTYING   , .func = NULL },
+};
+
+Private const ControllerEvent priv_guys_drink_events[] =
+{
+
+};
+
+Private const ControllerEvent priv_girls_drink_events[] =
+{
+     { .second = 7u,  .upperText = "",              .lowerText = "",                    .shot_action = OVERRIDE_FUNCTION         , .func = &girlsSpecialIntro   },
+     { .second = 20u, .upperText = "Fill shots",    .lowerText = "Girls round",         .shot_action = BEERSHOT_BEGIN_FILLING    , .func = NULL },
+     { .second = 45u, .upperText = "Ready",         .lowerText = NULL,                  .shot_action = BEERSHOT_FULL             , .func = NULL },
+     { .second = 59u, .upperText = "Proosit!",      .lowerText = "Cheers girls!",       .shot_action = OVERRIDE_FUNCTION         , .func = &girlsSpecialTask    },
+};
+
+
+Private beershotState priv_beer_state;
+Private Rectangle priv_timer_rect;
+Private OverrideFunc priv_override_ptr;
 
 #define CLOCK_FONT FONT_NUMBERS_HUGE
-//Private U8 priv_timer_yloc;
-//Private const U8 priv_timer_xloc = 1u;
-Private Rectangle priv_timer_rect;
 
 Public void clockDisplay_init(void)
 {
@@ -144,12 +172,34 @@ Public void clockDisplay_start(void)
     priv_timer_state = CONTROLLER_COUNTING;
 }
 
+Private U8 priv_override_counter;
+
 Public void clockDisplay_cyclic1000msec(void)
 {
     U8 ix;
     const ControllerEvent * event_ptr = NULL;
     beerShotAction action = BEERSHOT_NO_ACTION;
     static Boolean isFirstRun = TRUE;
+
+    static const ControllerEvent * controllerEvents_ptr = priv_normal_minute_events;
+    static U8 controllerEvents_cnt = NUMBER_OF_ITEMS(priv_normal_minute_events);
+
+
+    if (priv_timekeeper.sec == 0u)
+    {
+        //We decide what kind of minute we are having.
+        if (((priv_timekeeper.min % SPECIAL_TASK_FREQUENCY) == 0u) && priv_timekeeper.min > 0)
+        {
+            controllerEvents_ptr = priv_girls_drink_events;
+            controllerEvents_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events);
+        }
+        else
+        {
+            controllerEvents_ptr = priv_normal_minute_events;
+            controllerEvents_cnt = NUMBER_OF_ITEMS(priv_normal_minute_events);
+        }
+    }
+
 
     switch(priv_timer_state)
     {
@@ -158,7 +208,6 @@ Public void clockDisplay_cyclic1000msec(void)
         break;
     case CONTROLLER_COUNTING:
         incrementTimer();
-
         if (isFirstRun)
         {
             event_ptr = &priv_initial_event;
@@ -166,9 +215,9 @@ Public void clockDisplay_cyclic1000msec(void)
         }
         else
         {
-            for (ix = 0u; ix < NUMBER_OF_ITEMS(priv_normal_minute_events); ix++)
+            for (ix = 0u; ix < controllerEvents_cnt; ix++)
             {
-                event_ptr = &priv_normal_minute_events[ix];
+                event_ptr = &controllerEvents_ptr[ix];
                 if (event_ptr->second == priv_timekeeper.sec)
                 {
                     break;
@@ -192,21 +241,31 @@ Public void clockDisplay_cyclic1000msec(void)
            action = event_ptr->shot_action;
         }
 
+        //Currently we still finish this cycle and special handling begins on the next.
+        if (action == OVERRIDE_FUNCTION)
+        {
+            priv_timer_state = CONTROLLER_OVERRIDDEN;
+            priv_override_ptr = event_ptr->func;
+            priv_override_counter = 0u;
+        }
+
         drawBeerShot(action);
 
-        convertTimerString(&priv_timekeeper, priv_timer_str);
         drawTimer();
 
         break;
-    case CONTROLLER_SPECIAL_TASK:
+    case CONTROLLER_OVERRIDDEN:
         //We still increment timer.
         incrementTimer();
-        if (++priv_special_task_counter > SPECIAL_TASK_LENGTH)
+
+        if (priv_override_ptr(priv_override_counter))
         {
-            //We return to normal state.
             display_clear();
+            drawTimer();
+            drawBeerShot(BEERSHOT_EMPTY);
             priv_timer_state = CONTROLLER_COUNTING;
         }
+        priv_override_counter++;
         break;
     }
 }
@@ -288,28 +347,57 @@ Private void drawBeerShot(beerShotAction action)
    }
 }
 
-Private void clearBeerShot(void)
-{
-    display_fillRectangle(BEERSHOT_X, BEERSHOT_Y, 63u, 43u, PATTERN_WHITE);
-    const Bitmap * bmp_ptr = ShotGlassAnimation_GetFirst();
-    display_drawBitmap(bmp_ptr, BEERSHOT_X, BEERSHOT_Y);
-}
 
 //We start displaying a special task.
-Private void enterSpecialTask(void)
+Private Boolean girlsSpecialIntro(U8 sec)
 {
-    priv_timer_state = CONTROLLER_SPECIAL_TASK;
-    priv_special_task_counter = 0u;
+    Boolean res = FALSE;
 
-    display_clear();
-    //TODO : Replace this with actual task, good enough for testing.
-    display_drawBitmap(&test_girl_bitmap, 0u, 0u);
-    display_drawString("Naised paljaks!", 50, 4, FONT_LARGE_FONT);
+    switch(sec)
+    {
+    case(1u):
+        display_clear();
+        display_drawBitmap(&test_girl_bitmap, 0u, 0u);
+        break;
+    case(2u):
+        display_drawString("Girls Round!", 50, 4, FONT_MEDIUM_FONT);
+        break;
+    case(10u):
+        res = TRUE;
+    break;
+    default:
+        break;
+    }
+
+    return res;
 }
+
+Private Boolean girlsSpecialTask(U8 sec)
+{
+    Boolean res = FALSE;
+
+    switch(sec)
+    {
+    case(1u):
+       display_clear();
+       display_drawString("Girls Drink\n          2x", 10u, 20u, FONT_LARGE_FONT);
+       break;
+    case(10u):
+       res = TRUE;
+       break;
+    default:
+        break;
+    }
+
+    return res;
+}
+
 
 Private void drawTimer(void)
 {
     //Currently for testing.
+    convertTimerString(&priv_timekeeper, priv_timer_str);
+
     //TODO : This is quite inefficient, should change it to a better solution.
     display_fillRectangle(priv_timer_rect.location.x,
                           priv_timer_rect.location.y,
