@@ -17,6 +17,7 @@ Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
 
 Private void timer_1sec(void);
+Private void showStartScreen(void);
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
@@ -41,6 +42,11 @@ void main(void)
 
     //Start HW layer.
     display_start();
+
+    //We show the initial start screen for a while.
+    showStartScreen();
+    delay_msec(5000);
+    display_clear();
 
     //Start LOGIC layer.
     clockDisplay_start();
@@ -143,6 +149,13 @@ Private void timer_lo_prio(void)
     // Make sure this is called at the very end, so that all logic
     // tasks can write to the display without problems.
     display_cyclic_50msec();
+}
+
+
+Private void showStartScreen(void)
+{
+    display_clear();
+    display_drawString("Power Hour \n Machine 2.0", 10u, 20u, FONT_LARGE_FONT);
 }
 
 

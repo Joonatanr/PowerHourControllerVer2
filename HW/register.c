@@ -178,10 +178,6 @@ Private void timerA_init(void)
 
     //Enable this interrupt in NVIC.
     Interrupt_setPriority(INT_TA0_0, 254u); //TODO : Definately should review this.
-
-    //Set offset, so that interrupts will not
-    TA0CCR0 = 2500u;
-
     Interrupt_enableInterrupt(INT_TA0_0);
 
 
