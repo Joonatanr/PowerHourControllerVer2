@@ -11,6 +11,41 @@
 
 #include "bitmaps.h"
 
+const U8 small_shotBitmaps[] =
+{
+    // ##################
+    // ##################
+    // ##################
+    // ####          ####
+    // ####          ####
+    // ####          ####
+    // ####          ####
+    //  ###          ###
+    //  ###          ###
+    //  ###          ###
+    //  ###          ###
+    //  ###          ###
+    //  ####        ####
+    //   ###############
+    //   ##############
+    //   ##############
+    //   ###        ###
+    //   ###        ###
+    //   ###        ###
+    //   ####       ###
+    //   ####      ####
+    //    #############
+    //    ############
+    //    ############
+    0x7F, 0xFF, 0xFF, 0xFF, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0xFF, 0xFF, 0xFF, 0x7F,
+    0x00, 0x1F, 0xFF, 0xFF, 0xF0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xF0, 0xFF, 0xFF, 0x3F, 0x00,
+    0x00, 0x00, 0x1F, 0xFF, 0xFF, 0xF8, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xF0, 0xFF, 0xFF, 0x3F, 0x00, 0x00,
+};
+
+/* Bitmap sizes for small_shot */
+#define small_shotWidthPixels 18
+#define small_shotHeightPixels 24
+
 const U8 palm_treeBitmaps[] =
 {
     //                #####
@@ -298,6 +333,13 @@ const U8 strongdudeBitmaps[] =
 /* Bitmap sizes for strongdude */
 #define strongdudeWidthPixels 96
 #define strongdudeHeightPixels 64
+
+Public const Bitmap small_shot_bitmap =
+{
+ .height = small_shotHeightPixels,
+ .width = small_shotWidthPixels,
+ .bmp_data = small_shotBitmaps,
+};
 
 Public const Bitmap strong_dude_bitmap =
 {

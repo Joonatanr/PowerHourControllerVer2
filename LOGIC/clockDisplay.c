@@ -163,8 +163,8 @@ Private const ControllerEvent priv_girls_drink_events[] =
 //TODO : Review this and add more tasks.
 Private const SchedulerTask priv_scheduler[] =
 {
- {.frequency = 8u, .offset = 8u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
- {.frequency = 8u, .offset = 4u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
+ {.frequency = 4u, .offset = 4u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
+ {.frequency = 4u, .offset = 2u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
 };
 
 
@@ -484,6 +484,10 @@ Private Boolean guysSpecialIntro(U8 sec)
     return res;
 }
 
+#define SMALL_SHOT_X 20u
+#define SMALL_SHOT_Y 32u
+#define SMALL_SHOT_INTERVAL 20u
+
 //TODO : This is still a placeholder.
 Private Boolean guysSpecialTask(U8 sec)
 {
@@ -493,7 +497,13 @@ Private Boolean guysSpecialTask(U8 sec)
     {
     case(1u):
        display_clear();
-       display_drawString("Guys Drink\n          2x", 10u, 20u, FONT_LARGE_FONT);
+       display_drawString("Guys Drink\n           2x", 10u, 2u, FONT_LARGE_FONT);
+       break;
+    case (2u):
+       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X, SMALL_SHOT_Y);
+       break;
+    case (3u):
+       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X + SMALL_SHOT_INTERVAL, SMALL_SHOT_Y);
        break;
     case(10u):
        res = TRUE;
@@ -538,7 +548,13 @@ Private Boolean girlsSpecialTask(U8 sec)
     {
     case(1u):
        display_clear();
-       display_drawString("Girls Drink\n          2x", 10u, 20u, FONT_LARGE_FONT);
+       display_drawString("Girls Drink\n           2x", 10u, 2u, FONT_LARGE_FONT);
+       break;
+    case (2u):
+       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X, SMALL_SHOT_Y);
+       break;
+    case (3u):
+       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X + SMALL_SHOT_INTERVAL, SMALL_SHOT_Y);
        break;
     case(10u):
        res = TRUE;
