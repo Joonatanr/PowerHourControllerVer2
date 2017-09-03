@@ -155,7 +155,8 @@ Private void timer_lo_prio(void)
 Private void showStartScreen(void)
 {
     display_clear();
-    display_drawString("Power Hour \n Machine 2.0", 10u, 20u, FONT_LARGE_FONT);
+    display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT);
+    display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT);
 }
 
 

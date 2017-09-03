@@ -42,6 +42,8 @@ Private void write_data(U8 data);
 Private void display_reset(void);
 Private void display_empty(void);
 
+Private U16 getStringWidth(const char * str, FontType font);
+
 
 /*****************************************************************************************************
  *
@@ -184,6 +186,28 @@ Public void display_cyclic_50msec(void)
             }
         }
     }
+}
+
+//Draws string around the centerPoint.
+Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font)
+{
+    U16 str_width; //String width in bits.
+    U8 begin_point;
+
+    str_width = getStringWidth(str, font);
+    str_width = str_width >> 1u; //Divide with 2.
+
+    if (str_width > centerPoint)
+    {
+        //String is too large to fit to display anyway.
+        begin_point = 0u;
+    }
+    else
+    {
+        begin_point = centerPoint - str_width;
+    }
+
+    display_drawString(str, begin_point, yloc, font);
 }
 
 
@@ -501,6 +525,28 @@ Private void display_empty(void)
             write_data(0xffu);
         }
     }
+}
+
+
+//TODO : Should take line breaks into account somehow.
+Private U16 getStringWidth(const char * str, FontType font)
+{
+    const char *ps = str;
+    U8 width = 0u;
+
+    while(*ps)
+    {
+        if (*ps == '\n')
+        {
+            break;
+        }
+
+        width += font_getCharWidth(*ps, font);
+        width++; //Account for one bit in between chars.
+        ps++;
+    }
+
+    return width;
 }
 
 

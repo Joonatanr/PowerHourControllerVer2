@@ -6042,3 +6042,21 @@ Public void font_getFontChar(char asc, Bitmap * dest)
         dest->bmp_data = font_info_ptr->bitmap_array + offset;
     }
 }
+
+Public U8 font_getCharWidth(char asc, FontType font)
+{
+    const FONT_INFO * font_info_ptr = priv_fonts[font];
+    const FONT_CHAR_INFO * font_descriptor_ptr;
+    char c;
+    U8 res = 0u;
+
+    if ((asc >= font_info_ptr->start_character) && (asc <= font_info_ptr->end_character))
+    {
+        c = asc - font_info_ptr->start_character;
+        font_descriptor_ptr = font_info_ptr->descriptor_array;
+
+        res = font_descriptor_ptr[c].width_bits;
+    }
+
+    return res;
+}
