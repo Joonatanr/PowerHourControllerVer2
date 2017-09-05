@@ -46,6 +46,7 @@ extern void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font
 extern void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font);
 extern void display_fillRectangle(U16 x, U16 y, U16 height, U16 width, FillPatternType patternType);
 extern void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y);
+extern void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y);
 
 Public void display_clear(void);
 

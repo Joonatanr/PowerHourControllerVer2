@@ -9,12 +9,11 @@
 #include "clockDisplay.h"
 #include "display_drv.h"
 #include "ShotGlassAnimation.h"
+#include "SpecialTasks.h"
 
 #define BEERSHOT_X 86
 #define BEERSHOT_Y 1
 
-#define SPECIAL_TASK_FREQUENCY 2u //TODO : This is not finished yet, current implementation is a placeholder.
-#define SPECIAL_TASK_LENGTH 15u //in seconds.
 
 //Text box definitions.
 #define UPPER_TEXT_XLOC 2u
@@ -66,7 +65,7 @@ typedef enum
     BEERSHOT_EMPTYING
 } beershotState;
 
-typedef Boolean (*OverrideFunc)(U8 sec); //Returns TRUE, if done with override.
+
 
 typedef struct
 {
@@ -95,20 +94,14 @@ typedef struct
 
 Private void incrementTimer(void);
 Private void convertTimerString(timekeeper_struct * t, char * dest_str);
-
 Private void drawBeerShot(beerShotAction action);
-
 Private Boolean girlsSpecialIntro(U8 sec);
-Private Boolean girlsSpecialTask(U8 sec);
-
 Private Boolean guysSpecialIntro(U8 sec);
-Private Boolean guysSpecialTask(U8 sec);
 
 Private void doFinalAction(void);
 
 Private timekeeper_struct priv_timekeeper;
 Private controllerState priv_timer_state;
-
 
 Private U8 getScheduledSpecialTask(const ControllerEvent ** event_ptr);
 Private void setUpperText(const char * str);
@@ -163,8 +156,8 @@ Private const ControllerEvent priv_girls_drink_events[] =
 //TODO : Review this and add more tasks.
 Private const SchedulerTask priv_scheduler[] =
 {
- {.frequency = 4u, .offset = 4u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
- {.frequency = 4u, .offset = 2u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
+ {.frequency = 6u, .offset = 6u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
+ {.frequency = 6u, .offset = 3u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
 };
 
 
@@ -456,11 +449,9 @@ Private void clearLowerText(void)
 
 /*****************************************************************************************************
  *
- * Special task function definitions.
+ * Intro functions.
  *
  *****************************************************************************************************/
-//TODO : Might want to move this into a separate file?
-
 Private Boolean guysSpecialIntro(U8 sec)
 {
     Boolean res = FALSE;
@@ -484,36 +475,6 @@ Private Boolean guysSpecialIntro(U8 sec)
     return res;
 }
 
-#define SMALL_SHOT_X 20u
-#define SMALL_SHOT_Y 32u
-#define SMALL_SHOT_INTERVAL 20u
-
-//TODO : This is still a placeholder.
-Private Boolean guysSpecialTask(U8 sec)
-{
-    Boolean res = FALSE;
-
-    switch(sec)
-    {
-    case(1u):
-       display_clear();
-       display_drawString("Guys Drink\n           2x", 10u, 2u, FONT_LARGE_FONT);
-       break;
-    case (2u):
-       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X, SMALL_SHOT_Y);
-       break;
-    case (3u):
-       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X + SMALL_SHOT_INTERVAL, SMALL_SHOT_Y);
-       break;
-    case(10u):
-       res = TRUE;
-       break;
-    default:
-        break;
-    }
-
-    return res;
-}
 
 //We start displaying a special task.
 Private Boolean girlsSpecialIntro(U8 sec)
@@ -539,29 +500,4 @@ Private Boolean girlsSpecialIntro(U8 sec)
     return res;
 }
 
-//TODO : This is still a placeholder.
-Private Boolean girlsSpecialTask(U8 sec)
-{
-    Boolean res = FALSE;
 
-    switch(sec)
-    {
-    case(1u):
-       display_clear();
-       display_drawString("Girls Drink\n           2x", 10u, 2u, FONT_LARGE_FONT);
-       break;
-    case (2u):
-       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X, SMALL_SHOT_Y);
-       break;
-    case (3u):
-       display_drawBitmap(&small_shot_bitmap, SMALL_SHOT_X + SMALL_SHOT_INTERVAL, SMALL_SHOT_Y);
-       break;
-    case(10u):
-       res = TRUE;
-       break;
-    default:
-        break;
-    }
-
-    return res;
-}

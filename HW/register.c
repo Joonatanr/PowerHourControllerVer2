@@ -177,11 +177,9 @@ Private void timerA_init(void)
     Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
 
     //Enable this interrupt in NVIC.
-    Interrupt_setPriority(INT_TA0_0, 254u); //TODO : Definately should review this.
+    Interrupt_setPriority(INT_TA0_0, 254u);
     Interrupt_enableInterrupt(INT_TA0_0);
 
-
-    //TODO : Set up timer for low priority interrupts.
     Timer_A_configureUpMode(TIMER_A1_BASE, &lo_prio_timer_config);
     Timer_A_registerInterrupt(TIMER_A1_BASE, TIMER_A_CCR0_INTERRUPT, TA1_0_IRQHandler);
     Timer_A_startCounter(TIMER_A1_BASE, TIMER_A_UP_MODE);

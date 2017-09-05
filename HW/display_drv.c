@@ -193,21 +193,23 @@ Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, 
 {
     U16 str_width; //String width in bits.
     U8 begin_point;
-
-    str_width = getStringWidth(str, font);
-    str_width = str_width >> 1u; //Divide with 2.
-
-    if (str_width > centerPoint)
+    if(str != NULL)
     {
-        //String is too large to fit to display anyway.
-        begin_point = 0u;
-    }
-    else
-    {
-        begin_point = centerPoint - str_width;
-    }
+        str_width = getStringWidth(str, font);
+        str_width = str_width >> 1u; //Divide with 2.
 
-    display_drawString(str, begin_point, yloc, font);
+        if (str_width > centerPoint)
+        {
+            //String is too large to fit to display anyway.
+            begin_point = 0u;
+        }
+        else
+        {
+            begin_point = centerPoint - str_width;
+        }
+
+        display_drawString(str, begin_point, yloc, font);
+    }
 }
 
 
@@ -218,30 +220,32 @@ Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font
     U8 y = yloc;
     Size char_size;
 
-    font_setFont(font);
-    char_size.height = font_getFontHeight(font);
-
-    while (*ps)
+    if(str != NULL)
     {
-        if (*ps == '\n')
+        font_setFont(font);
+        char_size.height = font_getFontHeight(font);
+
+        while (*ps)
         {
-            x = xloc;
-            y += char_size.height;
+            if (*ps == '\n')
+            {
+                x = xloc;
+                y += char_size.height;
+            }
+            else
+            {
+                display_drawChar(*ps, x, y, &char_size);
+                x += char_size.width;
+                //Draw a blank line in between the characters.
+                display_fillRectangle(x, y, char_size.height, 1u, PATTERN_WHITE);
+                x += 1u;
+            }
+            ps++;
         }
-        else
-        {
-            display_drawChar(*ps, x, y, &char_size);
-            x += char_size.width; //TODO : Make it possible to change spaces between characters.
-            //Draw a blank line in between the characters.
-            display_fillRectangle(x, y, char_size.height, 1u, PATTERN_WHITE);
-            x += 1u;
-        }
-        ps++;
     }
 }
 
-//Returns width of character, this must be changed later to more complex handling.
-//TODO
+
 Public void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize)
 {
     Bitmap myBitMap;
@@ -251,6 +255,33 @@ Public void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize)
 
     destSize->height = myBitMap.height;
     destSize->width = myBitMap.width;
+}
+
+
+Public void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y)
+{
+    Size mySize;
+    Point myPoint;
+    U8 halfWidth;
+
+    mySize.height = bmp->height;
+    mySize.width = bmp->width;
+    myPoint.y = y;
+
+    if (bmp != NULL)
+    {
+        halfWidth = bmp->width >> 1u;
+        if (halfWidth <= centerPoint)
+        {
+            myPoint.x = centerPoint - halfWidth;
+        }
+        else
+        {
+            myPoint.x = 0u;
+        }
+
+        drawImage(&myPoint, &mySize, bmp);
+    }
 }
 
 

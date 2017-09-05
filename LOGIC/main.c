@@ -81,7 +81,7 @@ Private void timer_hi_prio(void)
 
 }
 
-//TODO : Might need to remove this.
+//Called from low priority context.
 Private void timer_1sec(void)
 {
     static U8 led_state = 0x00u;
