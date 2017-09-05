@@ -84,6 +84,18 @@ typedef struct
     U8 event_cnt;
 } SchedulerTask;
 
+//Just an idea.
+typedef struct
+{
+    const Bitmap * bmp_ptr;
+    U8 bmp_x;
+    U8 bmp_y;
+
+    const char * text_str;
+    U8 text_x;
+    U8 text_y;
+    FontType text_font;
+} IntroSequence;
 
 
 /*****************************************************************************************************
@@ -156,8 +168,8 @@ Private const ControllerEvent priv_girls_drink_events[] =
 //TODO : Review this and add more tasks.
 Private const SchedulerTask priv_scheduler[] =
 {
- {.frequency = 6u, .offset = 6u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
- {.frequency = 6u, .offset = 3u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
+ {.frequency = 4u, .offset = 4u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
+ {.frequency = 4u, .offset = 2u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
 };
 
 
@@ -452,18 +464,37 @@ Private void clearLowerText(void)
  * Intro functions.
  *
  *****************************************************************************************************/
+Private const IntroSequence priv_guys_intros[] =
+{
+ {.bmp_ptr = &strong_dude_bitmap, .bmp_x = 0u, .bmp_y = 0u, .text_str = "Guys Round!", .text_x = 58u, .text_y = 4u, .text_font = FONT_MEDIUM_FONT },
+ {.bmp_ptr = &chad_bitmap,        .bmp_x = 0u, .bmp_y = 0u, .text_str = "Guys Round!", .text_x = 50u, .text_y = 4u, .text_font = FONT_MEDIUM_FONT },
+};
+
 Private Boolean guysSpecialIntro(U8 sec)
 {
     Boolean res = FALSE;
+
+    static const IntroSequence * intro_ptr = &priv_guys_intros[0];
+    static U8 intro_ix;
 
     switch(sec)
     {
     case(1u):
         display_clear();
-        display_drawBitmap(&strong_dude_bitmap, 0u, 0u);
+
+        intro_ptr = &priv_guys_intros[intro_ix];
+        intro_ix++;
+        if (intro_ix >= NUMBER_OF_ITEMS(priv_guys_intros))
+        {
+            intro_ix = 0u;
+        }
+
+        //display_drawBitmap(&strong_dude_bitmap, 0u, 0u);
+        display_drawBitmap(intro_ptr->bmp_ptr, intro_ptr->bmp_x, intro_ptr->bmp_y);
         break;
     case(2u):
-        display_drawString("Guys Round!", 58u, 4, FONT_MEDIUM_FONT);
+        display_drawString(intro_ptr->text_str, intro_ptr->text_x, intro_ptr->text_y, intro_ptr->text_font);
+        //display_drawString("Guys Round!", 58u, 4, FONT_MEDIUM_FONT);
         break;
     case(10u):
         res = TRUE;
@@ -476,19 +507,38 @@ Private Boolean guysSpecialIntro(U8 sec)
 }
 
 
+
+//TODO : This is unfinished for now. It is just an idea on how to create more abstraction to intro sequences.
+Private const IntroSequence priv_girl_intros[] =
+{
+     {.bmp_ptr = &girl_1_bitmap, .bmp_x = 0u, .bmp_y = 0u, .text_str = "Girls round!", .text_x = 50u, .text_y = 4u, .text_font = FONT_MEDIUM_FONT },
+     {.bmp_ptr = &girl_2_bitmap, .bmp_x = 6u, .bmp_y = 0u, .text_str = "Girls round!", .text_x = 50u, .text_y = 4u, .text_font = FONT_MEDIUM_FONT },
+};
+
 //We start displaying a special task.
 Private Boolean girlsSpecialIntro(U8 sec)
 {
     Boolean res = FALSE;
+    static const IntroSequence * intro_ptr = &priv_girl_intros[0];
+    static U8 intro_ix;
 
     switch(sec)
     {
     case(1u):
         display_clear();
-        display_drawBitmap(&test_girl_bitmap, 0u, 0u);
+        intro_ptr = &priv_girl_intros[intro_ix];
+        intro_ix++;
+        if (intro_ix >= NUMBER_OF_ITEMS(priv_girl_intros))
+        {
+            intro_ix = 0u;
+        }
+
+        //display_drawBitmap(&test_girl_bitmap, 0u, 0u);
+        display_drawBitmap(intro_ptr->bmp_ptr, intro_ptr->bmp_x, intro_ptr->bmp_y);
         break;
     case(2u):
-        display_drawString("Girls Round!", 50, 4, FONT_MEDIUM_FONT);
+        //display_drawString("Girls Round!", 50, 4, FONT_MEDIUM_FONT);
+        display_drawString(intro_ptr->text_str, intro_ptr->text_x, intro_ptr->text_y, intro_ptr->text_font);
         break;
     case(10u):
         res = TRUE;

@@ -53,27 +53,27 @@ Private const SpecialTaskFunc priv_special_tasks_guys_array[] =
 Private char priv_str_buf[64];
 Private SpecialTaskFunc priv_selected_task_ptr;
 
-
+/* TODO : Generate more tasks. */
 Private const MultiString priv_specialTaskArrayGirls[] =
 {
-     {"The girl with ",     "the fanciest clothes"  , "drinks 2x"       },
-     {"The girl with  ",    "the largest boobs"     , "drinks 2x"       },
-     {NULL,                 "Only girls drink"      , NULL              },
-     {"Girls",              "I have never ever"     , NULL              },
-     {"The girl with ",     "the sexiest voice"     , "drinks 2x "      },
-     {"All girls lose" ,    "One Item of Clothing"  , NULL              },
-     {"Drink without",      "using your hands"      , NULL              },
+     {"The girl with ",     "the fanciest clothes"  , "drinks 2x"           },
+     {"The girl with  ",    "the largest boobs"     , "drinks 2x"           },
+     {NULL,                 "Only girls drink"      , NULL                  },
+     {"Girls",              "I have never ever"     , NULL                  },
+     {"The girl with ",     "the sexiest voice"     , "drinks 2x "          },
+     {"All girls lose" ,    "One Item of Clothing"  , NULL                  },
+     {"Girls drink",        "without "      ,         "using hands"         },
 };
 
 Private const MultiString priv_specialTaskArrayGuys[] =
 {
-     {  NULL                    , "Only guys drink",            NULL    },
-     {  "Drink without"         , "using your hands",           NULL    },
-     {  "The toughest guy"      , "drinks 3x",                  NULL    },
-     {  "The biggest playboy"   , "drinks 3x",                  NULL    },
-     {  "All guys lose"         , "One Item of Clothing",       NULL    },
-     {  "Guys"                  , "Never have I ever",          NULL    },
-     {  NULL                    , "Guys must sing",   "a song together" },
+     {  NULL                    , "Only guys drink",            NULL            },
+     {  "Guys drink"            , "without",                    "using hands"   },
+     {  "The toughest guy"      , "drinks 3x",                  NULL            },
+     {  "The biggest playboy"   , "drinks 3x",                  NULL            },
+     {  "All guys lose"         , "One Item of Clothing",       NULL            },
+     {  "Guys"                  , "Never have I ever",          NULL            },
+     {  NULL                    , "Guys must sing",         "a song together"   },
 };
 
 

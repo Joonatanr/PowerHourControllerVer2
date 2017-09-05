@@ -11,8 +11,12 @@ typedef struct
 } Bitmap;
 
 
-extern const Bitmap test_girl_bitmap;
+extern const Bitmap girl_1_bitmap;
+extern const Bitmap girl_2_bitmap;
+
 extern const Bitmap strong_dude_bitmap;
+extern const Bitmap chad_bitmap;
+
 extern const Bitmap test_palmtree_bmp;
 extern const Bitmap beershot_bmp;
 extern const Bitmap small_shot_bitmap;
