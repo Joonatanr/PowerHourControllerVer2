@@ -10,6 +10,7 @@
 #include "display_drv.h"
 #include "ShotGlassAnimation.h"
 #include "SpecialTasks.h"
+#include "buzzer.h"
 
 #define BEERSHOT_X 86
 #define BEERSHOT_Y 1
@@ -219,6 +220,13 @@ Public void clockDisplay_cyclic1000msec(void)
     if ((priv_timekeeper.sec == 0u) && (priv_timekeeper.min > 0u))
     {
         controllerEvents_cnt = getScheduledSpecialTask(&controllerEvents_ptr);
+    }
+
+    /* TODO : This should be changed to a better implementation. */
+    if (priv_timekeeper.sec == 59u)
+    {
+        //buzzer_playBuzzer(10u);
+        buzzer_playBeeps(3u);
     }
 
     //Game ends and we enter final state.

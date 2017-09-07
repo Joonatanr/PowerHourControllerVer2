@@ -9,6 +9,7 @@
 #include "display_drv.h"
 #include <driverlib.h>
 #include <spi_drv.h>
+#include "buzzer.h"
 
 //Hi priority timer runs at 10msec interval (might need to be faster)
 Private const Timer_A_UpModeConfig hi_prio_timer_config =
@@ -89,6 +90,9 @@ Public void register_init(void)
 
     //Initialise SPI for LCD display.
     spi_init();
+
+    //Initialise buzzer.
+    buzzer_init();
 
     //Not quite sure what this does yet.
     MAP_Interrupt_enableSleepOnIsrExit();

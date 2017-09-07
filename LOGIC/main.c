@@ -9,6 +9,7 @@
 #include "register.h"
 #include "comm.h"
 #include "display_drv.h"
+#include "buzzer.h"
 #include "parser.h"
 #include "clockDisplay.h"
 
@@ -144,6 +145,11 @@ Private void timer_lo_prio(void)
     {
         timer_sec_counter = 0;
         timer_1sec();
+    }
+
+    if (timer_sec_counter % 2u == 0u)
+    {
+        buzzer_Cyclic100msec();
     }
 
     // Make sure this is called at the very end, so that all logic
