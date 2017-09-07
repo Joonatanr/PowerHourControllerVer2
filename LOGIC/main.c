@@ -12,6 +12,7 @@
 #include "buzzer.h"
 #include "parser.h"
 #include "clockDisplay.h"
+#include "buttons.h"
 
 
 Private void timer_hi_prio(void);
@@ -19,6 +20,7 @@ Private void timer_lo_prio(void);
 
 Private void timer_1sec(void);
 Private void showStartScreen(void);
+Private void showStartDialog(void);
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
@@ -47,6 +49,10 @@ void main(void)
     //We show the initial start screen for a while.
     showStartScreen();
     delay_msec(5000);
+
+    showStartDialog();
+    while(!isRedButton());
+
     display_clear();
 
     //Start LOGIC layer.
@@ -62,24 +68,9 @@ Private void timer_hi_prio(void)
 {
     //All high priority tasks should be put in here.
     //This means hardware tasks, such as reading buttons, changing PWM etc.
-    if (isBtnOne())
-    {
-        set_led_two_blue(0x01u);
-    }
-    else
-    {
-        set_led_two_blue(0x00u);
-    }
-
-    if (isBtnTwo())
-    {
-        set_led_two_red(0x01u);
-    }
-    else
-    {
-        set_led_two_red(0x00u);
-    }
-
+    set_led_two_blue(isBlueButton());
+    set_led_two_red(isRedButton());
+    set_led_two_green(isGreenButton());
 }
 
 //Called from low priority context.
@@ -163,6 +154,14 @@ Private void showStartScreen(void)
     display_clear();
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT);
     display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT);
+}
+
+//TODO : This is a placeholder, should add proper start menu.
+Private void showStartDialog(void)
+{
+    display_clear();
+    display_drawStringCenter("Press red button", 64u, 16u, FONT_MEDIUM_FONT);
+    display_drawStringCenter("to begin", 64u, 32u, FONT_MEDIUM_FONT);
 }
 
 

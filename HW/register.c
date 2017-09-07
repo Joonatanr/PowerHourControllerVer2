@@ -10,6 +10,7 @@
 #include <driverlib.h>
 #include <spi_drv.h>
 #include "buzzer.h"
+#include "buttons.h"
 
 //Hi priority timer runs at 10msec interval (might need to be faster)
 Private const Timer_A_UpModeConfig hi_prio_timer_config =
@@ -93,6 +94,9 @@ Public void register_init(void)
 
     //Initialise buzzer.
     buzzer_init();
+
+    //Initialise buttons.
+    buttons_init();
 
     //Not quite sure what this does yet.
     MAP_Interrupt_enableSleepOnIsrExit();

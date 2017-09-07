@@ -169,8 +169,8 @@ Private const ControllerEvent priv_girls_drink_events[] =
 //TODO : Review this and add more tasks.
 Private const SchedulerTask priv_scheduler[] =
 {
- {.frequency = 4u, .offset = 4u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
- {.frequency = 4u, .offset = 2u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
+ {.frequency = 6u, .offset = 6u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
+ {.frequency = 6u, .offset = 3u, .event_array = priv_guys_drink_events,     .event_cnt = NUMBER_OF_ITEMS(priv_guys_drink_events)    },
 };
 
 
