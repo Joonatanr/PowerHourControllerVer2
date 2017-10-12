@@ -17,16 +17,9 @@
 #define BEEP_INTERVAL 3u /* 400msec */
 #define BEEP_LENGTH 2u   /* 200msec */
 
-/* Timer_A PWM Configuration Parameter */
-Private Timer_A_PWMConfig pwmConfig =
-{
-        TIMER_A_CLOCKSOURCE_SMCLK, //SMCLK has frequency of 12MHz
-        TIMER_A_CLOCKSOURCE_DIVIDER_16,
-        277,
-        TIMER_A_CAPTURECOMPARE_REGISTER_1,
-        TIMER_A_OUTPUTMODE_RESET_SET,
-        0  //Set to 139 for activating.
-};
+/* NOTE : Buzzer should be connected to the P2.3 port, because it can drive up to 20mA.
+ * Not sure about other ports, these might be limited to 6mA */
+
 
 Private int priv_buzzer_counter = -1;
 Private int priv_beep_counter = 0;
@@ -34,32 +27,20 @@ Private U8 priv_cycle_counter;
 
 Public void buzzer_init(void)
 {
-    /* Configuring GPIO2.4 as peripheral output for PWM  and P6.7 for button
-     * interrupt */
-    /*
-    MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN4,
-            GPIO_PRIMARY_MODULE_FUNCTION);
-    */
-    /* Configuring Timer_A to have a period of approximately 5ms and
-     * an initial duty cycle of 50% of that  */
-
-    MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P5, GPIO_PIN6,
-            GPIO_PRIMARY_MODULE_FUNCTION);
-
-    MAP_Timer_A_generatePWM(TIMER_A2_BASE, &pwmConfig);
+    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN3);
 }
+
 
 Public void buzzer_setBuzzer(Boolean state)
 {
-    if(state)
+    if (state)
     {
-        pwmConfig.dutyCycle = 139;
+        GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN3);
     }
     else
     {
-        pwmConfig.dutyCycle = 0;
+        GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN3);
     }
-    MAP_Timer_A_generatePWM(TIMER_A2_BASE, &pwmConfig);
 }
 
 

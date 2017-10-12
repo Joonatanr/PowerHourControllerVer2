@@ -11,6 +11,7 @@
 #include <spi_drv.h>
 #include "buzzer.h"
 #include "buttons.h"
+#include "backlight.h"
 
 //Hi priority timer runs at 10msec interval (might need to be faster)
 Private const Timer_A_UpModeConfig hi_prio_timer_config =
@@ -97,6 +98,9 @@ Public void register_init(void)
 
     //Initialise buttons.
     buttons_init();
+
+    //Initialise display backlight.
+    backlight_init();
 
     //Not quite sure what this does yet.
     MAP_Interrupt_enableSleepOnIsrExit();
@@ -309,8 +313,11 @@ Public void set_cs_pin(U8 state)
     }
 }
 
+//This does not currently do anything.
+/* TODO : Remove this eventually. */
 Public void set_disp_reset_pin(U8 state)
 {
+    /*
     if (state)
     {
         GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN5);
@@ -319,7 +326,9 @@ Public void set_disp_reset_pin(U8 state)
     {
         GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN5);
     }
+    */
 }
+
 
 Public U8 isBtnOne(void)
 {

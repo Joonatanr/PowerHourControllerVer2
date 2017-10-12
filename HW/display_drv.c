@@ -535,6 +535,7 @@ Private inline void set_column(U8 column)
 
 Private void display_reset(void)
 {
+    //This does not do anything currently.
     set_disp_reset_pin(0u);
     delay_msec(100);
     set_disp_reset_pin(1u);

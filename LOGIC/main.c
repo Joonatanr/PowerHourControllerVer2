@@ -13,6 +13,7 @@
 #include "parser.h"
 #include "clockDisplay.h"
 #include "buttons.h"
+#include "backlight.h"
 
 
 Private void timer_hi_prio(void);
@@ -37,6 +38,9 @@ void main(void)
 
     //Initialise HW layer.
     register_init();
+
+    //Set backlight to 100 percent.
+    backlight_set_level(100);
 
     //Initialise logic layer.
     clockDisplay_init();
