@@ -23,7 +23,7 @@
 
 Private int priv_buzzer_counter = -1;
 Private int priv_beep_counter = 0;
-Private U8 priv_cycle_counter;
+Private U16 priv_cycle_counter;
 
 Public void buzzer_init(void)
 {

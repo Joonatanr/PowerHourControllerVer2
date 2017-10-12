@@ -15,6 +15,7 @@ typedef struct
 {
     buttonFunction state_func;      //Used to get the state of the button.
     buttonListener listener_func;   //Can be subscribed to.
+    Boolean button_hold;
     Boolean pressed;
 
 } ButtonContainer;
@@ -23,10 +24,10 @@ typedef struct
 /* TODO : Maybe it would be better to have an interrupt driven solution?? */
 Private ButtonContainer priv_button_config [NUMBER_OF_BUTTONS] =
 {
- { .state_func = isRedButton,    .listener_func = NULL, .pressed = FALSE },    /* RED_BUTTON       */
- { .state_func = isGreenButton,  .listener_func = NULL, .pressed = FALSE },    /* GREEN_BUTTON     */
- { .state_func = isBlackButton,  .listener_func = NULL, .pressed = FALSE },    /* BLACK_BUTTON     */
- { .state_func = isBlueButton,   .listener_func = NULL, .pressed = FALSE },    /* BLUE_BUTTON      */
+ { .state_func = isRedButton,    .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* RED_BUTTON       */
+ { .state_func = isGreenButton,  .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* GREEN_BUTTON     */
+ { .state_func = isBlackButton,  .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* BLACK_BUTTON     */
+ { .state_func = isBlueButton,   .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* BLUE_BUTTON      */
 };
 
 
@@ -52,15 +53,16 @@ Public void buttons_cyclic10msec(void)
 
         if (state)
         {
-            priv_button_config[ix].pressed = TRUE;
+            priv_button_config[ix].button_hold = TRUE;
         }
-        else if (priv_button_config[ix].pressed == TRUE)
+        else if (priv_button_config[ix].button_hold == TRUE)
         {
-            priv_button_config[ix].pressed = FALSE;
-            if (priv_button_config[ix].listener_func != NULL)
-            {
-                priv_button_config[ix].listener_func();
-            }
+            priv_button_config[ix].button_hold = FALSE;
+            priv_button_config[ix].pressed = TRUE;
+            //if (priv_button_config[ix].listener_func != NULL)
+            //{
+            //    priv_button_config[ix].listener_func();
+            //}
         }
         else
         {
@@ -69,7 +71,25 @@ Public void buttons_cyclic10msec(void)
     }
 }
 
-//Listener functions should be short functions that use flags.
+
+//Low priority task.
+Public void buttons_cyclic100msec(void)
+{
+    U8 ix;
+    for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
+    {
+        if (priv_button_config[ix].pressed)
+        {
+            priv_button_config[ix].pressed = FALSE;
+            if (priv_button_config[ix].listener_func != NULL)
+            {
+                priv_button_config[ix].listener_func();
+            }
+        }
+    }
+}
+
+//Note that the listeners are called from lo prio context.
 //This function subscribes a listener function to a button.
 Public void buttons_subscribeListener(ButtonType btn, buttonListener listener)
 {

@@ -39,8 +39,6 @@ Private U8 timer_sec_counter = 0u;
 Private U8 priv_uart_buffer[UART_BUF_LEN];
 
 //Button flags.
-Private Boolean isRedButtonPressed = FALSE;
-Private Boolean isBlueButtonPressed = FALSE;
 Private Boolean isGreenButtonPressed = FALSE;
 
 /** Start Menu Items.*/
@@ -74,7 +72,8 @@ void main(void)
     register_init();
 
     //Set backlight to 100 percent.
-    backlight_set_level(100);
+    //backlight_set_level(100);
+    backlight_set_level(60);
 
     //Initialise logic layer.
     clockDisplay_init();
@@ -187,6 +186,7 @@ Private void timer_lo_prio(void)
     if (timer_sec_counter % 2u == 0u)
     {
         buzzer_Cyclic100msec();
+        buttons_cyclic100msec();
     }
 
     // Make sure this is called at the very end, so that all logic
@@ -217,19 +217,19 @@ Private void showStartScreen(void)
 #endif
 }
 
-Private void redButtonListener(void)
-{
-    isRedButtonPressed = TRUE;
-}
-
 Private void greenButtonListener(void)
 {
     isGreenButtonPressed = TRUE;
 }
 
+Private void redButtonListener(void)
+{
+    menu_MoveCursor(&StartMenu, TRUE);
+}
+
 Private void blueButtonListener(void)
 {
-    isBlueButtonPressed = TRUE;
+    menu_MoveCursor(&StartMenu, FALSE);
 }
 
 
@@ -258,17 +258,6 @@ Private Boolean handleMenu(void)
         res = TRUE;
     }
 
-    if (isRedButtonPressed)
-    {
-        isRedButtonPressed = FALSE;
-        menu_MoveCursor(&StartMenu, TRUE);
-    }
-
-    if (isBlueButtonPressed)
-    {
-        isBlueButtonPressed = FALSE;
-        menu_MoveCursor(&StartMenu, FALSE);
-    }
 
     return res;
 }

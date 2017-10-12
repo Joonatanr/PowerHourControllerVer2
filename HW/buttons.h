@@ -24,6 +24,7 @@ typedef enum
 
 extern void buttons_init(void);
 extern void buttons_cyclic10msec(void);
+extern void buttons_cyclic100msec(void);
 extern void buttons_subscribeListener(ButtonType btn, buttonListener listener);
 
 extern Boolean isRedButton(void);
