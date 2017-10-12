@@ -313,8 +313,8 @@ Public void clockDisplay_cyclic1000msec(void)
 Private void doFinalAction(void)
 {
     display_clear();
-    display_drawString("Game Over!", 20u, 15u, FONT_LARGE_FONT);
-    display_drawString("  Congratulations! \n You are now drunk", 5u, 37u, FONT_MEDIUM_FONT);
+    display_drawString("Game Over!", 20u, 15u, FONT_LARGE_FONT, FALSE);
+    display_drawString("  Congratulations! \n You are now drunk", 5u, 37u, FONT_MEDIUM_FONT, FALSE);
 }
 
 
@@ -391,7 +391,7 @@ Private void drawBeerShot(beerShotAction action)
    //If bmp_ptr is not NULL, then we have something to draw.
    if (bmp_ptr != NULL)
    {
-       display_drawBitmap(bmp_ptr, BEERSHOT_X, BEERSHOT_Y);
+       display_drawBitmap(bmp_ptr, BEERSHOT_X, BEERSHOT_Y, FALSE);
    }
 }
 
@@ -438,7 +438,8 @@ Private void drawTimer(void)
     display_drawString(priv_timer_str,
                        priv_timer_rect.location.x,
                        priv_timer_rect.location.y,
-                       CLOCK_FONT);
+                       CLOCK_FONT,
+                       FALSE);
 }
 
 
@@ -446,7 +447,7 @@ Private void drawTimer(void)
 Private void setUpperText(const char * str)
 {
     clearUpperText();
-    display_drawString(str, UPPER_TEXT_XLOC, UPPER_TEXT_YLOC, UPPER_TEXT_FONT);
+    display_drawString(str, UPPER_TEXT_XLOC, UPPER_TEXT_YLOC, UPPER_TEXT_FONT, FALSE);
 }
 
 //TODO : Replace this area with defined points.
@@ -458,7 +459,7 @@ Private void clearUpperText(void)
 Private void setLowerText(const char * str)
 {
     clearLowerText();
-    display_drawString(str, LOWER_TEXT_XLOC, LOWER_TEXT_YLOC, LOWER_TEXT_FONT);
+    display_drawString(str, LOWER_TEXT_XLOC, LOWER_TEXT_YLOC, LOWER_TEXT_FONT, FALSE);
 }
 
 Private void clearLowerText(void)
@@ -498,10 +499,10 @@ Private Boolean guysSpecialIntro(U8 sec)
         }
 
         //display_drawBitmap(&strong_dude_bitmap, 0u, 0u);
-        display_drawBitmap(intro_ptr->bmp_ptr, intro_ptr->bmp_x, intro_ptr->bmp_y);
+        display_drawBitmap(intro_ptr->bmp_ptr, intro_ptr->bmp_x, intro_ptr->bmp_y, FALSE);
         break;
     case(2u):
-        display_drawString(intro_ptr->text_str, intro_ptr->text_x, intro_ptr->text_y, intro_ptr->text_font);
+        display_drawString(intro_ptr->text_str, intro_ptr->text_x, intro_ptr->text_y, intro_ptr->text_font, FALSE);
         //display_drawString("Guys Round!", 58u, 4, FONT_MEDIUM_FONT);
         break;
     case(10u):
@@ -542,11 +543,11 @@ Private Boolean girlsSpecialIntro(U8 sec)
         }
 
         //display_drawBitmap(&test_girl_bitmap, 0u, 0u);
-        display_drawBitmap(intro_ptr->bmp_ptr, intro_ptr->bmp_x, intro_ptr->bmp_y);
+        display_drawBitmap(intro_ptr->bmp_ptr, intro_ptr->bmp_x, intro_ptr->bmp_y, FALSE);
         break;
     case(2u):
         //display_drawString("Girls Round!", 50, 4, FONT_MEDIUM_FONT);
-        display_drawString(intro_ptr->text_str, intro_ptr->text_x, intro_ptr->text_y, intro_ptr->text_font);
+        display_drawString(intro_ptr->text_str, intro_ptr->text_x, intro_ptr->text_y, intro_ptr->text_font, FALSE);
         break;
     case(10u):
         res = TRUE;

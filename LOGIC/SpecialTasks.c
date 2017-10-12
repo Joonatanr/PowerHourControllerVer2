@@ -137,14 +137,14 @@ Private Boolean DrinkTwiceTask(U8 sec, SpecialTaskType type)
        }
 
        strcat(priv_str_buf, " drink");
-       display_drawStringCenter(priv_str_buf, 64u, 2u, FONT_LARGE_FONT);
-       display_drawStringCenter("2x", 64u ,20u, FONT_LARGE_FONT);
+       display_drawStringCenter(priv_str_buf, 64u, 2u, FONT_LARGE_FONT, FALSE);
+       display_drawStringCenter("2x", 64u ,20u, FONT_LARGE_FONT, FALSE);
        break;
     case (2u):
-       display_drawBitmapCenter(&small_shot_bitmap, 64 - SMALL_SHOT_INTERVAL, SMALL_SHOT_Y);
+       display_drawBitmapCenter(&small_shot_bitmap, 64 - SMALL_SHOT_INTERVAL, SMALL_SHOT_Y, FALSE);
        break;
     case (3u):
-        display_drawBitmapCenter(&small_shot_bitmap, 64 + SMALL_SHOT_INTERVAL, SMALL_SHOT_Y);
+        display_drawBitmapCenter(&small_shot_bitmap, 64 + SMALL_SHOT_INTERVAL, SMALL_SHOT_Y, FALSE);
        break;
     case(10u):
        res = TRUE;
@@ -192,13 +192,13 @@ Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
        break;
     case (2u):
          display_clear();
-         display_drawStringCenter(priv_task_str_ptr->upper_text, 64u, 4u, FONT_MEDIUM_FONT);
+         display_drawStringCenter(priv_task_str_ptr->upper_text, 64u, 4u, FONT_MEDIUM_FONT, FALSE);
        break;
     case (3u):
-         display_drawStringCenter(priv_task_str_ptr->middle_text, 64u, 23u, FONT_MEDIUM_FONT);
+         display_drawStringCenter(priv_task_str_ptr->middle_text, 64u, 23u, FONT_MEDIUM_FONT, FALSE);
        break;
     case(4u):
-         display_drawStringCenter(priv_task_str_ptr->lower_text, 64u, 43u, FONT_MEDIUM_FONT);
+         display_drawStringCenter(priv_task_str_ptr->lower_text, 64u, 43u, FONT_MEDIUM_FONT, FALSE);
        break;
     case(12u):
        res = TRUE;

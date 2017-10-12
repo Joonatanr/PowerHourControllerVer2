@@ -10,12 +10,25 @@
 
 #include "typedefs.h"
 
+typedef void (*buttonListener)(void);
+
+typedef enum
+{
+    RED_BUTTON,
+    GREEN_BUTTON,
+    BLACK_BUTTON,
+    BLUE_BUTTON,
+
+    NUMBER_OF_BUTTONS
+} ButtonType;
 
 extern void buttons_init(void);
+extern void buttons_cyclic10msec(void);
+extern void buttons_subscribeListener(ButtonType btn, buttonListener listener);
 
-extern U8 isRedButton(void);
-extern U8 isBlueButton(void);
-extern U8 isGreenButton(void);
-extern U8 isBlackButton(void);
+extern Boolean isRedButton(void);
+extern Boolean isBlueButton(void);
+extern Boolean isGreenButton(void);
+extern Boolean isBlackButton(void);
 
 #endif /* HW_BUTTONS_H_ */

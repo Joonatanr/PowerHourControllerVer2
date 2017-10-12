@@ -41,12 +41,12 @@ extern void display_init(void);
 extern void display_start(void);
 extern void display_cyclic_50msec(void);
 
-extern void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize);
-extern void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font);
-extern void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font);
+extern void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize, Boolean isInverted);
+extern void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font, Boolean isInverted);
+extern void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font, Boolean isInverted);
 extern void display_fillRectangle(U16 x, U16 y, U16 height, U16 width, FillPatternType patternType);
-extern void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y);
-extern void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y);
+extern void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y, Boolean isInverted);
+extern void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y, Boolean isInverted);
 
 Public void display_clear(void);
 

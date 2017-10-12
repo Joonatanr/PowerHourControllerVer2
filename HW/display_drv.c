@@ -33,7 +33,7 @@ typedef struct
  *
  *****************************************************************************************************/
 
-Private void drawImage(Point * p, Size * s, const Bitmap * bmp);
+Private void drawImage(Point * p, Size * s, const Bitmap * bmp, Boolean isInverted);
 Private void drawPattern(Point * p, Size * s, const FillPattern * patternType);
 Private void disp_command(U8 cmd, Boolean reg_select);
 Private void set_page_address(U8 page);
@@ -135,21 +135,14 @@ Public void display_start(void)
     disp_command(0xA4u, FALSE);
 
     //TODO : Probably should remove this delay from here.
-    delay_msec(500);
+    delay_msec(200);
 
     display_clear();
-    //display_drawBitmap(&test_palmtree_bmp, 0,0);
-    //display_drawBitmap(&test_girl_bitmap, 0,0);
-    //delay_msec(2000);
-    //display_drawString("Hello World! \n Yolotron", 10u, ROW_3, FONT_LARGE_FONT);
-    //display_drawString("Yoloswag", 1u, ROW_5, FONT_SMALL_FONT);
-    //display_drawChar('H',24u, ROW_3);
 
     isDisplayReady = TRUE;
 }
 
 
-/* TODO : Implement this. */
 Public void display_cyclic_50msec(void)
 {
     //Redraw display.
@@ -189,7 +182,7 @@ Public void display_cyclic_50msec(void)
 }
 
 //Draws string around the centerPoint.
-Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font)
+Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font, Boolean isInverted)
 {
     U16 str_width; //String width in bits.
     U8 begin_point;
@@ -208,12 +201,12 @@ Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, 
             begin_point = centerPoint - str_width;
         }
 
-        display_drawString(str, begin_point, yloc, font);
+        display_drawString(str, begin_point, yloc, font, isInverted);
     }
 }
 
 
-Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font)
+Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font, Boolean isInverted)
 {
     const char * ps = str;
     U8 x = xloc;
@@ -234,10 +227,17 @@ Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font
             }
             else
             {
-                display_drawChar(*ps, x, y, &char_size);
+                display_drawChar(*ps, x, y, &char_size, isInverted);
                 x += char_size.width;
                 //Draw a blank line in between the characters.
-                display_fillRectangle(x, y, char_size.height, 1u, PATTERN_WHITE);
+                if(isInverted)
+                {
+                    display_fillRectangle(x, y, char_size.height, 1u, PATTERN_BLACK);
+                }
+                else
+                {
+                    display_fillRectangle(x, y, char_size.height, 1u, PATTERN_WHITE);
+                }
                 x += 1u;
             }
             ps++;
@@ -246,19 +246,19 @@ Public void display_drawString(const char * str, U8 xloc, U8 yloc, FontType font
 }
 
 
-Public void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize)
+Public void display_drawChar(char c, U8 xloc, U8 yloc, Size * destSize, Boolean isInverted)
 {
     Bitmap myBitMap;
 
     font_getFontChar(c, &myBitMap);
-    display_drawBitmap(&myBitMap, xloc, yloc);
+    display_drawBitmap(&myBitMap, xloc, yloc, isInverted);
 
     destSize->height = myBitMap.height;
     destSize->width = myBitMap.width;
 }
 
 
-Public void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y)
+Public void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y, Boolean isInverted)
 {
     Size mySize;
     Point myPoint;
@@ -280,12 +280,12 @@ Public void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y)
             myPoint.x = 0u;
         }
 
-        drawImage(&myPoint, &mySize, bmp);
+        drawImage(&myPoint, &mySize, bmp, isInverted);
     }
 }
 
 
-Public void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y)
+Public void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y, Boolean isInverted)
 {
     Size mySize;
     Point myPoint;
@@ -297,7 +297,7 @@ Public void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y)
 
     if (bmp != NULL)
     {
-        drawImage(&myPoint, &mySize, bmp);
+        drawImage(&myPoint, &mySize, bmp, isInverted);
     }
 }
 
@@ -415,7 +415,7 @@ Private void drawPattern(Point * p, Size * s, const FillPattern * pattern_ptr)
 
 
 //Draw an image in a rectangular area.
-Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
+Private void drawImage(Point * p, Size * s, const Bitmap * bmp, Boolean isInverted)
 {
     U8 curr_page, bottom_page, top_page;
     U8 column, right_column, bottom_row;
@@ -423,7 +423,6 @@ Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
 
     U8 left_segment, right_segment, ix;
 
-    //TODO : Might need to check if patternType is in range.
     const U8 * data;
     U8 value;
 
@@ -463,9 +462,9 @@ Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
 
             if (curr_page == bottom_page)
             {
+                //We do not need to mask, if the bitmap is out of bounds.
                 if (bottom_row < NUMBER_OF_ROWS)
                 {
-                    //We do not need to mask, if the bitmap is out of bounds.
                     mask &= (0xffu >> (7u - (bottom_row % 8u)));
                 }
             }
@@ -474,22 +473,22 @@ Private void drawImage(Point * p, Size * s, const Bitmap * bmp)
             {
                 //We are drawing a bitmap.
                 //We need to extract the value to be written to the display.
-                value = (*data) << y_offset;
+                value = (isInverted ? (~(*data)) : (*data)) << y_offset;
 
                 if(curr_page == top_page)
                 {
-                    priv_split_buffer[column] = 0x00u; //TODO : Must get rid of this split buffer somehow.
+                   priv_split_buffer[column] = 0x00u; //TODO : Must get rid of this split buffer somehow.
                 }
                 else
                 {
                     value |= priv_split_buffer[column]; //Should contain the top bits for the bitmap image. If it is top page, then these bits are ignored anyway.
                 }
+
                 if (y_offset > 0)
                 {
-                    priv_split_buffer[column] = (*data) >> (8u - y_offset);
+                    priv_split_buffer[column] = (isInverted ? (U8)(~((U8)*data)) : (*data)) >> (8u - y_offset);
                 }
 
-                //priv_display_buffer[column][curr_page] |= (mask & value);
                 priv_display_buffer[column][curr_page] &= (~mask);
                 priv_display_buffer[column][curr_page] |= (mask & value);
                 data++;

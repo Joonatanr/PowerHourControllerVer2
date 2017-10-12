@@ -14,8 +14,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define BEEP_INTERVAL 3u /* 400msec */
-#define BEEP_LENGTH 2u   /* 200msec */
+#define BEEP_INTERVAL 5u /* 400msec */
+#define BEEP_LENGTH 3u   /* 200msec */
 
 /* NOTE : Buzzer should be connected to the P2.3 port, because it can drive up to 20mA.
  * Not sure about other ports, these might be limited to 6mA */
@@ -28,6 +28,7 @@ Private U8 priv_cycle_counter;
 Public void buzzer_init(void)
 {
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN3);
+    buzzer_setBuzzer(FALSE);
 }
 
 
@@ -60,10 +61,6 @@ Public void buzzer_playBeeps(U8 beeps)
 Public void buzzer_Cyclic100msec(void)
 {
     priv_cycle_counter++;
-    if (priv_cycle_counter >= 10u)
-    {
-        priv_cycle_counter = 0u;
-    }
 
     if (priv_beep_counter > 0)
     {

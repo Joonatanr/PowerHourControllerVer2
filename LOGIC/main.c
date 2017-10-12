@@ -14,6 +14,9 @@
 #include "clockDisplay.h"
 #include "buttons.h"
 #include "backlight.h"
+#include "menu.h"
+
+//#define DEBUG_SEQUENCE
 
 
 Private void timer_hi_prio(void);
@@ -21,7 +24,12 @@ Private void timer_lo_prio(void);
 
 Private void timer_1sec(void);
 Private void showStartScreen(void);
+
 Private void showStartDialog(void);
+//TODO : This currently returns only TRUE or FALSE, but once the menu is actually working, will change it.
+Private Boolean handleMenu(void);
+
+Private void redButtonListener(void);
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
@@ -30,7 +38,33 @@ Public TimerHandler timer_50msec_callback = timer_lo_prio;
 Private U8 timer_sec_counter = 0u;
 Private U8 priv_uart_buffer[UART_BUF_LEN];
 
-//volatile Boolean myTestFlag = FALSE;
+//Button flags.
+Private Boolean isRedButtonPressed = FALSE;
+Private Boolean isBlueButtonPressed = FALSE;
+Private Boolean isGreenButtonPressed = FALSE;
+
+/** Start Menu Items.*/
+
+Private MenuItem StartIcon =    { .text = "Start Game", .txt_len = 10u  };
+Private MenuItem SettingsIcon = { .text = "Settings",   .txt_len = 8u   };
+Private MenuItem ExitIcon   =   { .text = "Exit",       .txt_len = 4u   };
+
+Private const MenuItem * StartMenuItemArray[] =
+{
+     &StartIcon,
+     &SettingsIcon,
+     &ExitIcon
+};
+
+Private SelectionMenu StartMenu =
+{
+ .items = StartMenuItemArray,
+ .number_of_items = NUMBER_OF_ITEMS(StartMenuItemArray),
+ .selected_item = 0u,
+};
+
+/** End of Start Menu Items. */
+
 
 void main(void)
 {
@@ -55,7 +89,13 @@ void main(void)
     delay_msec(5000);
 
     showStartDialog();
-    while(!isRedButton());
+
+    //buttons_subscribeListener(RED_BUTTON, redButtonListener);
+    //while(!isRedButton());
+    //while(!isRedButtonPressed);
+
+    //Will be stuck in menu until button is pressed.
+    while (handleMenu() == FALSE);
 
     display_clear();
 
@@ -75,6 +115,8 @@ Private void timer_hi_prio(void)
     set_led_two_blue(isBlueButton());
     set_led_two_red(isRedButton());
     set_led_two_green(isGreenButton());
+
+    buttons_cyclic10msec();
 }
 
 //Called from low priority context.
@@ -156,16 +198,79 @@ Private void timer_lo_prio(void)
 Private void showStartScreen(void)
 {
     display_clear();
-    display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT);
-    display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT);
+#ifdef DEBUG_SEQUENCE
+    //display_drawBitmap(&girl_1_bitmap, 2, 2, FALSE);
+    //display_fillRectangle(0, 0, 40, 128, PATTERN_BLACK);
+    //display_drawStringCenter("Power Hour", 64u, 6u, FONT_LARGE_FONT, TRUE);
+    //display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT, TRUE);
+/*
+    display_fillRectangle(20, 20, 40, 40, PATTERN_BLACK);
+    display_fillRectangle(24, 24, 30, 30, PATTERN_WHITE);
+    display_fillRectangle(30, 30, 20, 20, PATTERN_BLACK);
+    display_fillRectangle(34, 34, 10, 10, PATTERN_WHITE);
+*/
+    menu_drawMenu(&testMenu);
+    delay_msec(10000);
+#else
+    display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);
+    display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT, FALSE);
+#endif
 }
+
+Private void redButtonListener(void)
+{
+    isRedButtonPressed = TRUE;
+}
+
+Private void greenButtonListener(void)
+{
+    isGreenButtonPressed = TRUE;
+}
+
+Private void blueButtonListener(void)
+{
+    isBlueButtonPressed = TRUE;
+}
+
 
 //TODO : This is a placeholder, should add proper start menu.
 Private void showStartDialog(void)
 {
     display_clear();
-    display_drawStringCenter("Press red button", 64u, 16u, FONT_MEDIUM_FONT);
-    display_drawStringCenter("to begin", 64u, 32u, FONT_MEDIUM_FONT);
+    menu_drawMenu(&StartMenu);
+
+    //Subscribe to buttons.
+    buttons_subscribeListener(RED_BUTTON, redButtonListener);
+    buttons_subscribeListener(GREEN_BUTTON, greenButtonListener);
+    buttons_subscribeListener(BLUE_BUTTON, blueButtonListener);
+
+    //display_drawStringCenter("Press red button", 64u, 16u, FONT_MEDIUM_FONT, FALSE);
+    //display_drawStringCenter("to begin", 64u, 32u, FONT_MEDIUM_FONT, FALSE);
+}
+
+Private Boolean handleMenu(void)
+{
+    Boolean res = FALSE;
+
+    if (isGreenButtonPressed)
+    {
+       isGreenButtonPressed = FALSE;
+        res = TRUE;
+    }
+
+    if (isRedButtonPressed)
+    {
+        isRedButtonPressed = FALSE;
+        menu_MoveCursor(&StartMenu, TRUE);
+    }
+
+    if (isBlueButtonPressed)
+    {
+        isBlueButtonPressed = FALSE;
+        menu_MoveCursor(&StartMenu, FALSE);
+    }
+
+    return res;
 }
 
 
