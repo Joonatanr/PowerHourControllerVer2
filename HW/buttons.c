@@ -102,6 +102,19 @@ Public void buttons_subscribeListener(ButtonType btn, buttonListener listener)
     Interrupt_enableMaster();
 }
 
+
+Public void buttons_unsubscribeAll(void)
+{
+    U8 ix;
+
+    Interrupt_disableMaster();
+    for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
+    {
+        priv_button_config[ix].listener_func = NULL;
+    }
+    Interrupt_enableMaster();
+}
+
 Public Boolean isRedButton(void)
 {
     return ((GPIO_getInputPinValue(GPIO_PORT_P4, GPIO_PIN7) == 1u) ? FALSE : TRUE);

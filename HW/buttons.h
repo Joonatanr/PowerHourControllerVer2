@@ -26,6 +26,7 @@ extern void buttons_init(void);
 extern void buttons_cyclic10msec(void);
 extern void buttons_cyclic100msec(void);
 extern void buttons_subscribeListener(ButtonType btn, buttonListener listener);
+extern void buttons_unsubscribeAll(void);
 
 extern Boolean isRedButton(void);
 extern Boolean isBlueButton(void);

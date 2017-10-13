@@ -96,6 +96,9 @@ void main(void)
     //Will be stuck in menu until button is pressed.
     while (handleMenu() == FALSE);
 
+    //Remove handlers from buttons.
+    buttons_unsubscribeAll();
+
     display_clear();
 
     //Start LOGIC layer.
@@ -257,7 +260,6 @@ Private Boolean handleMenu(void)
        isGreenButtonPressed = FALSE;
         res = TRUE;
     }
-
 
     return res;
 }
