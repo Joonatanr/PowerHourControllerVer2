@@ -18,19 +18,13 @@
 
 //#define DEBUG_SEQUENCE
 
-
 Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
 
 Private void timer_1sec(void);
 Private void showStartScreen(void);
 
-
-//TODO : This currently returns only TRUE or FALSE, but once the menu is actually working, will change it.
-Private Boolean handleMenu(void);
 Private void startGameHandler(void);
-
-
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
@@ -39,8 +33,6 @@ Public TimerHandler timer_50msec_callback = timer_lo_prio;
 Private U8 timer_sec_counter = 0u;
 Private U8 priv_uart_buffer[UART_BUF_LEN];
 
-//Button flags.
-Private Boolean isGreenButtonPressed = FALSE;
 
 /** Start Menu Items.*/
 
@@ -88,26 +80,8 @@ void main(void)
     showStartScreen();
     delay_msec(5000);
 
-    //showStartDialog();
-
-    //buttons_subscribeListener(RED_BUTTON, redButtonListener);
-    //while(!isRedButton());
-    //while(!isRedButtonPressed);
-
+    /* We pass control over to the menu handler. */
     menu_enterMenu(&StartMenu);
-
-    /* TODO : This is still a placeholder. */
-    //Will be stuck in menu until button is pressed.
-    while (handleMenu() == FALSE);
-
-    //Remove handlers from buttons.
-    menu_exitMenu();
-
-
-    display_clear();
-
-    //Start LOGIC layer.
-    clockDisplay_start();
 
     //Currently this function never returns.
     register_enable_low_powermode();
@@ -225,23 +199,11 @@ Private void showStartScreen(void)
 #endif
 }
 
+/* Starts the main Power Hour game. */
 Private void startGameHandler(void)
 {
-    isGreenButtonPressed = TRUE;
+    display_clear();
+
+    clockDisplay_start();
 }
-
-/* This is a placeholder. TODO : Make proper implementation of start menu. */
-Private Boolean handleMenu(void)
-{
-    Boolean res = FALSE;
-
-    if (isGreenButtonPressed)
-    {
-       isGreenButtonPressed = FALSE;
-        res = TRUE;
-    }
-
-    return res;
-}
-
 
