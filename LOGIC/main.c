@@ -25,11 +25,12 @@ Private void timer_lo_prio(void);
 Private void timer_1sec(void);
 Private void showStartScreen(void);
 
-Private void showStartDialog(void);
+
 //TODO : This currently returns only TRUE or FALSE, but once the menu is actually working, will change it.
 Private Boolean handleMenu(void);
+Private void startGameHandler(void);
 
-Private void redButtonListener(void);
+
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
@@ -43,9 +44,9 @@ Private Boolean isGreenButtonPressed = FALSE;
 
 /** Start Menu Items.*/
 
-Private MenuItem StartIcon =    { .text = "Start Game", .txt_len = 10u  };
-Private MenuItem SettingsIcon = { .text = "Settings",   .txt_len = 8u   };
-Private MenuItem ExitIcon   =   { .text = "Exit",       .txt_len = 4u   };
+Private MenuItem StartIcon =    { .text = "Start Game", .txt_len = 10u  , .Action = MENU_ACTION_FUNCTION    , .ActionArg.function = startGameHandler    };
+Private MenuItem SettingsIcon = { .text = "Settings",   .txt_len = 8u   , .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        };
+Private MenuItem ExitIcon   =   { .text = "Exit",       .txt_len = 4u   , .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        };
 
 Private const MenuItem * StartMenuItemArray[] =
 {
@@ -56,9 +57,9 @@ Private const MenuItem * StartMenuItemArray[] =
 
 Private SelectionMenu StartMenu =
 {
- .items = StartMenuItemArray,
- .number_of_items = NUMBER_OF_ITEMS(StartMenuItemArray),
- .selected_item = 0u,
+     .items = StartMenuItemArray,
+     .number_of_items = NUMBER_OF_ITEMS(StartMenuItemArray),
+     .selected_item = 0u,
 };
 
 /** End of Start Menu Items. */
@@ -87,17 +88,21 @@ void main(void)
     showStartScreen();
     delay_msec(5000);
 
-    showStartDialog();
+    //showStartDialog();
 
     //buttons_subscribeListener(RED_BUTTON, redButtonListener);
     //while(!isRedButton());
     //while(!isRedButtonPressed);
 
+    menu_enterMenu(&StartMenu);
+
+    /* TODO : This is still a placeholder. */
     //Will be stuck in menu until button is pressed.
     while (handleMenu() == FALSE);
 
     //Remove handlers from buttons.
-    buttons_unsubscribeAll();
+    menu_exitMenu();
+
 
     display_clear();
 
@@ -220,37 +225,12 @@ Private void showStartScreen(void)
 #endif
 }
 
-Private void greenButtonListener(void)
+Private void startGameHandler(void)
 {
     isGreenButtonPressed = TRUE;
 }
 
-Private void redButtonListener(void)
-{
-    menu_MoveCursor(&StartMenu, TRUE);
-}
-
-Private void blueButtonListener(void)
-{
-    menu_MoveCursor(&StartMenu, FALSE);
-}
-
-
-//TODO : This is a placeholder, should add proper start menu.
-Private void showStartDialog(void)
-{
-    display_clear();
-    menu_drawMenu(&StartMenu);
-
-    //Subscribe to buttons.
-    buttons_subscribeListener(RED_BUTTON, redButtonListener);
-    buttons_subscribeListener(GREEN_BUTTON, greenButtonListener);
-    buttons_subscribeListener(BLUE_BUTTON, blueButtonListener);
-
-    //display_drawStringCenter("Press red button", 64u, 16u, FONT_MEDIUM_FONT, FALSE);
-    //display_drawStringCenter("to begin", 64u, 32u, FONT_MEDIUM_FONT, FALSE);
-}
-
+/* This is a placeholder. TODO : Make proper implementation of start menu. */
 Private Boolean handleMenu(void)
 {
     Boolean res = FALSE;

@@ -9,14 +9,52 @@
 #include "menu.h"
 #include "display_drv.h"
 #include "font.h"
+#include "buttons.h"
 
 #define MENU_FONT FONT_MEDIUM_FONT
+
+/***** Private function definitions ***********/
+
+Private void redButtonListener(void);
+Private void blueButtonListener(void);
+Private void greenButtonListener(void);
+
+Private void drawMenu(SelectionMenu * menu);
+
+
+/******Private variable definitions ***********/
+Private SelectionMenu * priv_active_menu_ptr = NULL;
+
+
+
+Public void menu_enterMenu(SelectionMenu * menu)
+{
+    priv_active_menu_ptr = menu;
+
+    display_clear();
+    drawMenu(priv_active_menu_ptr);
+
+    //Subscribe to buttons.
+    buttons_subscribeListener(RED_BUTTON, redButtonListener);
+    buttons_subscribeListener(GREEN_BUTTON, greenButtonListener);
+    buttons_subscribeListener(BLUE_BUTTON, blueButtonListener);
+}
+
+/* Exit from menu unconditionally. */
+Public void menu_exitMenu(void)
+{
+    if (priv_active_menu_ptr != NULL)
+    {
+        priv_active_menu_ptr = NULL;
+        buttons_unsubscribeAll();
+    }
+}
 
 
 Public void menu_setSelectedItem(SelectionMenu * menu, U8 selected_item)
 {
     menu->selected_item = selected_item;
-    menu_drawMenu(menu);
+    drawMenu(menu);
 }
 
 
@@ -43,16 +81,20 @@ Public void menu_MoveCursor(SelectionMenu * menu, Boolean dir)
 
     if (changed)
     {
-        menu_drawMenu(menu);
+        drawMenu(menu);
     }
 }
+
 
 Public const MenuItem * menu_getSelectedItem(SelectionMenu * menu)
 {
     return menu->items[menu->selected_item];
 }
 
-Public void menu_drawMenu(SelectionMenu * menu)
+
+/* Private function definitions. */
+
+Private void drawMenu(SelectionMenu * menu)
 {
     //First lets see how large the menu to be drawn is.
     U8 height;
@@ -77,6 +119,45 @@ Public void menu_drawMenu(SelectionMenu * menu)
         }
         ypos += font_height;
         ypos += 2u;
+    }
+}
+
+/* This is the OK key. */
+Private void greenButtonListener(void)
+{
+    const MenuItem * item = menu_getSelectedItem(priv_active_menu_ptr);
+
+    switch(item->Action)
+    {
+    case(MENU_ACTION_FUNCTION):
+            /* We exit the menu and perform the attached function pointer. */
+            menu_exitMenu();
+            item->ActionArg.function();
+            break;
+    case(MENU_ACTION_SUBMENU):
+            /* TODO : Implement this. */
+            break;
+    case(MENU_ACTION_NONE):
+    default:
+        break;
+    }
+}
+
+/* This is the UP key   */
+Private void redButtonListener(void)
+{
+    if(priv_active_menu_ptr != NULL)
+    {
+        menu_MoveCursor(priv_active_menu_ptr, TRUE);
+    }
+}
+
+/* This is the DOWN key. */
+Private void blueButtonListener(void)
+{
+    if (priv_active_menu_ptr != NULL)
+    {
+        menu_MoveCursor(priv_active_menu_ptr, FALSE);
     }
 }
 
