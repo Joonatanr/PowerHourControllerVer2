@@ -203,10 +203,20 @@ Public void clockDisplay_init(void)
     priv_timer_state = CONTROLLER_INIT;
 }
 
+
 Public void clockDisplay_start(void)
 {
     //We start counting.
     priv_timer_state = CONTROLLER_COUNTING;
+}
+
+
+/* Should return all variables to their initial states. */
+Public void clockDisplay_stop(void)
+{
+    priv_timer_state = CONTROLLER_INIT;
+    priv_timekeeper.minute = 0u;
+    priv_timekeeper.second = 0u;
 }
 
 

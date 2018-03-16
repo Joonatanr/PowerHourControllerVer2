@@ -19,5 +19,6 @@ typedef struct
 extern void clockDisplay_init(void);
 extern void clockDisplay_start(void);
 extern void clockDisplay_cyclic1000msec(void);
+extern void clockDisplay_stop(void);
 
 #endif /* LOGIC_CLOCKDISPLAY_H_ */
