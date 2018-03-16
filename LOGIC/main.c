@@ -105,8 +105,10 @@ Private void timer_1sec(void)
 {
     static U8 led_state = 0x00u;
 
+    /* Second counter LED is controlled here. */
     led_state = !led_state;
     set_led_one(led_state);
+
     clockDisplay_cyclic1000msec();
 }
 

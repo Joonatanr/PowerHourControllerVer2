@@ -12,8 +12,8 @@
 
 typedef struct
 {
-    U8 min;
-    U8 sec;
+    U8 minute;
+    U8 second;
 } timekeeper_struct;
 
 extern void clockDisplay_init(void);

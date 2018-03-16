@@ -83,6 +83,7 @@ Public Boolean girlsSpecialTask(U8 sec)
     Boolean res = FALSE;
     static U8 test_counter = 0u;
 
+    /* If sec is 0, then we have just begun. */
     if (sec == 0u)
     {
         priv_selected_task_ptr = priv_special_tasks_girls_array[test_counter];
@@ -162,6 +163,8 @@ Private U8 test_counter_index_girls;
 
 Private const MultiString * priv_task_str_ptr;
 
+/* The sec parameter specifies the current second from the beginning of the task.
+ * This function is called cyclically after every second. */
 Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
 {
     //This is the simplest special task, currently no bitmaps, but we just display text on screen.
