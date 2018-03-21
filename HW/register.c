@@ -36,18 +36,6 @@ Private const Timer_A_UpModeConfig lo_prio_timer_config =
      .timerPeriod = 9375u //Configured for 50 msec interval.
 };
 
-Private const eUSCI_UART_Config uartConfig =
-{
-        EUSCI_A_UART_CLOCKSOURCE_SMCLK,          // SMCLK Clock Source
-        78,                                     // BRDIV = 78
-        2,                                       // UCxBRF = 2
-        0,                                       // UCxBRS = 0
-        EUSCI_A_UART_NO_PARITY,                  // No Parity
-        EUSCI_A_UART_LSB_FIRST,                  // LSB First
-        EUSCI_A_UART_ONE_STOP_BIT,               // One stop bit
-        EUSCI_A_UART_MODE,                       // UART mode
-        EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION  // Oversampling
-};
 
 /*****************************************************************************************************
  *
@@ -60,7 +48,6 @@ Private void ports_init(void);
 Private void TA0_0_IRQHandler(void);
 Private void TA1_0_IRQHandler(void);
 Private void timerA_init(void);
-Private void uart_init(void);
 
 /*****************************************************************************************************
  *
@@ -87,17 +74,8 @@ Public void register_init(void)
     //Initialise main timer.
     timerA_init();
 
-    //Initialise UART
-    uart_init();
-
     //Initialise SPI for LCD display.
     spi_init();
-
-    //Initialise buzzer.
-    buzzer_init();
-
-    //Initialise buttons.
-    buttons_init();
 
     //Initialise display backlight.
     backlight_init();
@@ -221,18 +199,6 @@ Private void TA1_0_IRQHandler(void)
 }
 
 
-Private void uart_init(void)
-{
-    /* Configuring UART Module */
-    MAP_UART_initModule(EUSCI_A0_BASE, &uartConfig);
-
-    /* Enable UART module */
-    MAP_UART_enableModule(EUSCI_A0_BASE);
-
-    /* Enabling interrupts */
-    MAP_UART_enableInterrupt(EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
-    MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
-}
 
 
 

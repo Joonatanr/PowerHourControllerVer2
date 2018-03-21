@@ -58,7 +58,7 @@ Public void buzzer_playBeeps(U8 beeps)
 
 
 //Must be called every 100 msec.
-Public void buzzer_Cyclic100msec(void)
+Public void buzzer_cyclic100msec(void)
 {
     priv_cycle_counter++;
 

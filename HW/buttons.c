@@ -59,10 +59,6 @@ Public void buttons_cyclic10msec(void)
         {
             priv_button_config[ix].button_hold = FALSE;
             priv_button_config[ix].pressed = TRUE;
-            //if (priv_button_config[ix].listener_func != NULL)
-            //{
-            //    priv_button_config[ix].listener_func();
-            //}
         }
         else
         {
