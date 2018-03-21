@@ -13,7 +13,7 @@
 #include "clockDisplay.h"
 #include "buttons.h"
 #include "backlight.h"
-#include "menu.h"
+#include "Menus/menu.h"
 #include "Scheduler.h"
 
 //#define DEBUG_SEQUENCE

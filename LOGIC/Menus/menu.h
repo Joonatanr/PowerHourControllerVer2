@@ -13,7 +13,8 @@
 typedef enum
 {
     MENU_ACTION_NONE,                   //We don't do anything, basically means that this is not yet implemented.
-    MENU_ACTION_SUBMENU,                //We enter a submenu. This is currently not yet implemented.
+    MENU_ACTION_SUBMENU,                //We enter a submenu.
+    MENU_ACTION_WIDGET,                 //We activate a widget, like a scrollbar
     MENU_ACTION_FUNCTION,               //We perform an attached function. This also means that we leave the menu.
     NUMBER_OF_MENU_ACTIONS
 } MenuActionType;
