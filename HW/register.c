@@ -6,7 +6,6 @@
  */
 
 #include "register.h"
-#include "display_drv.h"
 #include <driverlib.h>
 #include <spi_drv.h>
 #include "buzzer.h"
@@ -86,8 +85,6 @@ Public void register_init(void)
     //Enable interrupts in general.
     Interrupt_enableMaster();
 
-    //Initialise display driver.
-    display_init();
 }
 
 Public void register_enable_low_powermode(void)

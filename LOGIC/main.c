@@ -65,14 +65,11 @@ void main(void)
     backlight_set_level(60);
 
     //Initialise logic layer.
-    Scheduler_init();
+    Scheduler_initTasks();
 
     delay_msec(250);
 
-    //Start HW layer.
-    display_start();
-
-    //Start scheduler tasks - also will include HW layer in the future.
+    //Start all scheduler task
     Scheduler_StartTasks();
 
     //We show the initial start screen for a while.
@@ -104,15 +101,8 @@ Private void timer_hi_prio(void)
 //Maybe this should be called more frequently?
 Private void timer_lo_prio(void)
 {
-
-
     //Call the main scheduler for logic tasks.
     Scheduler_cyclic();
-
-    // Make sure this is called at the very end, so that all logic
-    // tasks can write to the display without problems.
-    /* TODO : Move all other tasks under the scheduler and move this last, so that we are sure it works... */
-    display_cyclic_50msec();
 }
 
 
@@ -141,8 +131,6 @@ Private void showStartScreen(void)
 /* Starts the main Power Hour game. */
 Private void startGameHandler(void)
 {
-    display_clear(); //TODO : This is probably redundant.
     Scheduler_SetActiveModule(TASK_CYCLIC1000MS_CLOCKDP);
-    //clockDisplay_start();
 }
 
