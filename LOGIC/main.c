@@ -15,13 +15,13 @@
 #include "buttons.h"
 #include "backlight.h"
 #include "menu.h"
+#include "Scheduler.h"
 
 //#define DEBUG_SEQUENCE
 
 Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
 
-Private void timer_1sec(void);
 Private void showStartScreen(void);
 
 Private void startGameHandler(void);
@@ -68,12 +68,15 @@ void main(void)
     backlight_set_level(60);
 
     //Initialise logic layer.
-    clockDisplay_init();
+    Scheduler_init();
 
     delay_msec(250);
 
     //Start HW layer.
     display_start();
+
+    //Start scheduler tasks - also will include HW layer in the future.
+    Scheduler_StartTasks();
 
     //We show the initial start screen for a while.
     showStartScreen();
@@ -99,15 +102,7 @@ Private void timer_hi_prio(void)
     buttons_cyclic10msec();
 }
 
-//Called from low priority context.
-Private void timer_1sec(void)
-{
-    static U8 led_state = 0x00u;
 
-    led_state = !led_state;
-    set_led_one(led_state);
-    clockDisplay_cyclic1000msec();
-}
 
 Rectangle test_rect;
 
@@ -115,6 +110,7 @@ Rectangle test_rect;
 //Maybe this should be called more frequently?
 Private void timer_lo_prio(void)
 {
+    /* TODO : Create a uart cyclic task and move this into the scheduler. */
     U8 msg_len;
 
     msg_len = comm_receiveData(priv_uart_buffer);
@@ -157,13 +153,11 @@ Private void timer_lo_prio(void)
         }
     }
 
-    //1 second timer.
-    if (++timer_sec_counter >= 20u)
-    {
-        timer_sec_counter = 0;
-        timer_1sec();
-    }
+    //Call the main scheduler for logic tasks.
+    Scheduler_cyclic();
 
+
+    /* TODO : Move this under a logic task. */
     if (timer_sec_counter % 2u == 0u)
     {
         buzzer_Cyclic100msec();
@@ -172,6 +166,7 @@ Private void timer_lo_prio(void)
 
     // Make sure this is called at the very end, so that all logic
     // tasks can write to the display without problems.
+    /* TODO : Move all other tasks under the scheduler and move this last, so that we are sure it works... */
     display_cyclic_50msec();
 }
 
@@ -201,8 +196,8 @@ Private void showStartScreen(void)
 /* Starts the main Power Hour game. */
 Private void startGameHandler(void)
 {
-    display_clear();
-
-    clockDisplay_start();
+    display_clear(); //TODO : This is probably redundant.
+    Scheduler_SetActiveModule(TASK_CYCLIC1000MS_CLOCKDP);
+    //clockDisplay_start();
 }
 

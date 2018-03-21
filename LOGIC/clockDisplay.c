@@ -167,6 +167,9 @@ Private const ControllerEvent priv_girls_drink_events[] =
 };
 
 //TODO : Review this and add more tasks.
+/* This is a scheduler for special minutes.
+ * It contains data about the frequency and offset of special minutes as well
+ * as links to their respective actions. */
 Private const SchedulerTask priv_scheduler[] =
 {
  {.frequency = 6u, .offset = 6u, .event_array = priv_girls_drink_events,    .event_cnt = NUMBER_OF_ITEMS(priv_girls_drink_events)   },
@@ -184,8 +187,8 @@ Public void clockDisplay_init(void)
 {
     U8 font_height;
 
-    priv_timekeeper.min = 0u;
-    priv_timekeeper.sec = 0u;
+    priv_timekeeper.minute = 0u;
+    priv_timekeeper.second = 0u;
 
     font_height = font_getFontHeight(CLOCK_FONT);
 
@@ -200,10 +203,20 @@ Public void clockDisplay_init(void)
     priv_timer_state = CONTROLLER_INIT;
 }
 
+
 Public void clockDisplay_start(void)
 {
     //We start counting.
     priv_timer_state = CONTROLLER_COUNTING;
+}
+
+
+/* Should return all variables to their initial states. */
+Public void clockDisplay_stop(void)
+{
+    priv_timer_state = CONTROLLER_INIT;
+    priv_timekeeper.minute = 0u;
+    priv_timekeeper.second = 0u;
 }
 
 
@@ -214,23 +227,23 @@ Public void clockDisplay_cyclic1000msec(void)
     beerShotAction action = BEERSHOT_NO_ACTION;
     static Boolean isFirstRun = TRUE;
 
-    static const ControllerEvent * controllerEvents_ptr = priv_normal_minute_events;
+    static const ControllerEvent * currentMinuteEvents_ptr = priv_normal_minute_events;
     static U8 controllerEvents_cnt = NUMBER_OF_ITEMS(priv_normal_minute_events);
 
-    if ((priv_timekeeper.sec == 0u) && (priv_timekeeper.min > 0u))
+    if ((priv_timekeeper.second == 0u) && (priv_timekeeper.minute > 0u))
     {
-        controllerEvents_cnt = getScheduledSpecialTask(&controllerEvents_ptr);
+        controllerEvents_cnt = getScheduledSpecialTask(&currentMinuteEvents_ptr);
     }
 
     /* TODO : This should be changed to a better implementation. */
-    if (priv_timekeeper.sec == 59u)
+    if (priv_timekeeper.second == 59u)
     {
         //buzzer_playBuzzer(10u);
         buzzer_playBeeps(3u);
     }
 
     //Game ends and we enter final state.
-    if (priv_timekeeper.min == 60u)
+    if (priv_timekeeper.minute == 60u)
     {
         doFinalAction();
         priv_timer_state = CONTROLLER_FINAL;
@@ -242,8 +255,6 @@ Public void clockDisplay_cyclic1000msec(void)
         //We do not do anything here.
         break;
     case CONTROLLER_COUNTING:
-
-
         incrementTimer();
         if (isFirstRun)
         {
@@ -254,8 +265,8 @@ Public void clockDisplay_cyclic1000msec(void)
         {
             for (ix = 0u; ix < controllerEvents_cnt; ix++)
             {
-                event_ptr = &controllerEvents_ptr[ix];
-                if (event_ptr->second == priv_timekeeper.sec)
+                event_ptr = &currentMinuteEvents_ptr[ix];
+                if (event_ptr->second == priv_timekeeper.second)
                 {
                     break;
                 }
@@ -321,21 +332,21 @@ Private void doFinalAction(void)
 //Increments timekeeper with 1 second.
 Private void incrementTimer(void)
 {
-    priv_timekeeper.sec++;
-    if (priv_timekeeper.sec >= 60u)
+    priv_timekeeper.second++;
+    if (priv_timekeeper.second >= 60u)
     {
-        priv_timekeeper.sec = 0u;
-        priv_timekeeper.min++;
+        priv_timekeeper.second = 0u;
+        priv_timekeeper.minute++;
     }
 }
 
 Private void convertTimerString(timekeeper_struct * t, char * dest_str)
 {
-    dest_str[0] = '0' + (t->min / 10u);
-    dest_str[1] = '0' + (t->min % 10u);
+    dest_str[0] = '0' + (t->minute / 10u);
+    dest_str[1] = '0' + (t->minute % 10u);
     dest_str[2] = ':';
-    dest_str[3] = '0' + (t->sec / 10u);
-    dest_str[4] = '0' + (t->sec % 10u);
+    dest_str[3] = '0' + (t->second / 10u);
+    dest_str[4] = '0' + (t->second % 10u);
     dest_str[5] = 0;
 }
 
@@ -408,9 +419,9 @@ Private U8 getScheduledSpecialTask(const ControllerEvent ** event_ptr)
 
     for (ix = 0u; ix < NUMBER_OF_ITEMS(priv_scheduler); ix++)
     {
-        if(priv_scheduler[ix].offset <= priv_timekeeper.min)
+        if(priv_scheduler[ix].offset <= priv_timekeeper.minute)
         {
-            offset = priv_timekeeper.min - priv_scheduler[ix].offset;
+            offset = priv_timekeeper.minute - priv_scheduler[ix].offset;
             if ((offset % priv_scheduler[ix].frequency) == 0u)
             {
                 *event_ptr = priv_scheduler[ix].event_array;
