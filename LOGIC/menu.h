@@ -23,21 +23,20 @@ typedef void (*MenuActionHandler)(void);
 typedef struct
 {
     const char * text;
-    const U8 txt_len;
-
     MenuActionType Action;
 
     union
     {
-        struct SelectionMenu *     subMenu;
+        struct _Selection_Menu_ *     subMenu;
         MenuActionHandler          function;
     } ActionArg;
 
 } MenuItem;
 
-typedef struct
+typedef struct _Selection_Menu_
 {
-    const MenuItem ** items;
+    struct _Selection_Menu_ * root; /* Reference to upper menu in case of submenu. */
+    const MenuItem * items;
     const U8 number_of_items;
     U8 selected_item;
 } SelectionMenu;

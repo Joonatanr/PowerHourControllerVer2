@@ -10,7 +10,7 @@
 #include "buzzer.h"
 #include "buttons.h"
 #include "register.h"
-#include "comm.h"
+#include "uartmgr.h"
 #include "display_drv.h"
 
 /* NB! Current implementation assumes that only 1 task is active at any time, but this can be changed ofcourse. */

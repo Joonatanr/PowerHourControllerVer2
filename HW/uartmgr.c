@@ -10,7 +10,7 @@
 
 #include <uart.h>
 #include <driverlib.h>
-#include "comm.h"
+#include "uartmgr.h"
 #include "parser.h"
 #include "display_drv.h"
 

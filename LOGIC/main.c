@@ -7,7 +7,6 @@
 #include "msp.h"
 #include "typedefs.h"
 #include "register.h"
-#include "comm.h"
 #include "display_drv.h"
 #include "buzzer.h"
 #include "parser.h"
@@ -30,18 +29,27 @@ Private void startGameHandler(void);
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
 Public TimerHandler timer_50msec_callback = timer_lo_prio;
 
+/* Settings Menu Items */
+Private const MenuItem SettingsMenuItemArray[] =
+{
+   { .text = "Brightness",    .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
+   { .text = "Test",          .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
+};
+
+Private SelectionMenu SettingsMenu =
+{
+     .items = SettingsMenuItemArray,
+     .number_of_items = NUMBER_OF_ITEMS(SettingsMenuItemArray),
+     .selected_item = 0u
+};
+
 
 /** Start Menu Items.*/
-
-Private MenuItem StartIcon =    { .text = "Start Game", .txt_len = 10u  , .Action = MENU_ACTION_FUNCTION    , .ActionArg.function = startGameHandler    };
-Private MenuItem SettingsIcon = { .text = "Settings",   .txt_len = 8u   , .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        };
-Private MenuItem ExitIcon   =   { .text = "Exit",       .txt_len = 4u   , .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        };
-
-Private const MenuItem * StartMenuItemArray[] =
+Private const MenuItem StartMenuItemArray[] =
 {
-     &StartIcon,
-     &SettingsIcon,
-     &ExitIcon
+   { .text = "Start Game",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function = startGameHandler    },
+   { .text = "Settings",    .Action = MENU_ACTION_SUBMENU     , .ActionArg.subMenu = &SettingsMenu        },
+   { .text = "Exit",        .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
 };
 
 Private SelectionMenu StartMenu =
