@@ -1,6 +1,6 @@
 //*****************************************************************************
 //
-// MSP432 main.c template - Empty main
+// MSP432 based Power Hour Controller machine main module.
 //
 //****************************************************************************
 
@@ -64,8 +64,7 @@ void main(void)
     //Initialise HW layer.
     register_init();
 
-    //Set backlight to 100 percent.
-    //backlight_set_level(100);
+    //Set backlight to 60 percent.
     backlight_set_level(60);
 
     //Initialise logic layer.
