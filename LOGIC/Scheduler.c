@@ -7,7 +7,11 @@
 
 #include "Scheduler.h"
 #include "clockDisplay.h"
+#include "buzzer.h"
+#include "buttons.h"
 #include "register.h"
+#include "uartmgr.h"
+#include "display_drv.h"
 
 /* NB! Current implementation assumes that only 1 task is active at any time, but this can be changed ofcourse. */
 /* NB! All lo prio interrupt tasks should come here. I think there is no point to create a separate scheduler for the
@@ -30,17 +34,22 @@ Private const Scheduler_LogicTask priv_logic_modules[NUMBER_OF_LOGIC_MODULES] =
 /* Small incremental changes :) - So lets enable the modules part first and then look at this part. */
 Private const Scheduler_LogicTask priv_tasks[NUMBER_OF_SCHEDULER_TASKS] =
 {
-     { .period = 1000u, .init_fptr = NULL, .start_fptr = NULL, .cyclic_fptr = timer_1sec, .stop_fptr = NULL }, /* Debug LED task. */
+     { .period = 1000u, .init_fptr = NULL,          .start_fptr = NULL,          .cyclic_fptr = timer_1sec,            .stop_fptr = NULL  }, /* Debug LED task.   */
+     { .period = 100u,  .init_fptr = buzzer_init,   .start_fptr = NULL,          .cyclic_fptr = buzzer_cyclic100msec,  .stop_fptr = NULL  }, /* Buzzer task.      */
+     { .period = 100u,  .init_fptr = buttons_init,  .start_fptr = NULL,          .cyclic_fptr = buttons_cyclic100msec, .stop_fptr = NULL  }, /* Buttons task      */
+     { .period = 50u,   .init_fptr = uart_init,     .start_fptr = NULL,          .cyclic_fptr = uart_cyclic,           .stop_fptr = NULL  }, /* Debug UART task   */
+     { .period = 50u,   .init_fptr = display_init,  .start_fptr = display_start, .cyclic_fptr = display_cyclic_50msec, .stop_fptr = NULL},
 };
 
 
 /*************  Private variable declarations.  **************/
 Private const Scheduler_LogicTask * priv_curr_task_ptr = NULL;
 Private U16 priv_task_timer = 0u;
+Private Boolean priv_isInitComplete = FALSE;
 
 
 /* Should be called once at startup. */
-void Scheduler_init(void)
+void Scheduler_initTasks(void)
 {
     U8 ix;
     for (ix = 0u; ix < NUMBER_OF_ITEMS(priv_logic_modules); ix++)
@@ -58,6 +67,8 @@ void Scheduler_init(void)
             priv_tasks[ix].init_fptr();
         }
     }
+
+    priv_isInitComplete = TRUE;
 }
 
 /* Should be called once at startup.. */
@@ -100,6 +111,10 @@ void Scheduler_StopActiveModule(void)
 void Scheduler_cyclic(void)
 {
     U8 ix;
+    if (priv_isInitComplete == FALSE)
+    {
+        return;
+    }
 
     priv_task_timer += SCHEDULER_PERIOD;
 

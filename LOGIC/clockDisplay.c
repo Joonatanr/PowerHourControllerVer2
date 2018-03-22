@@ -206,6 +206,7 @@ Public void clockDisplay_init(void)
 
 Public void clockDisplay_start(void)
 {
+    display_clear(); //TODO : This is probably redundant.
     //We start counting.
     priv_timer_state = CONTROLLER_COUNTING;
 }

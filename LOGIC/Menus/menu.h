@@ -13,7 +13,8 @@
 typedef enum
 {
     MENU_ACTION_NONE,                   //We don't do anything, basically means that this is not yet implemented.
-    MENU_ACTION_SUBMENU,                //We enter a submenu. This is currently not yet implemented.
+    MENU_ACTION_SUBMENU,                //We enter a submenu.
+    MENU_ACTION_WIDGET,                 //We activate a widget, like a scrollbar
     MENU_ACTION_FUNCTION,               //We perform an attached function. This also means that we leave the menu.
     NUMBER_OF_MENU_ACTIONS
 } MenuActionType;
@@ -23,21 +24,20 @@ typedef void (*MenuActionHandler)(void);
 typedef struct
 {
     const char * text;
-    const U8 txt_len;
-
     MenuActionType Action;
 
     union
     {
-        struct SelectionMenu *     subMenu;
+        struct _Selection_Menu_ *     subMenu;
         MenuActionHandler          function;
     } ActionArg;
 
 } MenuItem;
 
-typedef struct
+typedef struct _Selection_Menu_
 {
-    const MenuItem ** items;
+    struct _Selection_Menu_ * root; /* Reference to upper menu in case of submenu. */
+    const MenuItem * items;
     const U8 number_of_items;
     U8 selected_item;
 } SelectionMenu;

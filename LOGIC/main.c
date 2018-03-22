@@ -1,20 +1,19 @@
 //*****************************************************************************
 //
-// MSP432 main.c template - Empty main
+// MSP432 based Power Hour Controller machine main module.
 //
 //****************************************************************************
 
 #include "msp.h"
 #include "typedefs.h"
 #include "register.h"
-#include "comm.h"
 #include "display_drv.h"
 #include "buzzer.h"
 #include "parser.h"
 #include "clockDisplay.h"
 #include "buttons.h"
 #include "backlight.h"
-#include "menu.h"
+#include "Menus/menu.h"
 #include "Scheduler.h"
 
 //#define DEBUG_SEQUENCE
@@ -30,21 +29,27 @@ Private void startGameHandler(void);
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
 Public TimerHandler timer_50msec_callback = timer_lo_prio;
 
-Private U8 timer_sec_counter = 0u;
-Private U8 priv_uart_buffer[UART_BUF_LEN];
+/* Settings Menu Items */
+Private const MenuItem SettingsMenuItemArray[] =
+{
+   { .text = "Brightness",    .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
+   { .text = "Test",          .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
+};
+
+Private SelectionMenu SettingsMenu =
+{
+     .items = SettingsMenuItemArray,
+     .number_of_items = NUMBER_OF_ITEMS(SettingsMenuItemArray),
+     .selected_item = 0u
+};
 
 
 /** Start Menu Items.*/
-
-Private MenuItem StartIcon =    { .text = "Start Game", .txt_len = 10u  , .Action = MENU_ACTION_FUNCTION    , .ActionArg.function = startGameHandler    };
-Private MenuItem SettingsIcon = { .text = "Settings",   .txt_len = 8u   , .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        };
-Private MenuItem ExitIcon   =   { .text = "Exit",       .txt_len = 4u   , .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        };
-
-Private const MenuItem * StartMenuItemArray[] =
+Private const MenuItem StartMenuItemArray[] =
 {
-     &StartIcon,
-     &SettingsIcon,
-     &ExitIcon
+   { .text = "Start Game",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function = startGameHandler    },
+   { .text = "Settings",    .Action = MENU_ACTION_SUBMENU     , .ActionArg.subMenu = &SettingsMenu        },
+   { .text = "Exit",        .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
 };
 
 Private SelectionMenu StartMenu =
@@ -68,14 +73,11 @@ void main(void)
     backlight_set_level(60);
 
     //Initialise logic layer.
-    Scheduler_init();
+    Scheduler_initTasks();
 
     delay_msec(250);
 
-    //Start HW layer.
-    display_start();
-
-    //Start scheduler tasks - also will include HW layer in the future.
+    //Start all scheduler task
     Scheduler_StartTasks();
 
     //We show the initial start screen for a while.
@@ -103,71 +105,12 @@ Private void timer_hi_prio(void)
 }
 
 
-
-Rectangle test_rect;
-
 //This is called every 50 milliseconds.
 //Maybe this should be called more frequently?
 Private void timer_lo_prio(void)
 {
-    /* TODO : Create a uart cyclic task and move this into the scheduler. */
-    U8 msg_len;
-
-    msg_len = comm_receiveData(priv_uart_buffer);
-
-    if (msg_len > 0u)
-    {
-        if (priv_uart_buffer[0] == 'R')
-        {
-            if (parseRectangle((char *)priv_uart_buffer, &test_rect))
-            {
-                display_fillRectangle(test_rect.location.x,
-                                      test_rect.location.y,
-                                      test_rect.size.height,
-                                      test_rect.size.width,
-                                      PATTERN_GRAY);
-                comm_send_str("OK");
-
-                comm_send_str("X : ");
-                comm_send_number(test_rect.location.x);
-
-                comm_send_str(", Y : ");
-                comm_send_number(test_rect.location.y);
-
-                comm_send_str(", Height: ");
-                comm_send_number(test_rect.size.height);
-
-                comm_send_str(", Width: ");
-                comm_send_number(test_rect.size.width);
-
-                comm_send_rn();
-            }
-            else
-            {
-                comm_send_str("ERROR");
-            }
-        }
-        else if(priv_uart_buffer[0] == 'C')
-        {
-            display_clear();
-        }
-    }
-
     //Call the main scheduler for logic tasks.
     Scheduler_cyclic();
-
-
-    /* TODO : Move this under a logic task. */
-    if (timer_sec_counter % 2u == 0u)
-    {
-        buzzer_Cyclic100msec();
-        buttons_cyclic100msec();
-    }
-
-    // Make sure this is called at the very end, so that all logic
-    // tasks can write to the display without problems.
-    /* TODO : Move all other tasks under the scheduler and move this last, so that we are sure it works... */
-    display_cyclic_50msec();
 }
 
 
@@ -196,8 +139,6 @@ Private void showStartScreen(void)
 /* Starts the main Power Hour game. */
 Private void startGameHandler(void)
 {
-    display_clear(); //TODO : This is probably redundant.
     Scheduler_SetActiveModule(TASK_CYCLIC1000MS_CLOCKDP);
-    //clockDisplay_start();
 }
 

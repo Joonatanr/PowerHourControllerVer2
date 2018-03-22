@@ -24,6 +24,10 @@ typedef enum
 typedef enum
 {
     TASK_CYCLIC1000MS_DEBUG_LED,
+    TASK_CYCLIC100MS_BUZZER,
+    TASK_CYCLIC100MS_BUTTONS,
+    TASK_CYCLIC50MS_UART,
+    TASK_CYCLIC50MS_DISPLAY_DRIVER, /* This one should be called last. */
     NUMBER_OF_SCHEDULER_TASKS
 } Scheduler_LogicTaskEnum;
 
@@ -36,7 +40,7 @@ typedef struct
     Scheduler_TaskFunc cyclic_fptr;
 } Scheduler_LogicTask;
 
-extern void Scheduler_init(void);
+extern void Scheduler_initTasks(void);
 extern void Scheduler_cyclic(void);
 extern void Scheduler_StartTasks(void);
 

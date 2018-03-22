@@ -18,6 +18,7 @@
 Private void redButtonListener(void);
 Private void blueButtonListener(void);
 Private void greenButtonListener(void);
+Private void blackButtonListener(void);
 
 Private void drawMenu(SelectionMenu * menu);
 
@@ -38,6 +39,7 @@ Public void menu_enterMenu(SelectionMenu * menu)
     buttons_subscribeListener(RED_BUTTON, redButtonListener);
     buttons_subscribeListener(GREEN_BUTTON, greenButtonListener);
     buttons_subscribeListener(BLUE_BUTTON, blueButtonListener);
+    buttons_subscribeListener(BLACK_BUTTON, blackButtonListener);
 }
 
 /* Exit from menu unconditionally. */
@@ -88,7 +90,7 @@ Public void menu_MoveCursor(SelectionMenu * menu, Boolean dir)
 
 Public const MenuItem * menu_getSelectedItem(SelectionMenu * menu)
 {
-    return menu->items[menu->selected_item];
+    return &(menu->items[menu->selected_item]);
 }
 
 
@@ -111,21 +113,23 @@ Private void drawMenu(SelectionMenu * menu)
     {
         if(x == menu->selected_item)
         {
-            display_drawStringCenter(menu->items[x]->text, 64u, ypos, MENU_FONT, TRUE);
+            display_drawStringCenter(menu->items[x].text, 64u, ypos, MENU_FONT, TRUE);
         }
         else
         {
-            display_drawStringCenter(menu->items[x]->text, 64u, ypos, MENU_FONT, FALSE);
+            display_drawStringCenter(menu->items[x].text, 64u, ypos, MENU_FONT, FALSE);
         }
         ypos += font_height;
         ypos += 2u;
     }
+
 }
 
 /* This is the OK key. */
 Private void greenButtonListener(void)
 {
     const MenuItem * item = menu_getSelectedItem(priv_active_menu_ptr);
+    SelectionMenu * sub;
 
     switch(item->Action)
     {
@@ -135,7 +139,9 @@ Private void greenButtonListener(void)
             item->ActionArg.function();
             break;
     case(MENU_ACTION_SUBMENU):
-            /* TODO : Implement this. */
+            sub = item->ActionArg.subMenu;
+            sub->root = priv_active_menu_ptr;
+            menu_enterMenu(sub);
             break;
     case(MENU_ACTION_NONE):
     default:
@@ -143,10 +149,11 @@ Private void greenButtonListener(void)
     }
 }
 
+
 /* This is the UP key   */
 Private void redButtonListener(void)
 {
-    if(priv_active_menu_ptr != NULL)
+    if (priv_active_menu_ptr != NULL)
     {
         menu_MoveCursor(priv_active_menu_ptr, TRUE);
     }
@@ -158,6 +165,19 @@ Private void blueButtonListener(void)
     if (priv_active_menu_ptr != NULL)
     {
         menu_MoveCursor(priv_active_menu_ptr, FALSE);
+    }
+}
+
+/* This is the back button. */
+Private void blackButtonListener(void)
+{
+    if (priv_active_menu_ptr != NULL)
+    {
+        if (priv_active_menu_ptr->root != NULL)
+        {
+            /* This is a submenu. */
+            menu_enterMenu(priv_active_menu_ptr->root);
+        }
     }
 }
 

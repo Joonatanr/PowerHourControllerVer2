@@ -17,5 +17,7 @@ extern void comm_send_str(const char * str);
 extern U8 comm_receiveData(U8 * dest);
 extern void comm_send_number(long nr);
 extern void comm_send_rn(void);
+extern void uart_init(void);
+extern void uart_cyclic(void);
 
 #endif /* HW_COMM_H_ */
