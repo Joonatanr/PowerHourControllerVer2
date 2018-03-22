@@ -25,7 +25,6 @@ typedef struct
 } FillPattern;
 
 
-/* TODO : Some of these could be replaced with macros, or inline functions. */
 
 /*****************************************************************************************************
  *
@@ -504,7 +503,6 @@ Private void drawImage(Point * p, Size * s, const Bitmap * bmp, Boolean isInvert
 }
 
 
-//TODO : Replace this with macro.
 Private inline void disp_command(U8 cmd, Boolean reg_select)
 {
     spi_transmit_byte(cmd, reg_select);

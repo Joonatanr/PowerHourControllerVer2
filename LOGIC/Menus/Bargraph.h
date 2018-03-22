@@ -5,8 +5,8 @@
  *      Author: Joonatan
  */
 
-#ifndef LOGIC_MENUS_SCROLLBAR_H_
-#define LOGIC_MENUS_SCROLLBAR_H_
+#ifndef LOGIC_MENUS_BARGRAPH_H_
+#define LOGIC_MENUS_BARGRAPH_H_
 
 #include "typedefs.h"
 #include "menu.h"
@@ -18,10 +18,10 @@ typedef struct
     U8 min_value;
     SelectionMenu * parent;
     char * text;
-} ScrollBar_T;
+} BarGraph_T;
 
-extern ScrollBar_T test_bar;
+extern BarGraph_T test_bar;
 
-extern void enterScrollBar(ScrollBar_T * bar);
+extern void enterBarGraph(BarGraph_T * bar);
 
-#endif /* LOGIC_MENUS_SCROLLBAR_H_ */
+#endif /* LOGIC_MENUS_BARGRAPH_H_ */

@@ -5,12 +5,12 @@
  *      Author: Joonatan
  */
 
-#include "Scrollbar.h"
+#include "Bargraph.h"
 #include "display_drv.h"
 
-#define SCROLLBAR_BEGIN_X   14u
-#define SCROLLBAR_WIDTH    100u
-#define SCROLLBAR_HEIGHT     4u
+#define BARGRAPH_BEGIN_X   14u
+#define BARGRAPH_WIDTH    100u
+#define BARGRAPH_HEIGHT     4u
 
 //
 //  Image data for arrow_right
@@ -52,7 +52,7 @@ Private const Bitmap leftArrowBmp =
 
 /* Lets define all available scrollbars here as public variables. */
 
-Public ScrollBar_T test_bar =
+Public BarGraph_T test_bar =
 {
      .max_value = 100u,
      .min_value = 0u,
@@ -63,12 +63,12 @@ Public ScrollBar_T test_bar =
 
 /*******************/
 
-Private ScrollBar_T * priv_active_bar;
+Private BarGraph_T * priv_active_bar;
 
 
 /***************************** Private function forward declarations  ******************************/
 
-Private void drawScrollBar(void);
+Private void drawBarGraph(void);
 Private void drawArrows(void);
 
 
@@ -76,18 +76,18 @@ Private void drawArrows(void);
 
 
 /* Called when a scrollbar becomes active. */
-Public void enterScrollBar(ScrollBar_T * bar)
+Public void enterBarGraph(BarGraph_T * bar)
 {
     priv_active_bar = bar;
     drawArrows();
-    drawScrollBar();
+    drawBarGraph();
 }
 
 
 /***************************** Private function definitions  ******************************/
 
 /* Draws whole scrollbar */
-Private void drawScrollBar(void)
+Private void drawBarGraph(void)
 {
     U16 percentage;
     U8 range = priv_active_bar->max_value - priv_active_bar->min_value;
@@ -96,9 +96,9 @@ Private void drawScrollBar(void)
 
     //Draw the line
     /* We clear it first. */
-    display_fillRectangle(SCROLLBAR_BEGIN_X, 32u - SCROLLBAR_HEIGHT , SCROLLBAR_HEIGHT, SCROLLBAR_WIDTH, PATTERN_WHITE);
+    display_fillRectangle(BARGRAPH_BEGIN_X, 32u - BARGRAPH_HEIGHT , BARGRAPH_HEIGHT, BARGRAPH_WIDTH, PATTERN_WHITE);
     /* Then draw the actual line. */
-    display_fillRectangle(SCROLLBAR_BEGIN_X, 32u - SCROLLBAR_HEIGHT , SCROLLBAR_HEIGHT, percentage, PATTERN_BLACK);
+    display_fillRectangle(BARGRAPH_BEGIN_X, 32u - BARGRAPH_HEIGHT , BARGRAPH_HEIGHT, percentage, PATTERN_BLACK);
 }
 
 
