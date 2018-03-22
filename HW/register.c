@@ -142,10 +142,10 @@ Private void clocks_init(void)
 
     /* Initializing the clock source as follows:
      *      MCLK = MODOSC/2 = 12MHz
-     *      ACLK = REFO/2 = 16kHz   --- Not used, should remove.
+     *      ACLK = REFO/2 = 16kHz   --- TODO Not used, should remove.
      *      HSMCLK = DCO/2 = 6Mhz
      *      SMCLK = DCO =  12MHz
-     *      BCLK  = REFO = 32kHz    --- Not used, should remove.
+     *      BCLK  = REFO = 32kHz    --- TODO Not used, should remove.
      */
     MAP_CS_initClockSignal(CS_MCLK,     CS_MODOSC_SELECT,   CS_CLOCK_DIVIDER_2);
     MAP_CS_initClockSignal(CS_ACLK,     CS_REFOCLK_SELECT,  CS_CLOCK_DIVIDER_2);
