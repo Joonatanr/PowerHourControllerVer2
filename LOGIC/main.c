@@ -33,7 +33,7 @@ Public TimerHandler timer_50msec_callback = timer_lo_prio;
 Private const MenuItem SettingsMenuItemArray[] =
 {
    { .text = "Brightness",    .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
-   { .text = "Test",          .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
+   { .text = "Test",          .Action = MENU_ACTION_WIDGET      , .ActionArg.bargraph_ptr = &TEST_BARGRAPH  },
 };
 
 Private SelectionMenu SettingsMenu =
@@ -47,9 +47,9 @@ Private SelectionMenu SettingsMenu =
 /** Start Menu Items.*/
 Private const MenuItem StartMenuItemArray[] =
 {
-   { .text = "Start Game",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function = startGameHandler    },
-   { .text = "Settings",    .Action = MENU_ACTION_SUBMENU     , .ActionArg.subMenu = &SettingsMenu        },
-   { .text = "Exit",        .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
+   { .text = "Start Game",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function_ptr = startGameHandler    },
+   { .text = "Settings",    .Action = MENU_ACTION_SUBMENU     , .ActionArg.subMenu_ptr = &SettingsMenu        },
+   { .text = "Exit",        .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                            },
 };
 
 Private SelectionMenu StartMenu =

@@ -138,31 +138,33 @@ Public U8 addstr (char * str1, const char * str2)
 }
 
 //Returns length of the string.
-Public U8 long2string (long nr, char *s)
+Public U8 long2string (long nr, char *dest)
 {
   U8 c, i, imax, imax2, i2;
 
   i2 = 0; i = 0;
-  if (nr == 0) s[i++] = '0';
+  if (nr == 0) dest[i++] = '0';
   if (nr < 0) {i2 = 1; nr = 0 - nr; }
 
   while (nr > 0)
   {
     c = nr % 10;
     nr = nr / 10;
-    s[i++] = '0' + c;
+    dest[i++] = '0' + c;
   }
-  if (i2) s[i++] = '-';
-  s[i] = 0;
+
+  if (i2) dest[i++] = '-';
+  dest[i] = 0;
 
   imax = i;
-  imax2 = imax/2;
-  for (i=0; i<imax2; ++i)
+  imax2 = imax / 2;
+
+  for (i = 0; i < imax2; ++i)
   {
     i2 = imax-i-1;
-    c = s[i];
-    s[i] = s[i2];
-    s[i2] = c;
+    c = dest[i];
+    dest[i] = dest[i2];
+    dest[i2] = c;
   }
 
   return imax;

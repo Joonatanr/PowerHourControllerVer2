@@ -11,17 +11,18 @@
 #include "typedefs.h"
 #include "menu.h"
 
-typedef struct
+
+typedef struct __Bargraph__
 {
-    U8 value;
-    U8 max_value;
-    U8 min_value;
-    SelectionMenu * parent;
+    U16 value;
+    U16 max_value;
+    U16 min_value;
+    struct _Selection_Menu_ * parent;
     char * text;
-} BarGraph_T;
+} Bargraph_T;
 
-extern BarGraph_T test_bar;
+extern Bargraph_T TEST_BARGRAPH;
 
-extern void enterBarGraph(BarGraph_T * bar);
+extern void enterBarGraph(Bargraph_T * bar);
 
 #endif /* LOGIC_MENUS_BARGRAPH_H_ */

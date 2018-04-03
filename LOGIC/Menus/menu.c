@@ -10,6 +10,7 @@
 #include "display_drv.h"
 #include "font.h"
 #include "buttons.h"
+#include "Bargraph.h"
 
 #define MENU_FONT FONT_MEDIUM_FONT
 
@@ -130,18 +131,25 @@ Private void greenButtonListener(void)
 {
     const MenuItem * item = menu_getSelectedItem(priv_active_menu_ptr);
     SelectionMenu * sub;
+    Bargraph_T * bg_ptr;
 
     switch(item->Action)
     {
     case(MENU_ACTION_FUNCTION):
             /* We exit the menu and perform the attached function pointer. */
             menu_exitMenu();
-            item->ActionArg.function();
+            item->ActionArg.function_ptr();
             break;
     case(MENU_ACTION_SUBMENU):
-            sub = item->ActionArg.subMenu;
-            sub->root = priv_active_menu_ptr;
+            sub = item->ActionArg.subMenu_ptr;
+            sub->parent = priv_active_menu_ptr;
             menu_enterMenu(sub);
+            break;
+    case(MENU_ACTION_WIDGET):
+            /* TODO : Currently we have only 1 widget type, in the future this might become more complex. */
+            bg_ptr = item->ActionArg.bargraph_ptr;
+            bg_ptr->parent = priv_active_menu_ptr;
+            enterBarGraph(bg_ptr);
             break;
     case(MENU_ACTION_NONE):
     default:
@@ -173,10 +181,10 @@ Private void blackButtonListener(void)
 {
     if (priv_active_menu_ptr != NULL)
     {
-        if (priv_active_menu_ptr->root != NULL)
+        if (priv_active_menu_ptr->parent != NULL)
         {
             /* This is a submenu. */
-            menu_enterMenu(priv_active_menu_ptr->root);
+            menu_enterMenu(priv_active_menu_ptr->parent);
         }
     }
 }

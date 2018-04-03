@@ -7,10 +7,17 @@
 
 #include "Bargraph.h"
 #include "display_drv.h"
+#include "buttons.h"
+#include "parser.h"
 
 #define BARGRAPH_BEGIN_X   14u
 #define BARGRAPH_WIDTH    100u
 #define BARGRAPH_HEIGHT     4u
+#define BARGRAPH_OFFSET_Y   52u
+
+#define UP_ARROW_OFFSET_Y   10u
+#define DOWN_ARROW_OFFSET_Y 40u
+#define NUMBER_OFFSET_Y     25u
 
 
 const U8 monochrom_arrow_upBitmaps[] =
@@ -53,7 +60,7 @@ Private const Bitmap downArrowBitmap =
 
 /* Lets define all available scrollbars here as public variables. */
 
-Public BarGraph_T test_bar =
+Public Bargraph_T TEST_BARGRAPH =
 {
      .max_value = 100u,
      .min_value = 0u,
@@ -64,22 +71,32 @@ Public BarGraph_T test_bar =
 
 /*******************/
 
-Private BarGraph_T * priv_active_bar;
-
+Private Bargraph_T * priv_active_bar;
+Private char priv_buf[10];
 
 /***************************** Private function forward declarations  ******************************/
 
 Private void drawBarGraph(void);
 Private void drawBackGround(void);
 
+Private void handleButtonUp(void);
+Private void handleButtonDown(void);
+Private void handleButtonAck(void);
+
 
 /***************************** Public function definitions  ******************************/
 
 
 /* Called when a scrollbar becomes active. */
-Public void enterBarGraph(BarGraph_T * bar)
+Public void enterBarGraph(Bargraph_T * bar)
 {
     priv_active_bar = bar;
+
+    buttons_subscribeListener(RED_BUTTON, handleButtonUp);
+    buttons_subscribeListener(BLUE_BUTTON, handleButtonDown);
+    buttons_subscribeListener(BLACK_BUTTON, handleButtonAck);
+    buttons_subscribeListener(GREEN_BUTTON, handleButtonAck);
+
     drawBackGround();
     drawBarGraph();
 }
@@ -97,9 +114,14 @@ Private void drawBarGraph(void)
 
     //Draw the line
     /* We clear it first. */
-    display_fillRectangle(BARGRAPH_BEGIN_X, 32u - BARGRAPH_HEIGHT , BARGRAPH_HEIGHT, BARGRAPH_WIDTH, PATTERN_WHITE);
+    display_fillRectangle(BARGRAPH_BEGIN_X, BARGRAPH_OFFSET_Y , BARGRAPH_HEIGHT, BARGRAPH_WIDTH, PATTERN_WHITE);
     /* Then draw the actual line. */
-    display_fillRectangle(BARGRAPH_BEGIN_X, 32u - BARGRAPH_HEIGHT , BARGRAPH_HEIGHT, percentage, PATTERN_BLACK);
+    display_fillRectangle(BARGRAPH_BEGIN_X, BARGRAPH_OFFSET_Y , BARGRAPH_HEIGHT, percentage, PATTERN_BLACK);
+
+    //Draw the number.
+    /* TODO : We should clear the previous number, but should do initial test before implementing this. */
+    long2string(priv_active_bar->value, priv_buf);
+    display_drawStringCenter(priv_buf, 32u , NUMBER_OFFSET_Y, FONT_MEDIUM_FONT, FALSE);
 }
 
 
@@ -107,11 +129,46 @@ Private void drawBarGraph(void)
 Private void drawBackGround(void)
 {
     //Draw up arrow.
-    display_drawBitmapCenter(&upArrowBitmap, 64u, 10u , FALSE);
+    display_drawBitmapCenter(&upArrowBitmap, 64u, UP_ARROW_OFFSET_Y , FALSE);
 
     //Draw down arrow.
-    display_drawBitmapCenter(&downArrowBitmap, 64u, 54u, FALSE);
+    display_drawBitmapCenter(&downArrowBitmap, 64u, DOWN_ARROW_OFFSET_Y, FALSE);
 
     //Draw rectangle around the bar.
     /* TODO */
+}
+
+
+Private void handleButtonUp(void)
+{
+    if (priv_active_bar->value < priv_active_bar->max_value)
+    {
+        priv_active_bar->value++;
+    }
+
+    //Update the displayed data.
+    drawBarGraph();
+}
+
+Private void handleButtonDown(void)
+{
+    if (priv_active_bar->value > priv_active_bar->min_value)
+    {
+        priv_active_bar->value--;
+    }
+
+    //Update the displayed data.
+    drawBarGraph();
+}
+
+Private void handleButtonAck(void)
+{
+    if (priv_active_bar->parent != NULL)
+    {
+        buttons_unsubscribeAll();
+        menu_enterMenu(priv_active_bar->parent);
+        priv_active_bar = NULL;
+    }
+    /* Else, I guess we are stuck here...   */
+    /* Maybe should restart, just in case?  */
 }

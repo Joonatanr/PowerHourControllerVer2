@@ -9,12 +9,13 @@
 #define LOGIC_MENU_H_
 
 #include "typedefs.h"
+#include "Bargraph.h"
 
 typedef enum
 {
     MENU_ACTION_NONE,                   //We don't do anything, basically means that this is not yet implemented.
     MENU_ACTION_SUBMENU,                //We enter a submenu.
-    MENU_ACTION_WIDGET,                 //We activate a widget, like a scrollbar
+    MENU_ACTION_WIDGET,                 //We activate a widget, like a bargraph
     MENU_ACTION_FUNCTION,               //We perform an attached function. This also means that we leave the menu.
     NUMBER_OF_MENU_ACTIONS
 } MenuActionType;
@@ -28,15 +29,16 @@ typedef struct
 
     union
     {
-        struct _Selection_Menu_ *     subMenu;
-        MenuActionHandler          function;
+        struct _Selection_Menu_ *   subMenu_ptr;
+        MenuActionHandler          function_ptr;
+        struct __Bargraph__ *      bargraph_ptr;
     } ActionArg;
 
 } MenuItem;
 
 typedef struct _Selection_Menu_
 {
-    struct _Selection_Menu_ * root; /* Reference to upper menu in case of submenu. */
+    struct _Selection_Menu_ * parent; /* Reference to upper menu in case of submenu. */
     const MenuItem * items;
     const U8 number_of_items;
     U8 selected_item;
