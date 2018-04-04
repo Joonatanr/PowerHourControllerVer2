@@ -5,7 +5,7 @@
  *      Author: Joonatan
  */
 
-#include "parser.h"
+#include <misc.h>
 #include <stdlib.h>
 
 //General use text buffer.
@@ -33,6 +33,22 @@ Public Boolean parseRectangle(char * src, Rectangle * dest)
         }
     }
 
+    return res;
+}
+
+
+/* Returns a rectangle around a central point defined by location.
+ * TODO : This should be replace by an inline function or a macro. */
+Public inline Rectangle CreateRectangleAroundCenter(Point location, Size size)
+{
+    Rectangle res;
+    //res.location.x = location.x - (size.width / 2);
+    //res.location.y = location.y - (size.height / 2);
+    res.location.x = GET_X_FROM_CENTER(location.x, size.width);
+    res.location.y = GET_Y_FROM_CENTER(location.y, size.height);
+
+    res.size.height = size.height;
+    res.size.width = size.width;
     return res;
 }
 

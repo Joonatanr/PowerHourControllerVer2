@@ -5,10 +5,10 @@
  *      Author: Joonatan
  */
 
+#include <misc.h>
 #include "Bargraph.h"
 #include "display_drv.h"
 #include "buttons.h"
-#include "parser.h"
 
 #define BARGRAPH_BEGIN_X   14u
 #define BARGRAPH_WIDTH    100u
@@ -17,8 +17,10 @@
 
 #define UP_ARROW_OFFSET_Y   10u
 #define DOWN_ARROW_OFFSET_Y 40u
-#define NUMBER_OFFSET_Y     25u
 
+#define NUMBER_OFFSET_Y     30u /* Currently this offset is from center, others are from top. */
+#define NUMBER_BOX_WIDTH    20u
+#define NUMBER_BOX_HEIGHT   20u
 
 const U8 monochrom_arrow_upBitmaps[] =
 {
@@ -74,6 +76,12 @@ Public Bargraph_T TEST_BARGRAPH =
 Private Bargraph_T * priv_active_bar;
 Private char priv_buf[10];
 
+Private const Rectangle priv_number_box =
+{
+     .location = { GET_X_FROM_CENTER(64u, NUMBER_BOX_WIDTH), NUMBER_OFFSET_Y   },
+     .size =     { NUMBER_BOX_HEIGHT,                        NUMBER_BOX_WIDTH  }
+};
+
 /***************************** Private function forward declarations  ******************************/
 
 Private void drawBarGraph(void);
@@ -96,6 +104,8 @@ Public void enterBarGraph(Bargraph_T * bar)
     buttons_subscribeListener(BLUE_BUTTON, handleButtonDown);
     buttons_subscribeListener(BLACK_BUTTON, handleButtonAck);
     buttons_subscribeListener(GREEN_BUTTON, handleButtonAck);
+
+    //priv_number_box = CreateRectangleAroundCenter((Point){64u, NUMBER_OFFSET_Y }, (Size){ 20u, 20u });
 
     drawBackGround();
     drawBarGraph();
@@ -121,7 +131,9 @@ Private void drawBarGraph(void)
     //Draw the number.
     /* TODO : We should clear the previous number, but should do initial test before implementing this. */
     long2string(priv_active_bar->value, priv_buf);
-    display_drawStringCenter(priv_buf, 32u , NUMBER_OFFSET_Y, FONT_MEDIUM_FONT, FALSE);
+
+    //display_drawStringCenter(priv_buf, 64u , NUMBER_OFFSET_Y, FONT_MEDIUM_FONT, FALSE);*/
+    display_drawTextBox(&priv_number_box, priv_buf, FONT_MEDIUM_FONT);
 }
 
 

@@ -10,6 +10,7 @@
 #include "spi_drv.h"
 #include "bitmaps.h"
 #include "register.h"
+#include "misc.h"
 
 
 /*****************************************************************************************************
@@ -179,6 +180,38 @@ Public void display_cyclic_50msec(void)
         }
     }
 }
+
+
+/* Return true, if successful, false, otherwise. */
+Public Boolean display_drawTextBox(const Rectangle * box, const char * str, FontType font)
+{
+    U8 box_center_x;
+    U8 box_center_y;
+    U8 str_height = font_getFontHeight(font);
+    /* First we clear the previous value. */
+    display_fillRectangle(box->location.x, box->location.y, box->size.height, box->size.width, PATTERN_WHITE);
+
+    /* Check if string will fit in the box. */
+    if ((str_height > box->size.height) || (getStringWidth(str, font) > box->size.width))
+    {
+        /* This should not normally happen, so we use the gray pattern to indicate that the box is too small. */
+        display_fillRectangle(box->location.x, box->location.y, box->size.height, box->size.width, PATTERN_GRAY);
+        return FALSE;
+    }
+    else
+    {
+        /* We draw the string to the center. */
+        box_center_x = box->location.x + (box->size.width / 2);
+        box_center_y = box->location.y + (box->size.height / 2);
+
+        //display_drawStringCenter(str, box_center_x, box_center_y - (str_height / 2) , font, FALSE);
+        /* Currently we draw a string to the center of the box. */
+        display_drawStringCenter(str, box_center_x, GET_Y_FROM_CENTER(box_center_y, str_height), font, FALSE);
+
+        return TRUE;
+    }
+}
+
 
 //Draws string around the centerPoint.
 Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, FontType font, Boolean isInverted)

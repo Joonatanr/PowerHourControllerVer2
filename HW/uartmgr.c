@@ -10,8 +10,8 @@
 
 #include <uart.h>
 #include <driverlib.h>
+#include <misc.h>
 #include "uartmgr.h"
-#include "parser.h"
 #include "display_drv.h"
 
 Private U8 priv_receive_buffer[UART_BUF_LEN];
