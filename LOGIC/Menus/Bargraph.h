@@ -11,6 +11,7 @@
 #include "typedefs.h"
 #include "menu.h"
 
+typedef void (*bargraph_func)(U16 value);
 
 typedef struct __Bargraph__
 {
@@ -19,9 +20,11 @@ typedef struct __Bargraph__
     U16 min_value;
     struct _Selection_Menu_ * parent;
     char * text;
+    bargraph_func value_changed;
 } Bargraph_T;
 
 extern Bargraph_T TEST_BARGRAPH;
+extern Bargraph_T BRIGHTNESS_BARGRAPH;
 
 extern void enterBarGraph(Bargraph_T * bar);
 

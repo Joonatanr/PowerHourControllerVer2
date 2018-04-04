@@ -32,8 +32,8 @@ Public TimerHandler timer_50msec_callback = timer_lo_prio;
 /* Settings Menu Items */
 Private const MenuItem SettingsMenuItemArray[] =
 {
-   { .text = "Brightness",    .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                        },
-   { .text = "Test",          .Action = MENU_ACTION_WIDGET      , .ActionArg.bargraph_ptr = &TEST_BARGRAPH  },
+   { .text = "Brightness",    .Action = MENU_ACTION_WIDGET  , .ActionArg.bargraph_ptr = &BRIGHTNESS_BARGRAPH },
+   { .text = "Test",          .Action = MENU_ACTION_WIDGET  , .ActionArg.bargraph_ptr = &TEST_BARGRAPH       },
 };
 
 Private SelectionMenu SettingsMenu =

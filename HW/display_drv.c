@@ -204,10 +204,11 @@ Public Boolean display_drawTextBox(const Rectangle * box, const char * str, Font
         box_center_x = box->location.x + (box->size.width / 2);
         box_center_y = box->location.y + (box->size.height / 2);
 
+
         //display_drawStringCenter(str, box_center_x, box_center_y - (str_height / 2) , font, FALSE);
         /* Currently we draw a string to the center of the box. */
         display_drawStringCenter(str, box_center_x, GET_Y_FROM_CENTER(box_center_y, str_height), font, FALSE);
-
+        //display_fillRectangle(box->location.x, box->location.y, box->size.height, box->size.width, PATTERN_GRAY);
         return TRUE;
     }
 }

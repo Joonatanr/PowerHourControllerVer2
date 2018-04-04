@@ -9,18 +9,19 @@
 #include "Bargraph.h"
 #include "display_drv.h"
 #include "buttons.h"
+#include "backlight.h"
 
-#define BARGRAPH_BEGIN_X   14u
-#define BARGRAPH_WIDTH    100u
-#define BARGRAPH_HEIGHT     4u
-#define BARGRAPH_OFFSET_Y   52u
+#define BARGRAPH_BEGIN_X    14u
+#define BARGRAPH_WIDTH     100u
+#define BARGRAPH_HEIGHT      4u
+#define BARGRAPH_OFFSET_Y   53u
 
-#define UP_ARROW_OFFSET_Y   10u
+#define UP_ARROW_OFFSET_Y   14u
 #define DOWN_ARROW_OFFSET_Y 40u
 
-#define NUMBER_OFFSET_Y     30u /* Currently this offset is from center, others are from top. */
-#define NUMBER_BOX_WIDTH    20u
-#define NUMBER_BOX_HEIGHT   20u
+#define NUMBER_OFFSET_Y     25u
+#define NUMBER_BOX_WIDTH    30u
+#define NUMBER_BOX_HEIGHT   14u
 
 const U8 monochrom_arrow_upBitmaps[] =
 {
@@ -68,7 +69,18 @@ Public Bargraph_T TEST_BARGRAPH =
      .min_value = 0u,
      .value = 50u,
      .parent = NULL,
-     .text = "Test Bar"
+     .text = "Test Bar",
+     .value_changed = NULL,
+};
+
+Public Bargraph_T BRIGHTNESS_BARGRAPH =
+{
+     .max_value = 100u,
+     .min_value = 0u,
+     .value = 60u,
+     .parent = NULL,
+     .text = "Brightness",
+     .value_changed = backlight_set_level,
 };
 
 /*******************/
@@ -90,6 +102,8 @@ Private void drawBackGround(void);
 Private void handleButtonUp(void);
 Private void handleButtonDown(void);
 Private void handleButtonAck(void);
+
+Private void updateBargraph(void);
 
 
 /***************************** Public function definitions  ******************************/
@@ -120,7 +134,7 @@ Private void drawBarGraph(void)
     U16 percentage;
     U8 range = priv_active_bar->max_value - priv_active_bar->min_value;
 
-    percentage = ((priv_active_bar->max_value - priv_active_bar->value) * 100u) / range;
+    percentage = ((priv_active_bar->value - priv_active_bar->min_value) * 100u) / range;
 
     //Draw the line
     /* We clear it first. */
@@ -132,7 +146,6 @@ Private void drawBarGraph(void)
     /* TODO : We should clear the previous number, but should do initial test before implementing this. */
     long2string(priv_active_bar->value, priv_buf);
 
-    //display_drawStringCenter(priv_buf, 64u , NUMBER_OFFSET_Y, FONT_MEDIUM_FONT, FALSE);*/
     display_drawTextBox(&priv_number_box, priv_buf, FONT_MEDIUM_FONT);
 }
 
@@ -140,6 +153,11 @@ Private void drawBarGraph(void)
 /* Draws the arrows on the scrollbar sides. */
 Private void drawBackGround(void)
 {
+    display_clear();
+
+    //Draw title
+    display_drawStringCenter(priv_active_bar->text, 63u, 1u, FONT_MEDIUM_FONT, FALSE);
+
     //Draw up arrow.
     display_drawBitmapCenter(&upArrowBitmap, 64u, UP_ARROW_OFFSET_Y , FALSE);
 
@@ -159,7 +177,7 @@ Private void handleButtonUp(void)
     }
 
     //Update the displayed data.
-    drawBarGraph();
+    updateBargraph();
 }
 
 Private void handleButtonDown(void)
@@ -170,6 +188,17 @@ Private void handleButtonDown(void)
     }
 
     //Update the displayed data.
+    updateBargraph();
+}
+
+
+Private void updateBargraph(void)
+{
+    if (priv_active_bar->value_changed != NULL)
+    {
+       priv_active_bar->value_changed(priv_active_bar->value);
+    }
+
     drawBarGraph();
 }
 
