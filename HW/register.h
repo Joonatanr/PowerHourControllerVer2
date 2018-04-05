@@ -30,5 +30,6 @@ extern U8 isBtnOne(void);
 extern U8 isBtnTwo(void);
 
 extern void delay_msec(U16 msec);
+extern U16 generate_random_number(U16 max);
 
 #endif /* HW_REGISTER_H_ */

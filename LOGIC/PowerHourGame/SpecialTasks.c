@@ -9,6 +9,8 @@
 #include "bitmaps.h"
 #include "font.h"
 #include "display_drv.h"
+#include "register.h"
+#include <stdlib.h>
 
 #define SMALL_SHOT_X 20u
 #define SMALL_SHOT_Y 32u
@@ -19,12 +21,14 @@ typedef struct
     const char * upper_text;
     const char * middle_text;
     const char * lower_text;
+    U8 counter; /* Number of times, this task has been selected. */
 } MultiString;
 
 
 //Private Boolean DrinkTwiceTask(U8 sec, const char * headerWord);
 Private Boolean DrinkTwiceTask(U8 sec, SpecialTaskType type);
 Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type);
+Private const MultiString * getRandomTaskFromArray(MultiString * array, U8 array_size);
 
 Private const SpecialTaskFunc priv_special_tasks_girls_array[] =
 {
@@ -54,30 +58,29 @@ Private char priv_str_buf[64];
 Private SpecialTaskFunc priv_selected_task_ptr;
 
 /* TODO : Generate more tasks. */
-Private const MultiString priv_specialTaskArrayGirls[] =
+Private MultiString priv_TextArrayGirls[] =
 {
-     {"The girl with ",     "the fanciest clothes"  , "drinks 2x"           },
-     {"The girl with  ",    "the largest boobs"     , "drinks 2x"           },
-     {NULL,                 "Only girls drink"      , NULL                  },
-     {"Girls",              "I have never ever"     , NULL                  },
-     {"The girl with ",     "the sexiest voice"     , "drinks 2x "          },
-     {"All girls lose" ,    "One Item of Clothing"  , NULL                  },
-     {"Girls drink",        "without "      ,         "using hands"         },
+     {"The girl with ",     "the fanciest clothes"  , "drinks 2x"         , .counter = 0u  },
+     {"The girl with  ",    "the largest boobs"     , "drinks 2x"         , .counter = 0u  },
+     {NULL,                 "Only girls drink"      , NULL                , .counter = 0u  },
+     {"Girls",              "I have never ever"     , NULL                , .counter = 0u  },
+     {"The girl with ",     "the sexiest voice"     , "drinks 2x "        , .counter = 0u  },
+     {"All girls lose" ,    "One Item of Clothing"  , NULL                , .counter = 0u  },
+     {"Girls drink",        "without "      ,         "using hands"       , .counter = 0u  },
 };
 
-Private const MultiString priv_specialTaskArrayGuys[] =
+Private MultiString priv_TextArrayGuys[] =
 {
-     {  NULL                    , "Only guys drink",            NULL            },
-     {  "Guys drink"            , "without",                    "using hands"   },
-     {  "The toughest guy"      , "drinks 3x",                  NULL            },
-     {  "The biggest playboy"   , "drinks 3x",                  NULL            },
-     {  "All guys lose"         , "One Item of Clothing",       NULL            },
-     {  "Guys"                  , "Never have I ever",          NULL            },
-     {  NULL                    , "Guys must sing",         "a song together"   },
+     {  NULL                    , "Only guys drink",            NULL          , .counter = 0u  },
+     {  "Guys drink"            , "without",                    "using hands" , .counter = 0u  },
+     {  "The toughest guy"      , "drinks 3x",                  NULL          , .counter = 0u  },
+     {  "The biggest playboy"   , "drinks 3x",                  NULL          , .counter = 0u  },
+     {  "All guys lose"         , "One Item of Clothing",       NULL          , .counter = 0u  },
+     {  "Guys"                  , "Never have I ever",          NULL          , .counter = 0u  },
+     {  NULL                    , "Guys must sing",         "a song together" , .counter = 0u  },
 };
 
 
-//TODO : This is still a placeholder.
 Public Boolean girlsSpecialTask(U8 sec)
 {
     Boolean res = FALSE;
@@ -157,10 +160,6 @@ Private Boolean DrinkTwiceTask(U8 sec, SpecialTaskType type)
     return res;
 }
 
-//We currently don't use random selection, but simply inrement the counter each time.
-Private U8 test_counter_index_guys;
-Private U8 test_counter_index_girls;
-
 Private const MultiString * priv_task_str_ptr;
 
 /* The sec parameter specifies the current second from the beginning of the task.
@@ -169,6 +168,9 @@ Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
 {
     //This is the simplest special task, currently no bitmaps, but we just display text on screen.
     //Text is three lines and randomly selected from tasks from previous PH controller :)
+
+    /* TODO : We should add a randomiser. So we return a task that has not been done before, but it is random. */
+
     Boolean res = FALSE;
 
     switch(sec)
@@ -176,21 +178,11 @@ Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
     case(1u):
        if (type == TASK_FOR_GIRLS)
        {
-           priv_task_str_ptr = &priv_specialTaskArrayGirls[test_counter_index_girls];
-           test_counter_index_girls++;
-           if(test_counter_index_girls >= NUMBER_OF_ITEMS(priv_specialTaskArrayGirls))
-           {
-               test_counter_index_girls = 0u;
-           }
+           priv_task_str_ptr = getRandomTaskFromArray(priv_TextArrayGirls, NUMBER_OF_ITEMS(priv_TextArrayGirls));
        }
        else if(type == TASK_FOR_GUYS)
        {
-           priv_task_str_ptr = &priv_specialTaskArrayGuys[test_counter_index_guys];
-           test_counter_index_guys++;
-           if(test_counter_index_guys >= NUMBER_OF_ITEMS(priv_specialTaskArrayGuys))
-           {
-               test_counter_index_guys = 0u;
-           }
+           priv_task_str_ptr = getRandomTaskFromArray(priv_TextArrayGuys, NUMBER_OF_ITEMS(priv_TextArrayGuys));
        }
        break;
     case (2u):
@@ -213,4 +205,56 @@ Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
     return res;
 }
 
+
+Private const MultiString * getRandomTaskFromArray(MultiString * array, U8 array_size)
+{
+    U8 ix;
+    U8 min_count = 0xffu;
+
+    U8 * index_array;
+    U8 unused = 0u;
+    U16 result_index;
+
+    index_array = (U8 *)malloc(sizeof(U8) * array_size);
+
+    if (index_array == NULL)
+    {
+        /* TODO : Review error handling. Currently will be stuck in infinite loop. */
+        while(1);
+    }
+
+    for (ix = 0u; ix < array_size; ix++)
+    {
+
+        if (array[ix].counter < min_count)
+        {
+            min_count = array[ix].counter;
+        }
+    }
+
+    for (ix = 0u; ix < array_size; ix++)
+    {
+        if (array[ix].counter <= min_count)
+        {
+            /* We can use this item. */
+            index_array[unused] = ix;
+            unused++;
+        }
+    }
+
+    if (unused > 0u)
+    {
+        /* So now index_array should contain all the unused indexes. */
+        result_index = index_array[generate_random_number(unused - 1u)];
+    }
+    else
+    {
+        /* TODO : Review this case. something has gone seriously wrong... */
+        result_index = 0u;
+    }
+
+    free(index_array);
+    array[result_index].counter++;
+    return &array[result_index];
+}
 

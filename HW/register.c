@@ -11,6 +11,7 @@
 #include "buzzer.h"
 #include "buttons.h"
 #include "backlight.h"
+#include <stdlib.h>
 
 //Hi priority timer runs at 10msec interval (might need to be faster)
 Private const Timer_A_UpModeConfig hi_prio_timer_config =
@@ -100,6 +101,31 @@ Public void delay_msec(U16 msec)
 {
     priv_delay_counter = msec / 10;
     while(priv_delay_counter > 0u);
+}
+
+
+Public U16 generate_random_number(U16 max)
+{
+    static U16 priv_seed = 0u;
+    U16 res;
+    if (priv_seed == 0u)
+    {
+        priv_seed = TA0R ^ TA1R;
+        /* We initialize the pseudo random number generator. */
+        srand(priv_seed);
+    }
+
+    /* Max might actually be legitimately 0 in some calculations. */
+    if (max == 0u)
+    {
+        res = 0u;
+    }
+    else
+    {
+        res =  rand() % (max + 1u);
+    }
+
+    return res;
 }
 
 /*****************************************************************************************************

@@ -54,7 +54,6 @@ typedef enum
     BEERSHOT_FULL,              //Draw full beershot.
     BEERSHOT_BEGIN_EMPTYING,    //Initiate emptying animation.
 
-    //TODO
     OVERRIDE_FUNCTION,          //Overrides ordinary function, displays bitmap instead.
     RESTORE_FUNCTION,           //Restore normal handling.
 } beerShotAction;
