@@ -4,13 +4,13 @@
 //
 //****************************************************************************
 
+#include <LOGIC/PowerHourGame/clockDisplay.h>
 #include <misc.h>
 #include "msp.h"
 #include "typedefs.h"
 #include "register.h"
 #include "display_drv.h"
 #include "buzzer.h"
-#include "clockDisplay.h"
 #include "buttons.h"
 #include "backlight.h"
 #include "Menus/menu.h"

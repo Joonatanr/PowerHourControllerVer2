@@ -5,8 +5,8 @@
  *      Author: Joonatan
  */
 
-#ifndef LOGIC_SPECIALTASKS_H_
-#define LOGIC_SPECIALTASKS_H_
+#ifndef LOGIC_POWERHOURGAME_SPECIALTASKS_H_
+#define LOGIC_POWERHOURGAME_SPECIALTASKS_H_
 
 
 #include "typedefs.h"
@@ -24,4 +24,4 @@ typedef Boolean (*SpecialTaskFunc)(U8 sec, SpecialTaskType type);
 extern Boolean girlsSpecialTask(U8 sec);
 extern Boolean guysSpecialTask(U8 sec);
 
-#endif /* LOGIC_SPECIALTASKS_H_ */
+#endif /* LOGIC_POWERHOURGAME_SPECIALTASKS_H_ */

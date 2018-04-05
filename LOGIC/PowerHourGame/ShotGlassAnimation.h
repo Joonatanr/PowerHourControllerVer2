@@ -5,8 +5,8 @@
  *      Author: Joonatan
  */
 
-#ifndef LOGIC_SHOTGLASSANIMATION_H_
-#define LOGIC_SHOTGLASSANIMATION_H_
+#ifndef LOGIC_POWERHOURGAME_SHOTGLASSANIMATION_H_
+#define LOGIC_POWERHOURGAME_SHOTGLASSANIMATION_H_
 
 
 #include "typedefs.h"
@@ -18,4 +18,4 @@ extern const Bitmap * ShotGlassAnimation_GetNext(void);
 extern const Bitmap * ShotGlassAnimation_GetPrev(void);
 
 
-#endif /* LOGIC_SHOTGLASSANIMATION_H_ */
+#endif /* LOGIC_POWERHOURGAME_SHOTGLASSANIMATION_H_ */

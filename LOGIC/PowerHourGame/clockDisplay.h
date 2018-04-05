@@ -5,8 +5,8 @@
  *      Author: Joonatan
  */
 
-#ifndef LOGIC_CLOCKDISPLAY_H_
-#define LOGIC_CLOCKDISPLAY_H_
+#ifndef LOGIC_POWERHOURGAME_CLOCKDISPLAY_H_
+#define LOGIC_POWERHOURGAME_CLOCKDISPLAY_H_
 
 #include "typedefs.h"
 
@@ -21,4 +21,4 @@ extern void clockDisplay_start(void);
 extern void clockDisplay_cyclic1000msec(void);
 extern void clockDisplay_stop(void);
 
-#endif /* LOGIC_CLOCKDISPLAY_H_ */
+#endif /* LOGIC_POWERHOURGAME_CLOCKDISPLAY_H_ */

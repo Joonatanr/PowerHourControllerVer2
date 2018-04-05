@@ -6,10 +6,10 @@
  */
 
 
-#include "clockDisplay.h"
+#include <LOGIC/PowerHourGame/clockDisplay.h>
+#include <LOGIC/PowerHourGame/ShotGlassAnimation.h>
+#include <LOGIC/PowerHourGame/SpecialTasks.h>
 #include "display_drv.h"
-#include "ShotGlassAnimation.h"
-#include "SpecialTasks.h"
 #include "buzzer.h"
 
 #define BEERSHOT_X 86

@@ -5,7 +5,7 @@
  *      Author: Joonatan
  */
 
-#include "SpecialTasks.h"
+#include <LOGIC/PowerHourGame/SpecialTasks.h>
 #include "bitmaps.h"
 #include "font.h"
 #include "display_drv.h"

@@ -5,8 +5,8 @@
  *      Author: JRE
  */
 
+#include <LOGIC/PowerHourGame/clockDisplay.h>
 #include "Scheduler.h"
-#include "clockDisplay.h"
 #include "buzzer.h"
 #include "buttons.h"
 #include "register.h"

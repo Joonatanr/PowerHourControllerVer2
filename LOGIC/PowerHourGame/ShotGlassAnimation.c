@@ -1,6 +1,6 @@
 
 
-#include "ShotGlassAnimation.h"
+#include <LOGIC/PowerHourGame/ShotGlassAnimation.h>
 
 #define NUMBER_OF_ANIMATION_FRAMES 9u
 
