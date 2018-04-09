@@ -78,6 +78,7 @@ Private MultiString priv_TextArrayGuys[] =
      {  "All guys lose"         , "One Item of Clothing",       NULL          , .counter = 0u  },
      {  "Guys"                  , "Never have I ever",          NULL          , .counter = 0u  },
      {  NULL                    , "Guys must sing",         "a song together" , .counter = 0u  },
+     {  "Last guy to put his"   , "finger on his nose",        "drinks 2x"    , .counter = 0u  },
 };
 
 
