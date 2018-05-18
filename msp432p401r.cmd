@@ -40,7 +40,7 @@
 
 MEMORY
 {
-    MAIN       (RX) : origin = 0x00000000, length = 0x00040000
+    MAIN       (RX) : origin = 0x00000000, length = 0x0003F000
     INFO       (RX) : origin = 0x00200000, length = 0x00004000
 #ifdef  __TI_COMPILER_VERSION__
 #if     __TI_COMPILER_VERSION__ >= 15009000

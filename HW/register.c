@@ -138,6 +138,13 @@ Private void clocks_init(void)
 {
     WDT_A_holdTimer();
 
+    /* This should be set in case of higher frequency. */
+    //MAP_PCM_setCoreVoltageLevel(PCM_VCORE1);
+
+    /* Set 2 flash wait states for Flash bank 0 and 1, also required for 48MHz */
+    //MAP_FlashCtl_setWaitState(FLASH_BANK0, 2);
+    //MAP_FlashCtl_setWaitState(FLASH_BANK1, 2);
+
     //Lets configure the DCO to 12MHz
     CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
 
