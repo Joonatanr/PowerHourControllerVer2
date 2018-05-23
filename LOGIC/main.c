@@ -117,23 +117,8 @@ Private void timer_lo_prio(void)
 Private void showStartScreen(void)
 {
     display_clear();
-#ifdef DEBUG_SEQUENCE
-    //display_drawBitmap(&girl_1_bitmap, 2, 2, FALSE);
-    //display_fillRectangle(0, 0, 40, 128, PATTERN_BLACK);
-    //display_drawStringCenter("Power Hour", 64u, 6u, FONT_LARGE_FONT, TRUE);
-    //display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT, TRUE);
-/*
-    display_fillRectangle(20, 20, 40, 40, PATTERN_BLACK);
-    display_fillRectangle(24, 24, 30, 30, PATTERN_WHITE);
-    display_fillRectangle(30, 30, 20, 20, PATTERN_BLACK);
-    display_fillRectangle(34, 34, 10, 10, PATTERN_WHITE);
-*/
-    menu_drawMenu(&testMenu);
-    delay_msec(10000);
-#else
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);
     display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT, FALSE);
-#endif
 }
 
 /* Starts the main Power Hour game. */
