@@ -6,6 +6,7 @@
  */
 
 #include <LOGIC/PowerHourGame/clockDisplay.h>
+#include <LOGIC/SnakeGame/SnakeMain.h>
 #include "Scheduler.h"
 #include "buzzer.h"
 #include "buttons.h"
@@ -27,6 +28,7 @@ Private void timer_1sec(void);
 Private const Scheduler_LogicTask priv_logic_modules[NUMBER_OF_LOGIC_MODULES] =
 {
      { .period = 1000u, .init_fptr = clockDisplay_init, .start_fptr = clockDisplay_start, .cyclic_fptr = clockDisplay_cyclic1000msec, .stop_fptr = clockDisplay_stop },
+     { .period = 100u,  .init_fptr = snake_init,        .start_fptr = snake_start,        .cyclic_fptr = snake_cyclic100ms,           .stop_fptr = snake_stop        }
 };
 
 

@@ -34,6 +34,12 @@ typedef enum
 #define NUMBER_OF_COLUMNS 128u
 #define NUMBER_OF_ROWS (NUMBER_OF_PAGES * 8u)
 
+
+#define DISP_FIRST_ROW      0u
+#define DISP_FIRST_COLUMN   0u
+#define DISP_LAST_ROW       (NUMBER_OF_ROWS - 1u)
+#define DISP_LAST_COLUMN    (NUMBER_OF_COLUMNS - 1u)
+
 #define GET_SEGMENT(column) ((column) >> 3u) //Divided by 8, since there are 8 columns per segment.
 #define GET_FIRST_COLUMN(segment) ((segment) << 3u) //Multiplied with 8, returns the first column index of a segment.
 
