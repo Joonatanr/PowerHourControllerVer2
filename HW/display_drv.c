@@ -369,6 +369,32 @@ Public void display_clear(void)
 }
 
 
+/* Sets or clears a single pixel. */
+Public void display_setPixel(U8 x, U8 y, Boolean val)
+{
+    /* TODO : Test this                   */
+    /* TODO : Add some proper bit macros. */
+
+    if ((x < NUMBER_OF_COLUMNS) && (y < NUMBER_OF_ROWS))
+    {
+        U8 page = y >> 3u;
+        U8 bit = y % 8u;
+        U8 segment = GET_SEGMENT(x);
+
+        if (val)
+        {
+            SETBIT(priv_display_buffer[x][page], (U8)(1u << bit));
+        }
+        else
+        {
+            CLRBIT(priv_display_buffer[x][page], (U8)(1u << bit));
+        }
+
+        //Invalidate segment.
+        SETBIT(priv_page_validity_bits[page], (U16)(1u << segment));
+    }
+}
+
 /*****************************************************************************************************
  *
  * Private Functions
@@ -611,8 +637,4 @@ Private U16 getStringWidth(const char * str, FontType font)
 
     return width;
 }
-
-
-
-
 

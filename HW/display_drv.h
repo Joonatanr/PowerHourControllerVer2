@@ -55,7 +55,7 @@ extern void display_fillRectangle(U16 x, U16 y, U16 height, U16 width, FillPatte
 extern void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y, Boolean isInverted);
 extern void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y, Boolean isInverted);
 
-Public void display_clear(void);
-
+extern void display_clear(void);
+extern void display_setPixel(U8 x, U8 y, Boolean val);
 
 #endif /* HW_DISPLAY_DRV_H_ */
