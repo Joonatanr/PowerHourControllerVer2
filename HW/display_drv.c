@@ -395,6 +395,45 @@ Public void display_setPixel(U8 x, U8 y, Boolean val)
     }
 }
 
+
+/* Line width is fixed at 1 pixel. If we want thicker lines, should implement rotating rectangles... */
+Public void display_drawLine(Point begin, Point end, Boolean isBlack)
+{
+
+    if (begin.x >= NUMBER_OF_COLUMNS ||
+        begin.y >= NUMBER_OF_ROWS    ||
+        end.x >= NUMBER_OF_COLUMNS   ||
+        end.y >= NUMBER_OF_ROWS)
+    {
+        return;
+    }
+
+    /* Eventually should be able to draw any line between 2 points.
+     * Lets begin with just simple straight line implementation... */
+    if (begin.x == end.x)
+    {
+        /* Straight vertical line. */
+        U8 y;
+        for (y = MIN(begin.y, end.y); y <= MAX(begin.y, end.y); y++)
+        {
+            display_setPixel(begin.x, y, isBlack);
+        }
+    }
+    else if(begin.y == end.y)
+    {
+        /* Straight horizontal line */
+        U8 x;
+        for (x = MIN(begin.x, end.x); x <= MAX(begin.x, end.x); x++)
+        {
+            display_setPixel(x, begin.y, isBlack);
+        }
+    }
+    else
+    {
+        /* TODO : Implement Bresenham's algorithm here. */
+    }
+}
+
 /*****************************************************************************************************
  *
  * Private Functions
