@@ -118,16 +118,23 @@ Private void showStartScreen(void)
 {
     display_clear();
 #ifdef    DEBUG_SEQUENCE
+
+    //Test setPixel function.
     display_setPixel(10, 10, TRUE);
     display_setPixel(20, 20, TRUE);
     display_setPixel(30, 30, TRUE);
     display_setPixel(40, 40, TRUE);
     display_setPixel(50, 50, TRUE);
     display_setPixel(60, 60, TRUE);
+
+    //Test line drawing.
+    display_drawLine((Point){70,20}, (Point){90,20}, TRUE);
+
     delay_msec(5000);
+
 #endif
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);
-    display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT, FALSE);
+    display_drawStringCenter("Machine 2.1", 64u, 40u, FONT_LARGE_FONT, FALSE);
 }
 
 /* Starts the main Power Hour game. */

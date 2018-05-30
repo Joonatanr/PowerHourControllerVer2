@@ -170,8 +170,6 @@ Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
     //This is the simplest special task, currently no bitmaps, but we just display text on screen.
     //Text is three lines and randomly selected from tasks from previous PH controller :)
 
-    /* TODO : We should add a randomiser. So we return a task that has not been done before, but it is random. */
-
     Boolean res = FALSE;
 
     switch(sec)
