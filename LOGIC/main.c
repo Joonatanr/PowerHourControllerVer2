@@ -82,7 +82,7 @@ void main(void)
 
     //We show the initial start screen for a while.
     showStartScreen();
-    delay_msec(5000);
+    delay_msec(4000);
 
     /* We pass control over to the menu handler. */
     menu_enterMenu(&StartMenu);
@@ -132,7 +132,7 @@ Private void showStartScreen(void)
     delay_msec(10000);
 #else
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);
-    display_drawStringCenter("Machine 2.0", 64u, 40u, FONT_LARGE_FONT, FALSE);
+    display_drawStringCenter("Machine 2.1", 64u, 40u, FONT_LARGE_FONT, FALSE);
 #endif
 }
 
