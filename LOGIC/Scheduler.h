@@ -16,7 +16,8 @@ typedef void (*Scheduler_TaskFunc)(void);
 
 typedef enum
 {
-    TASK_CYCLIC1000MS_CLOCKDP,
+    TASK_CYCLIC1000MS_CLOCKDP, /* Main PH game, TODO : Rename this from clock display, as it is incorrect. */
+    TASK_CYCLIC100MS_SNAKE,    /* Secondary snake game... TODO : Implement this. */
     NUMBER_OF_LOGIC_MODULES
 } Scheduler_LogicModuleEnum;
 

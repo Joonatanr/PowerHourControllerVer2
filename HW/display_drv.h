@@ -34,6 +34,12 @@ typedef enum
 #define NUMBER_OF_COLUMNS 128u
 #define NUMBER_OF_ROWS (NUMBER_OF_PAGES * 8u)
 
+
+#define DISP_FIRST_ROW      0u
+#define DISP_FIRST_COLUMN   0u
+#define DISP_LAST_ROW       (NUMBER_OF_ROWS - 1u)
+#define DISP_LAST_COLUMN    (NUMBER_OF_COLUMNS - 1u)
+
 #define GET_SEGMENT(column) ((column) >> 3u) //Divided by 8, since there are 8 columns per segment.
 #define GET_FIRST_COLUMN(segment) ((segment) << 3u) //Multiplied with 8, returns the first column index of a segment.
 
@@ -49,7 +55,8 @@ extern void display_fillRectangle(U16 x, U16 y, U16 height, U16 width, FillPatte
 extern void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y, Boolean isInverted);
 extern void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y, Boolean isInverted);
 
-Public void display_clear(void);
-
+extern void display_clear(void);
+extern void display_setPixel(U8 x, U8 y, Boolean val);
+extern void display_drawLine(Point begin, Point end, Boolean isBlack);
 
 #endif /* HW_DISPLAY_DRV_H_ */
