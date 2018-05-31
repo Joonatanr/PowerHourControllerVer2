@@ -138,7 +138,7 @@ Private void drawBorder(void)
 
 Private void setSnakeDirection(SnakeDirection dir)
 {
-
+    /* TODO : Implement this. */
 }
 
 
