@@ -31,11 +31,10 @@ extern void buttons_init(void);
 extern void buttons_cyclic10msec(void);
 extern void buttons_cyclic100msec(void);
 extern void buttons_subscribeListener(ButtonType btn, buttonListener listener);
+extern void buttons_subscribeHoldDownListener(ButtonType btn, buttonListener listener);
 extern void buttons_unsubscribeAll(void);
 
-extern Boolean isRedButton(void);
-extern Boolean isBlueButton(void);
-extern Boolean isGreenButton(void);
-extern Boolean isBlackButton(void);
+extern Boolean isButton(ButtonType btn);
+
 
 #endif /* HW_BUTTONS_H_ */

@@ -97,9 +97,9 @@ Private void timer_hi_prio(void)
 {
     //All high priority tasks should be put in here.
     //This means hardware tasks, such as reading buttons, changing PWM etc.
-    set_led_two_blue(isBlueButton());
-    set_led_two_red(isRedButton());
-    set_led_two_green(isGreenButton());
+    set_led_two_blue(isButton(BLUE_BUTTON));
+    set_led_two_red(isButton(RED_BUTTON));
+    set_led_two_green(isButton(GREEN_BUTTON));
 
     buttons_cyclic10msec();
 }

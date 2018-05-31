@@ -9,35 +9,68 @@
 #include "buttons.h"
 #include <driverlib.h>
 
+#define BUTTON_HOLD_TIME 3000u  /* Set this threshold to 3 seconds. */
+
+
 typedef Boolean (*buttonFunction)(void);
 
 typedef struct
 {
-    buttonFunction state_func;      //Used to get the state of the button.
-    buttonListener listener_func;   //Can be subscribed to.
-    Boolean button_hold;
-    Boolean pressed;
+    const U8 port;
+    const U8 pin;
 
-} ButtonContainer;
+    /* TODO : Add edge configuration in here. */
+} ButtonConf;
+
+typedef struct
+{
+    const ButtonConf * conf;
+
+    buttonListener listener_press_func;   //Can be subscribed to. > Triggers when button is pressed
+    buttonListener listener_hold_func;    //Can be subscribed to. > Triggers when button is held down for a period of time.
+
+    Boolean        button_hold; /* Used for falling edge detection.     */
+    U16            hold_cnt;    /* Used for button held-down detection  */
+
+    Boolean        pressed;     /* Flag is triggered when a button press has been detected.         */
+    Boolean        held_down;   /* Flag is triggered when a button has been held down for a time    */
+} ButtonState;
+
+
+Private const ButtonConf priv_button_config[NUMBER_OF_BUTTONS] =
+{
+ {  .port = GPIO_PORT_P4, .pin = GPIO_PIN7 },      /* RED_BUTTON       */
+ {  .port = GPIO_PORT_P5, .pin = GPIO_PIN5 },      /* GREEN_BUTTON     */
+ {  .port = GPIO_PORT_P6, .pin = GPIO_PIN4 },      /* BLACK_BUTTON     */
+ {  .port = GPIO_PORT_P5, .pin = GPIO_PIN4 },      /* BLUE_BUTTON      */
+};
+
 
 /* TODO : Make it possible to configure buttons to rising edge. */
 /* TODO : Maybe it would be better to have an interrupt driven solution?? */
-Private ButtonContainer priv_button_config [NUMBER_OF_BUTTONS] =
-{
- { .state_func = isRedButton,    .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* RED_BUTTON       */
- { .state_func = isGreenButton,  .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* GREEN_BUTTON     */
- { .state_func = isBlackButton,  .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* BLACK_BUTTON     */
- { .state_func = isBlueButton,   .listener_func = NULL, .button_hold = FALSE , .pressed = FALSE},    /* BLUE_BUTTON      */
-};
+
+Private ButtonState priv_button_state[NUMBER_OF_BUTTONS];
 
 
 //Set up buttons as inputs.
 //4.7, 5.5, 5.4, 6.4
 Public void buttons_init(void)
 {
-    GPIO_setAsInputPin(GPIO_PORT_P4, GPIO_PIN7);
-    GPIO_setAsInputPin(GPIO_PORT_P5, GPIO_PIN5 | GPIO_PIN4);
-    GPIO_setAsInputPin(GPIO_PORT_P6, GPIO_PIN4);
+    U8 ix;
+
+    for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
+    {
+        priv_button_state[ix].conf = &priv_button_config[ix];
+
+        priv_button_state[ix].listener_hold_func = NULL;
+        priv_button_state[ix].listener_press_func = NULL;
+
+        priv_button_state[ix].held_down =   FALSE;
+        priv_button_state[ix].pressed =     FALSE;
+        priv_button_state[ix].button_hold = FALSE;
+
+        GPIO_setAsInputPin(priv_button_config[ix].port, priv_button_config[ix].pin);
+    }
 }
 
 
@@ -46,23 +79,34 @@ Public void buttons_cyclic10msec(void)
 {
     U8 ix;
     Boolean state;
+    ButtonState * btn_ptr;
+    const ButtonConf  * conf_ptr;
 
     for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
     {
-        state = priv_button_config[ix].state_func();
+        btn_ptr = &priv_button_state[ix];
+        conf_ptr = btn_ptr->conf;
+        state = (GPIO_getInputPinValue(conf_ptr->port, conf_ptr->pin) == 1u) ? FALSE : TRUE;
 
         if (state)
         {
-            priv_button_config[ix].button_hold = TRUE;
+            btn_ptr->button_hold = TRUE;
+            btn_ptr->hold_cnt += 10u;
         }
-        else if (priv_button_config[ix].button_hold == TRUE)
+        else if (btn_ptr->button_hold == TRUE)
         {
-            priv_button_config[ix].button_hold = FALSE;
-            priv_button_config[ix].pressed = TRUE;
+            btn_ptr->button_hold = FALSE;
+            btn_ptr->pressed = TRUE;
+            btn_ptr->hold_cnt = 0u;
         }
         else
         {
             /* Do nothing. */
+        }
+
+        if (btn_ptr->hold_cnt >= BUTTON_HOLD_TIME)
+        {
+            btn_ptr->held_down = TRUE;
         }
     }
 }
@@ -74,12 +118,21 @@ Public void buttons_cyclic100msec(void)
     U8 ix;
     for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
     {
-        if (priv_button_config[ix].pressed)
+        if (priv_button_state[ix].pressed)
         {
-            priv_button_config[ix].pressed = FALSE;
-            if (priv_button_config[ix].listener_func != NULL)
+            priv_button_state[ix].pressed = FALSE;
+            if (priv_button_state[ix].listener_press_func != NULL)
             {
-                priv_button_config[ix].listener_func();
+                priv_button_state[ix].listener_press_func();
+            }
+        }
+
+        if (priv_button_state[ix].held_down)
+        {
+            priv_button_state[ix].held_down = FALSE;
+            if (priv_button_state[ix].listener_hold_func != NULL)
+            {
+                priv_button_state[ix].listener_hold_func();
             }
         }
     }
@@ -93,7 +146,20 @@ Public void buttons_subscribeListener(ButtonType btn, buttonListener listener)
     //Critical section.
     if (btn < NUMBER_OF_BUTTONS)
     {
-        priv_button_config[btn].listener_func = listener;
+        priv_button_state[btn].listener_press_func = listener;
+    }
+    Interrupt_enableMaster();
+}
+
+
+/* TODO : Test this. */
+Public void buttons_subscribeHoldDownListener(ButtonType btn, buttonListener listener)
+{
+    Interrupt_disableMaster();
+    //Critical section.
+    if (btn < NUMBER_OF_BUTTONS)
+    {
+        priv_button_state[btn].listener_hold_func = listener;
     }
     Interrupt_enableMaster();
 }
@@ -106,30 +172,22 @@ Public void buttons_unsubscribeAll(void)
     Interrupt_disableMaster();
     for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
     {
-        priv_button_config[ix].listener_func = NULL;
+        priv_button_state[ix].listener_press_func = NULL;
     }
     Interrupt_enableMaster();
 }
 
-Public Boolean isRedButton(void)
-{
-    return ((GPIO_getInputPinValue(GPIO_PORT_P4, GPIO_PIN7) == 1u) ? FALSE : TRUE);
-}
 
-Public Boolean isBlueButton(void)
+Public Boolean isButton(ButtonType btn)
 {
-    return ((GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN4) == 1u) ? FALSE : TRUE);
-}
+    Boolean res = FALSE;
 
-Public Boolean isGreenButton(void)
-{
-    return ((GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN5) == 1u) ? FALSE : TRUE);
-}
+    if(btn < NUMBER_OF_BUTTONS)
+    {
+        res = (GPIO_getInputPinValue(priv_button_config[btn].port, priv_button_config[btn].pin) == 1u) ? FALSE : TRUE;
+    }
 
-Public Boolean isBlackButton(void)
-{
-    return ((GPIO_getInputPinValue(GPIO_PORT_P6, GPIO_PIN4) == 1u) ? FALSE : TRUE);
+    return res;
 }
-
 
 
