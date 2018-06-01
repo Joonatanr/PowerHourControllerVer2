@@ -14,6 +14,15 @@ typedef void (*buttonListener)(void);
 
 typedef enum
 {
+    RISING_EDGE,
+    FALLING_EDGE,
+    NUMBER_OF_BUTTON_MODES
+} ButtonMode;
+
+
+/* Configuration part - Change this to suit the application. */
+typedef enum
+{
     RED_BUTTON,     /* Up button    */
     GREEN_BUTTON,   /* Left button  */
     BLACK_BUTTON,   /* Right button */
@@ -27,10 +36,14 @@ typedef enum
 #define RIGHT_BUTTON    BLACK_BUTTON
 #define DOWN_BUTTON     BLUE_BUTTON
 
+/**************************************************************/
+
+
 extern void buttons_init(void);
 extern void buttons_cyclic10msec(void);
 extern void buttons_cyclic100msec(void);
 extern void buttons_subscribeListener(ButtonType btn, buttonListener listener);
+extern void buttons_setButtonMode(ButtonType btn, ButtonMode mode);
 extern void buttons_subscribeHoldDownListener(ButtonType btn, buttonListener listener);
 extern void buttons_unsubscribeAll(void);
 

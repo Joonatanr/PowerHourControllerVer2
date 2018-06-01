@@ -16,16 +16,16 @@ typedef Boolean (*buttonFunction)(void);
 
 typedef struct
 {
-    const U8 port;
-    const U8 pin;
+    const U8            port;
+    const U8            pin;
 
-    /* TODO : Add edge configuration in here. */
 } ButtonConf;
 
 typedef struct
 {
     const ButtonConf * conf;
 
+    ButtonMode     mode;                  //Rising or falling edge.
     buttonListener listener_press_func;   //Can be subscribed to. > Triggers when button is pressed
     buttonListener listener_hold_func;    //Can be subscribed to. > Triggers when button is held down for a period of time.
 
@@ -68,6 +68,7 @@ Public void buttons_init(void)
         priv_button_state[ix].held_down =   FALSE;
         priv_button_state[ix].pressed =     FALSE;
         priv_button_state[ix].button_hold = FALSE;
+        priv_button_state[ix].mode = FALLING_EDGE;
 
         GPIO_setAsInputPin(priv_button_config[ix].port, priv_button_config[ix].pin);
     }
@@ -88,20 +89,36 @@ Public void buttons_cyclic10msec(void)
         conf_ptr = btn_ptr->conf;
         state = (GPIO_getInputPinValue(conf_ptr->port, conf_ptr->pin) == 1u) ? FALSE : TRUE;
 
-        if (state)
+        /* Handle button press detection. */
+        if (state && (btn_ptr->button_hold == FALSE))
         {
             btn_ptr->button_hold = TRUE;
-            btn_ptr->hold_cnt += 10u;
+            if (btn_ptr->mode == RISING_EDGE)
+            {
+                btn_ptr->pressed = TRUE;
+            }
         }
-        else if (btn_ptr->button_hold == TRUE)
+        else if (!state && (btn_ptr->button_hold == TRUE))
         {
             btn_ptr->button_hold = FALSE;
-            btn_ptr->pressed = TRUE;
-            btn_ptr->hold_cnt = 0u;
+            if (btn_ptr->mode == FALLING_EDGE)
+            {
+                btn_ptr->pressed = TRUE;
+            }
         }
         else
         {
             /* Do nothing. */
+        }
+
+        /* Handle button hold-down detection */
+        if (state)
+        {
+            btn_ptr->hold_cnt += 10u;
+        }
+        else
+        {
+            btn_ptr->hold_cnt = 0u;
         }
 
         if (btn_ptr->hold_cnt >= BUTTON_HOLD_TIME)
@@ -149,6 +166,15 @@ Public void buttons_subscribeListener(ButtonType btn, buttonListener listener)
         priv_button_state[btn].listener_press_func = listener;
     }
     Interrupt_enableMaster();
+}
+
+
+Public void buttons_setButtonMode(ButtonType btn, ButtonMode mode)
+{
+    if ((btn < NUMBER_OF_BUTTONS) && (mode < NUMBER_OF_BUTTON_MODES))
+    {
+        priv_button_state[btn].mode = mode;
+    }
 }
 
 
