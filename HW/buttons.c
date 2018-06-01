@@ -46,8 +46,6 @@ Private const ButtonConf priv_button_config[NUMBER_OF_BUTTONS] =
 };
 
 
-/* TODO : Make it possible to configure buttons to rising edge. */
-/* TODO : Maybe it would be better to have an interrupt driven solution?? */
 
 Private ButtonState priv_button_state[NUMBER_OF_BUTTONS];
 
