@@ -197,6 +197,7 @@ Public void buttons_unsubscribeAll(void)
     for (ix = 0u; ix < NUMBER_OF_BUTTONS; ix++)
     {
         priv_button_state[ix].listener_press_func = NULL;
+        priv_button_state[ix].listener_hold_func = NULL;
     }
     Interrupt_enableMaster();
 }
