@@ -5,10 +5,6 @@
  *      Author: Joonatan
  */
 
-//
-//  Image data for palm_tree
-//
-
 #include "bitmaps.h"
 
 const U8 small_shotBitmaps[] =

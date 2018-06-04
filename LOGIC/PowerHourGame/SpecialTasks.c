@@ -22,13 +22,13 @@ typedef struct
     const char * middle_text;
     const char * lower_text;
     U8 counter; /* Number of times, this task has been selected. */
-} MultiString;
+} Task_T;
 
 
 //Private Boolean DrinkTwiceTask(U8 sec, const char * headerWord);
 Private Boolean DrinkTwiceTask(U8 sec, SpecialTaskType type);
 Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type);
-Private const MultiString * getRandomTaskFromArray(MultiString * array, U8 array_size);
+Private const Task_T * getRandomTaskFromArray(Task_T * array, U8 array_size);
 
 Private const SpecialTaskFunc priv_special_tasks_girls_array[] =
 {
@@ -58,7 +58,7 @@ Private char priv_str_buf[64];
 Private SpecialTaskFunc priv_selected_task_ptr;
 
 /* TODO : Generate more tasks. */
-Private MultiString priv_TextArrayGirls[] =
+Private Task_T priv_TextArrayGirls[] =
 {
      {"The girl with ",     "the fanciest clothes"  , "drinks 2x"         , .counter = 0u  },
      {"The girl with  ",    "the largest boobs"     , "drinks 2x"         , .counter = 0u  },
@@ -67,9 +67,10 @@ Private MultiString priv_TextArrayGirls[] =
      {"The girl with ",     "the sexiest voice"     , "drinks 2x "        , .counter = 0u  },
      {"All girls lose" ,    "One Item of Clothing"  , NULL                , .counter = 0u  },
      {"Girls drink",        "without "      ,         "using hands"       , .counter = 0u  },
+     {"Choose one girl",    "who drinks 3x ",         NULL                , .counter = 0u  },
 };
 
-Private MultiString priv_TextArrayGuys[] =
+Private Task_T priv_TextArrayGuys[] =
 {
      {  NULL                    , "Only guys drink",            NULL          , .counter = 0u  },
      {  "Guys drink"            , "without",                    "using hands" , .counter = 0u  },
@@ -79,6 +80,7 @@ Private MultiString priv_TextArrayGuys[] =
      {  "Guys"                  , "Never have I ever",          NULL          , .counter = 0u  },
      {  NULL                    , "Guys must sing",         "a song together" , .counter = 0u  },
      {  "Last guy to put his"   , "finger on his nose",        "drinks 2x"    , .counter = 0u  },
+     {  "Choose one guy"        , "who drinks 3x ",             NULL          , .counter = 0u  },
 };
 
 
@@ -161,7 +163,7 @@ Private Boolean DrinkTwiceTask(U8 sec, SpecialTaskType type)
     return res;
 }
 
-Private const MultiString * priv_task_str_ptr;
+Private const Task_T * priv_task_str_ptr;
 
 /* The sec parameter specifies the current second from the beginning of the task.
  * This function is called cyclically after every second. */
@@ -205,7 +207,7 @@ Private Boolean SpecialTaskWithRandomText(U8 sec, SpecialTaskType type)
 }
 
 
-Private const MultiString * getRandomTaskFromArray(MultiString * array, U8 array_size)
+Private const Task_T * getRandomTaskFromArray(Task_T * array, U8 array_size)
 {
     U8 ix;
     U8 min_count = 0xffu;
