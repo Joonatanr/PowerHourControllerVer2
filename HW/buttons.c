@@ -198,6 +198,7 @@ Public void buttons_unsubscribeAll(void)
     {
         priv_button_state[ix].listener_press_func = NULL;
         priv_button_state[ix].listener_hold_func = NULL;
+        priv_button_state[ix].mode = FALLING_EDGE; //This is default.
     }
     Interrupt_enableMaster();
 }

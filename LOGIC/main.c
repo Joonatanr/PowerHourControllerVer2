@@ -24,6 +24,7 @@ Private void timer_lo_prio(void);
 Private void showStartScreen(void);
 
 Private void startGameHandler(void);
+Private void startSnakeGame(void);
 
 //Callback for register.c
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
@@ -48,6 +49,7 @@ Private SelectionMenu SettingsMenu =
 Private const MenuItem StartMenuItemArray[] =
 {
    { .text = "Start Game",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function_ptr = startGameHandler    },
+   { .text = "Test Snake",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function_ptr = startSnakeGame      },
    { .text = "Settings",    .Action = MENU_ACTION_SUBMENU     , .ActionArg.subMenu_ptr = &SettingsMenu        },
    { .text = "Exit",        .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                            },
 };
@@ -141,5 +143,11 @@ Private void showStartScreen(void)
 Private void startGameHandler(void)
 {
     Scheduler_SetActiveModule(TASK_CYCLIC1000MS_CLOCKDP);
+}
+
+/* Starts the snake game. */
+Private void startSnakeGame(void)
+{
+    Scheduler_SetActiveModule(TASK_CYCLIC100MS_SNAKE);
 }
 

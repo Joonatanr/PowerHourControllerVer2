@@ -13,6 +13,7 @@
 #include "register.h"
 #include "uartmgr.h"
 #include "display_drv.h"
+#include <driverlib.h>
 
 /* NB! Current implementation assumes that only 1 task is active at any time, but this can be changed ofcourse. */
 /* NB! All lo prio interrupt tasks should come here. I think there is no point to create a separate scheduler for the
@@ -90,11 +91,13 @@ void Scheduler_StartTasks(void)
 
 void Scheduler_SetActiveModule(Scheduler_LogicModuleEnum task)
 {
+    Interrupt_disableMaster();
     if (priv_curr_task_ptr != NULL)
     {
         priv_curr_task_ptr->stop_fptr();
     }
     priv_curr_task_ptr = &priv_logic_modules[task];
+    Interrupt_enableMaster();
     priv_curr_task_ptr->start_fptr();
 }
 
