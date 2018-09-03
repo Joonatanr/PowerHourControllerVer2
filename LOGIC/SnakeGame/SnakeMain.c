@@ -43,7 +43,7 @@ Private Boolean priv_isDirSet = FALSE; /* Prevents from changing direction twice
 
 
 Private void setSnakeDirection(SnakeDirection dir);
-Private Point getEndOfElement(const SnakeElement * elem);
+Private Point getTailOfElement(const SnakeElement * elem);
 
 /* Drawing functions. */
 Private void drawBorder(void);
@@ -118,10 +118,10 @@ Public void snake_cyclic100ms(void)
     switch(priv_head->dir)
     {
     case DIR_UP:
-        priv_head->begin.y++;
+        priv_head->begin.y--;
         break;
     case DIR_DOWN:
-        priv_head->begin.y--;
+        priv_head->begin.y++;
         break;
     case DIR_LEFT:
         priv_head->begin.x--;
@@ -241,7 +241,7 @@ Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack)
         return;
     }
 
-    end = getEndOfElement(elem);
+    end = getTailOfElement(elem);
 
     /* Initialize these to top left pixels. */
     BeginPixel.x = elem->begin.x * 2;
@@ -254,21 +254,20 @@ Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack)
     switch(elem->dir)
     {
     case DIR_UP:
-        BeginPixel.y++;
-        display_drawLine(BeginPixel, EndPixel, isBlack);
-        BeginPixel.x++;
-        EndPixel.x++;
-        display_drawLine(BeginPixel, EndPixel, isBlack);
-        break;
-    case DIR_DOWN:
         EndPixel.y++;
         display_drawLine(BeginPixel, EndPixel, isBlack);
         BeginPixel.x++;
         EndPixel.x++;
         display_drawLine(BeginPixel, EndPixel, isBlack);
         break;
-    case DIR_LEFT:
+    case DIR_DOWN:
+        BeginPixel.y++;
+        display_drawLine(BeginPixel, EndPixel, isBlack);
         BeginPixel.x++;
+        EndPixel.x++;
+        display_drawLine(BeginPixel, EndPixel, isBlack);
+        break;
+    case DIR_LEFT:
         EndPixel.x++;
         display_drawLine(BeginPixel, EndPixel, isBlack);
         BeginPixel.y++;
@@ -276,7 +275,7 @@ Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack)
         display_drawLine(BeginPixel, EndPixel, isBlack);
         break;
     case DIR_RIGHT:
-        EndPixel.x++;
+        BeginPixel.x++;
         display_drawLine(BeginPixel, EndPixel, isBlack);
         BeginPixel.y++;
         EndPixel.y++;
@@ -289,7 +288,7 @@ Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack)
 }
 
 /* Returns end point of segment in the snake coordinate system. */
-Private Point getEndOfElement(const SnakeElement * elem)
+Private Point getTailOfElement(const SnakeElement * elem)
 {
     Point res;
 
@@ -297,20 +296,18 @@ Private Point getEndOfElement(const SnakeElement * elem)
     {
         case DIR_UP:
             res.x = elem->begin.x;
-            res.y = elem->begin.y - elem->length;
+            res.y = elem->begin.y + elem->length;
             break;
         case DIR_DOWN:
             res.x = elem->begin.x;
-            res.y = elem->begin.y + elem->length;
-
+            res.y = elem->begin.y - elem->length;
             break;
         case DIR_LEFT:
-            res.x = elem->begin.x - elem->length;
+            res.x = elem->begin.x + elem->length;
             res.y = elem->begin.y;
-
             break;
         case DIR_RIGHT:
-            res.x = elem->begin.x + elem->length;
+            res.x = elem->begin.x - elem->length;
             res.y = elem->begin.y;
 
             break;
@@ -325,21 +322,21 @@ Private Point getEndOfElement(const SnakeElement * elem)
 /* Note that this is in reverse to the logical direction that flows from head to tail. */
 Private void HandleUpButton(void)
 {
-    setSnakeDirection(DIR_DOWN);
+    setSnakeDirection(DIR_UP);
 }
 
 Private void HandleDownButton(void)
 {
-    setSnakeDirection(DIR_UP);
+    setSnakeDirection(DIR_DOWN);
 }
 
 Private void HandleRightButton(void)
 {
-    setSnakeDirection(DIR_LEFT);
+    setSnakeDirection(DIR_RIGHT);
 }
 
 Private void HandleLeftButton(void)
 {
-    setSnakeDirection(DIR_RIGHT);
+    setSnakeDirection(DIR_LEFT);
 }
 
