@@ -111,7 +111,10 @@ Public void snake_cyclic100ms(void)
         cycle_counter = 0u;
     }
 
-    /* 1. Move head forward */
+    /* 1. Erase previous tail --- TODO : This could probably be done more optimally. */
+    drawSnakeElement(priv_tail, FALSE);
+
+    /* 2. Move head forward */
     switch(priv_head->dir)
     {
     case DIR_UP:
@@ -130,9 +133,6 @@ Public void snake_cyclic100ms(void)
         break;
         //Should not happen.
     }
-
-    /*2. Erase previous tail --- TODO : This could probably be done more optimally. */
-    drawSnakeElement(priv_tail, FALSE);
 
     /*3. Increase size of the head, decrease size of the tail. */
     priv_tail->length--;
