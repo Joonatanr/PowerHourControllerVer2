@@ -37,13 +37,18 @@ px   0 1 2 3 4 5 6 7 8 9 ...
 
 */
 
+#define DISABLE_BUZZER
+
 /* This file will contain the long-planned Snake Game on the power hour machine...*/
 
-#define GAME_BORDER_WIDTH 2u /* Set this at 2 pixels.    */
+#define GAME_BORDER_WIDTH 2u     /* Set this at 2 pixels.    */
+#define GAME_BORDER_SIZE_Y  64u  /* 64  pixels               */
+#define GAME_BORDER_SIZE_X  108u /* 108 pixels               */
+
 #define SNAKE_SPEED       4u /* Set at 400 ms intervals. */
 
-#define MAX_COORD_X (NUMBER_OF_COLUMNS - 1u) / 2u
-#define MAX_COORD_Y (NUMBER_OF_ROWS - 1u) / 2u
+#define MAX_COORD_X (GAME_BORDER_SIZE_X - 1u) / 2u
+#define MAX_COORD_Y (GAME_BORDER_SIZE_Y - 1u) / 2u
 
 typedef enum
 {
@@ -78,6 +83,7 @@ Private Point getTailOfElement(const SnakeElement * elem);
 /* Drawing functions. */
 Private void drawBorder(void);
 Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack);
+Private void eraseTail(void);
 
 Private Boolean isCollisionWithBorder(void);
 
@@ -155,8 +161,8 @@ Public void snake_cyclic100ms(void)
         cycle_counter = 0u;
     }
 
-    /* 1. Erase previous tail --- TODO : This could probably be done more optimally. */
-    drawSnakeElement(priv_tail, FALSE);
+    /* 1. Erase previous tail segment */
+    eraseTail();
 
     /* 2. Move head forward */
     switch(priv_head->dir)
@@ -193,7 +199,9 @@ Public void snake_cyclic100ms(void)
     /* TODO : This is a placeholder. */
     if (isCollisionWithBorder())
     {
+#ifndef DISABLE_BUZZER
         buzzer_playBeeps(2u);
+#endif
         MessageBox_ShowWithOk("Game over!");
         priv_isGameOver = TRUE;
         return;
@@ -225,7 +233,19 @@ Public void snake_stop(void)
 
 Private void drawBorder(void)
 {
-    display_drawRectangle(0u, 0u, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, GAME_BORDER_WIDTH);
+    Rectangle pointsRectangle;
+    display_drawRectangle(0u, 0u, GAME_BORDER_SIZE_Y, GAME_BORDER_SIZE_X, GAME_BORDER_WIDTH);
+
+    /* Draw points area for testing. */
+    pointsRectangle.location.x = 109u;
+    pointsRectangle.location.y = 2u;
+
+    pointsRectangle.size.height = 20u;
+    pointsRectangle.size.width = NUMBER_OF_COLUMNS - 109u;
+
+    display_drawTextBox(&pointsRectangle, "000", FONT_SMALL_FONT);
+
+    display_drawRectangle(107u, 0u, 64u, NUMBER_OF_COLUMNS - 107u, 1u);
 }
 
 
@@ -260,6 +280,22 @@ Private void setSnakeDirection(SnakeDirection request)
             }
         }
    }
+}
+
+
+/* Erase the last segment of the tail */
+Private void eraseTail(void)
+{
+    Point tailPoint = getTailOfElement(priv_tail);
+    Point pxl;
+
+    pxl.x = tailPoint.x * 2;
+    pxl.y = tailPoint.y * 2;
+
+    display_setPixel(pxl.x,     pxl.y,     FALSE);
+    display_setPixel(pxl.x + 1, pxl.y,     FALSE);
+    display_setPixel(pxl.x,     pxl.y + 1, FALSE);
+    display_setPixel(pxl.x + 1, pxl.y + 1, FALSE);
 }
 
 

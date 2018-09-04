@@ -92,13 +92,12 @@ Private void drawMessageBox(const char * text, Boolean includeButtonArea)
     /* Draw just 1 line for now. */
     display_drawTextBox(&box, text, MSGBOX_FONT);
 
-    /* TODO : Remove this, just for debug*/
-    /*
-    if(includeButtonArea)
+    /* This area won't be cleared otherwise. */
+    if (includeButtonArea)
     {
-        display_fillRectangle(rectLocation.x , rectLocation.y + box.size.height, BUTTON_AREA_HEIGHT, rectSize.width, PATTERN_GRAY);
+        display_fillRectangle(rectLocation.x , rectLocation.y + box.size.height, BUTTON_AREA_HEIGHT, rectSize.width, PATTERN_WHITE);
     }
-    */
+
     //Draw the border.
     display_drawRectangle(rectLocation.x, rectLocation.y, rectSize.height, rectSize.width, 2u);
 

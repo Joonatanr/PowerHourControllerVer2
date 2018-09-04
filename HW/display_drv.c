@@ -371,10 +371,10 @@ Public void display_drawRectangle(U16 x, U16 y, U16 height, U16 width, U8 border
 
     if (borderWidth == 1u)
     {
-        Point xx = {.x = x,         .y = y          };
-        Point xy = {.x = x,         .y = y + height };
-        Point yx = {.x = x + width, .y = y          };
-        Point yy = {.x = x + width, .y = y + height };
+        Point xx = {.x = x,                .y = y                };
+        Point xy = {.x = x,                .y = y + height - 1u  };
+        Point yx = {.x = x +  width - 1u , .y = y                };
+        Point yy = {.x = x +  width - 1u , .y = y + height - 1u  };
 
         display_drawLine(xx, xy, TRUE);
         display_drawLine(xx, yx, TRUE);
