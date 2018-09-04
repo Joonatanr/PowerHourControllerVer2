@@ -385,28 +385,29 @@ Public void display_drawRectangle(U16 x, U16 y, U16 height, U16 width, U8 border
     {
         /* We solve this by drawing 4 filled rectangles (the borders) */
 
+        /* TOP side */
         display_fillRectangle(x,
                               y,
                               borderWidth,
                               width,
                               PATTERN_BLACK);
-
+        /* LEFT side*/
         display_fillRectangle(x,
                               y,
                               height,
                               borderWidth,
                               PATTERN_BLACK);
-
+        /* RIGHT side */
         display_fillRectangle(x + (width - borderWidth),
                               y,
                               height,
                               borderWidth,
                               PATTERN_BLACK);
-
+        /* BOTTOM side */
         display_fillRectangle(x,
-                              y + height - borderWidth,
+                              y + (height - borderWidth),
                               borderWidth,
-                              height,
+                              width,
                               PATTERN_BLACK);
     }
 }

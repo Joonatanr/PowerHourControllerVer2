@@ -198,31 +198,7 @@ Public void snake_stop(void)
 
 Private void drawBorder(void)
 {
-    /* TODO : This should be made into a drawRectangle function.... */
-    /* TODO : Review this. */
-    display_fillRectangle(0u,
-                          0u,
-                          GAME_BORDER_WIDTH,
-                          NUMBER_OF_COLUMNS,
-                          PATTERN_BLACK);
-
-    display_fillRectangle(0u,
-                          0u,
-                          NUMBER_OF_ROWS,
-                          GAME_BORDER_WIDTH,
-                          PATTERN_BLACK);
-
-    display_fillRectangle(NUMBER_OF_COLUMNS - GAME_BORDER_WIDTH,
-                          0u,
-                          NUMBER_OF_ROWS,
-                          GAME_BORDER_WIDTH,
-                          PATTERN_BLACK);
-
-    display_fillRectangle(0u,
-                          NUMBER_OF_ROWS - GAME_BORDER_WIDTH,
-                          GAME_BORDER_WIDTH,
-                          NUMBER_OF_COLUMNS,
-                          PATTERN_BLACK);
+    display_drawRectangle(0u, 0u, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, GAME_BORDER_WIDTH);
 }
 
 
