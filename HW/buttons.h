@@ -36,6 +36,9 @@ typedef enum
 #define RIGHT_BUTTON    BLACK_BUTTON
 #define DOWN_BUTTON     BLUE_BUTTON
 
+#define OK_BUTTON       GREEN_BUTTON
+#define CANCEL_BUTTON   BLACK_BUTTON
+
 /**************************************************************/
 
 

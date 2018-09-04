@@ -5,6 +5,7 @@
 //****************************************************************************
 
 #include <LOGIC/PowerHourGame/clockDisplay.h>
+#include "LOGIC/TextTools/MessageBox.h"
 #include <misc.h>
 #include "msp.h"
 #include "typedefs.h"
@@ -137,13 +138,13 @@ Private void showStartScreen(void)
 
     //Test rectangle drawing.
     //display_drawRectangle(0, 0, 10, 10, 1);
-    display_drawRectangle(0, 0, 6, 6, 2);
-    display_drawRectangle(24, 15, 20, 20, 3);
+    //display_drawRectangle(0, 0, 6, 6, 2);
+    //display_drawRectangle(24, 15, 20, 20, 3);
 
     //display_fillRectangle(0, 0, 3, 2, PATTERN_BLACK);
+    MessageBox_ShowWithOk("Hello World!");
 
-
-    delay_msec(10000);
+    //delay_msec(10000);
 
 #endif
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);

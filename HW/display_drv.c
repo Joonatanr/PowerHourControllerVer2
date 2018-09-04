@@ -42,7 +42,7 @@ Private void write_data(U8 data);
 Private void display_reset(void);
 Private void display_empty(void);
 
-Private U16 getStringWidth(const char * str, FontType font);
+
 
 
 /*****************************************************************************************************
@@ -192,7 +192,7 @@ Public Boolean display_drawTextBox(const Rectangle * box, const char * str, Font
     display_fillRectangle(box->location.x, box->location.y, box->size.height, box->size.width, PATTERN_WHITE);
 
     /* Check if string will fit in the box. */
-    if ((str_height > box->size.height) || (getStringWidth(str, font) > box->size.width))
+    if ((str_height > box->size.height) || (display_getStringWidth(str, font) > box->size.width))
     {
         /* This should not normally happen, so we use the gray pattern to indicate that the box is too small. */
         display_fillRectangle(box->location.x, box->location.y, box->size.height, box->size.width, PATTERN_GRAY);
@@ -221,7 +221,7 @@ Public void display_drawStringCenter(const char * str, U8 centerPoint, U8 yloc, 
     U8 begin_point;
     if(str != NULL)
     {
-        str_width = getStringWidth(str, font);
+        str_width = display_getStringWidth(str, font);
         str_width = str_width >> 1u; //Divide with 2.
 
         if (str_width > centerPoint)
@@ -493,6 +493,28 @@ Public void display_drawLine(Point begin, Point end, Boolean isBlack)
     }
 }
 
+
+//TODO : Should take line breaks into account somehow.
+Public U16 display_getStringWidth(const char * str, FontType font)
+{
+    const char *ps = str;
+    U8 width = 0u;
+
+    while(*ps)
+    {
+        if (*ps == '\n')
+        {
+            break;
+        }
+
+        width += font_getCharWidth(*ps, font);
+        width++; //Account for one bit in between chars.
+        ps++;
+    }
+
+    return width;
+}
+
 /*****************************************************************************************************
  *
  * Private Functions
@@ -715,24 +737,5 @@ Private void display_empty(void)
 }
 
 
-//TODO : Should take line breaks into account somehow.
-Private U16 getStringWidth(const char * str, FontType font)
-{
-    const char *ps = str;
-    U8 width = 0u;
 
-    while(*ps)
-    {
-        if (*ps == '\n')
-        {
-            break;
-        }
-
-        width += font_getCharWidth(*ps, font);
-        width++; //Account for one bit in between chars.
-        ps++;
-    }
-
-    return width;
-}
 
