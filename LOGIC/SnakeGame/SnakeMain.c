@@ -10,10 +10,38 @@
 #include "buttons.h"
 #include <stdlib.h>
 
+
+/*
+This is the coordinate system used. Each game coordinate corresponds to 2x2 pixels.
+
+px   0 1 2 3 4 5 6 7 8 9 ...
+  crd 0   1   2   3   4
+0   * *|* *|* *|* *|
+1 0 * *|* *|* *|* *|
+    ---+---+---+---+
+2   * *|   |   |   |
+3 1 * *|   |   |   |
+    ---+---+---+---+
+4   * *|   |   |   |
+5 2 * *|   |   |   |
+    ---+---+---+---+
+6   * *|   |   |   |
+7 3 * *|   |   |   |
+    ---+---+---+---+
+8   * *|   |   |   |
+9 4 * *|   |   |   |
+    ---+---+---+---+
+...
+
+*/
+
 /* This file will contain the long-planned Snake Game on the power hour machine...*/
 
-#define GAME_BORDER_WIDTH 3u /* Set this at 3 pixels.    */
+#define GAME_BORDER_WIDTH 2u /* Set this at 2 pixels.    */
 #define SNAKE_SPEED       4u /* Set at 400 ms intervals. */
+
+#define MAX_COORD_X NUMBER_OF_COLUMNS / 2u
+#define MAX_COORD_Y NUMBER_OF_ROWS / 2u
 
 typedef enum
 {
@@ -234,7 +262,8 @@ Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack)
 {
     Point BeginPixel;
     Point EndPixel;
-    Point end; /* This is in the snake coordinate system. */
+    Point end;  /* This is in the game coordinate system. */
+    Point head; /* This is in the game coordinate system.  */
 
     if (elem == NULL)
     {
@@ -242,10 +271,18 @@ Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack)
     }
 
     end = getTailOfElement(elem);
+    /* Perform sanity check. */
+    /* If element is out of bounds, then we still draw it, but cut off the out of bounds part. */
+
+    head.x = MIN(elem->begin.x , MAX_COORD_X);
+    head.y = MIN(elem->begin.y , MAX_COORD_Y);
+    end.x = MIN(end.x, MAX_COORD_X);
+    end.y = MIN(end.y, MAX_COORD_Y);
+
 
     /* Initialize these to top left pixels. */
-    BeginPixel.x = elem->begin.x * 2;
-    BeginPixel.y = elem->begin.y * 2;
+    BeginPixel.x = head.x * 2;
+    BeginPixel.y = head.y * 2;
 
     EndPixel.x = end.x * 2;
     EndPixel.y = end.y * 2;
