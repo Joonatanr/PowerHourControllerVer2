@@ -15,4 +15,7 @@ extern void snake_start(void);
 extern void snake_cyclic100ms(void);
 extern void snake_stop(void);
 
+/* TODO : This should be made into a general implementation for returning to the main menu. */
+extern void returnToMain(void);
+
 #endif /* LOGIC_SNAKEGAME_SNAKEMAIN_H_ */

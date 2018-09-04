@@ -47,6 +47,6 @@ extern void Scheduler_StartTasks(void);
 
 extern void Scheduler_SetActiveModule(Scheduler_LogicModuleEnum task);
 extern void Scheduler_StopActiveModule(void);
-
+extern void Scheduler_SetActiveModulePause(Boolean pause);
 
 #endif /* LOGIC_SCHEDULER_H_ */

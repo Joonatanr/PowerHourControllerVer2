@@ -10,6 +10,7 @@
 #include "misc.h"
 #include "register.h"
 #include "buttons.h"
+#include "LOGIC/Scheduler.h"
 
 #define MSGBOX_FONT FONT_MEDIUM_FONT
 //#define MSGBOX_FONT FONT_SMALL_FONT
@@ -30,11 +31,11 @@ Private void clearBox(void);
 Private void handleOkPress(void);
 
 Private Rectangle priv_msg_box;
-volatile Boolean priv_is_ok_pressed = FALSE;
 
 
 /**************************** Public function definitions **************************/
 
+/* TODO : Rework this... */
 Public void MessageBox_Show(const char * text, U16 period)
 {
     drawMessageBox(text, FALSE);
@@ -42,18 +43,19 @@ Public void MessageBox_Show(const char * text, U16 period)
     clearBox();
 }
 
-
+/* TODO : Add also option for cancel button and to get info on user feedback. */
 Public void MessageBox_ShowWithOk(const char * text)
 {
     buttons_unsubscribeAll();
     buttons_subscribeListener(OK_BUTTON , handleOkPress);
-    drawMessageBox(text, TRUE);
 
+    drawMessageBox(text, TRUE);
     drawButton("OK", 63u);
 
-    while(!priv_is_ok_pressed);
-    priv_is_ok_pressed = FALSE;
-    clearBox();
+    //while(!priv_is_ok_pressed); Won't work because we currently only have 1 thread...
+
+    /* So we pause the active module until OK has been pressed. */
+    Scheduler_SetActiveModulePause(TRUE);
 }
 
 /**************************** Private function definitions **************************/
@@ -178,5 +180,5 @@ Private Size getMessageSize(const char * text)
 
 Private void handleOkPress(void)
 {
-    priv_is_ok_pressed = TRUE;
+    Scheduler_SetActiveModulePause(FALSE);
 }

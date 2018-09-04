@@ -10,6 +10,7 @@
 #include "buttons.h"
 #include <stdlib.h>
 #include "LOGIC/TextTools/MessageBox.h"
+#include "buzzer.h"
 
 
 /*
@@ -41,8 +42,8 @@ px   0 1 2 3 4 5 6 7 8 9 ...
 #define GAME_BORDER_WIDTH 2u /* Set this at 2 pixels.    */
 #define SNAKE_SPEED       4u /* Set at 400 ms intervals. */
 
-#define MAX_COORD_X NUMBER_OF_COLUMNS / 2u
-#define MAX_COORD_Y NUMBER_OF_ROWS / 2u
+#define MAX_COORD_X (NUMBER_OF_COLUMNS - 1u) / 2u
+#define MAX_COORD_Y (NUMBER_OF_ROWS - 1u) / 2u
 
 typedef enum
 {
@@ -66,7 +67,7 @@ Private SnakeElement *  priv_head = NULL;
 Private SnakeElement *  priv_tail = NULL;
 
 Private Boolean priv_isDirSet = FALSE; /* Prevents from changing direction twice during the cycle. */
-
+Private Boolean priv_isGameOver = FALSE;
 
 /************************** Private function forward declarations. *****************************/
 
@@ -77,6 +78,8 @@ Private Point getTailOfElement(const SnakeElement * elem);
 /* Drawing functions. */
 Private void drawBorder(void);
 Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack);
+
+Private Boolean isCollisionWithBorder(void);
 
 Private void HandleUpButton(void);
 Private void HandleDownButton(void);
@@ -92,6 +95,8 @@ Public void snake_init(void)
 
 Public void snake_start(void)
 {
+    priv_isGameOver = FALSE;
+
     /* Draw the background and border. */
     display_clear();
     drawBorder();
@@ -121,8 +126,11 @@ Public void snake_start(void)
 
         priv_tail = priv_head; //Initially only one segment.
     }
-
-    /* TODO : Should raise error, if this fails. */
+    else
+    {
+        /* TODO : Create proper error manager.*/
+        MessageBox_Show("Memory fault", 20000u);
+    }
 }
 
 
@@ -130,6 +138,13 @@ Public void snake_start(void)
 Public void snake_cyclic100ms(void)
 {
     static U8 cycle_counter = 0u;
+
+    if (priv_isGameOver)
+    {
+        priv_isGameOver = FALSE;
+        returnToMain(); //Return to main menu.
+        return;
+    }
 
     if (++cycle_counter <= SNAKE_SPEED)
     {
@@ -174,6 +189,17 @@ Public void snake_cyclic100ms(void)
         free(prev);
     }
 
+    /* 4. Check for collisions */
+    /* TODO : This is a placeholder. */
+    if (isCollisionWithBorder())
+    {
+        buzzer_playBeeps(2u);
+        MessageBox_ShowWithOk("Game over!");
+        priv_isGameOver = TRUE;
+        return;
+    }
+
+
     drawSnakeElement(priv_head, TRUE);
     drawSnakeElement(priv_tail, TRUE);
 
@@ -184,7 +210,7 @@ Public void snake_cyclic100ms(void)
 Public void snake_stop(void)
 {
     /* TODO : Must clean up all resources here. */
-    SnakeElement * elem_ptr = priv_head;
+    SnakeElement * elem_ptr = priv_tail;
     SnakeElement * prev = NULL;
 
     while (elem_ptr != NULL)
@@ -223,6 +249,8 @@ Private void setSnakeDirection(SnakeDirection request)
                 new_elem->begin.y = priv_head->begin.y;
                 new_elem->length = 0u;  /* Lets hope the zero length won't cause issues... */
                 new_elem->dir = request;
+                new_elem->next = NULL;
+
                 priv_head->next = new_elem;
                 priv_head = new_elem;
             }
@@ -333,7 +361,38 @@ Private Point getTailOfElement(const SnakeElement * elem)
     return res;
 }
 
-/* Note that this is in reverse to the logical direction that flows from head to tail. */
+
+Private Boolean isCollisionWithBorder(void)
+{
+    Boolean res = FALSE;
+
+    if (priv_head->begin.x < (GAME_BORDER_WIDTH / 2))
+    {
+        res = TRUE;
+    }
+
+    if (priv_head->begin.x > (MAX_COORD_X - (GAME_BORDER_WIDTH / 2)))
+    {
+        res = TRUE;
+    }
+
+    if (priv_head->begin.y < (GAME_BORDER_WIDTH / 2))
+    {
+        res =  TRUE;
+    }
+
+    if (priv_head->begin.y > (MAX_COORD_Y - (GAME_BORDER_WIDTH / 2)))
+    {
+        res = TRUE;
+    }
+
+    return res;
+}
+
+
+
+/********** Button Handlers  ********/
+
 Private void HandleUpButton(void)
 {
     setSnakeDirection(DIR_UP);

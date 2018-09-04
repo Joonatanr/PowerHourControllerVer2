@@ -97,6 +97,12 @@ void main(void)
     register_enable_low_powermode();
 }
 
+void returnToMain(void)
+{
+    Scheduler_StopActiveModule();
+    menu_enterMenu(&StartMenu);
+}
+
 //Periodically called from interrupt context.
 //Called every 10msec.
 Private void timer_hi_prio(void)
@@ -142,7 +148,7 @@ Private void showStartScreen(void)
     //display_drawRectangle(24, 15, 20, 20, 3);
 
     //display_fillRectangle(0, 0, 3, 2, PATTERN_BLACK);
-    MessageBox_ShowWithOk("Hello World!");
+    MessageBox_ShowWithOk("Hello World!\n Power Hour");
 
     //delay_msec(10000);
 

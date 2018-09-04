@@ -49,6 +49,7 @@ Private const Scheduler_LogicTask priv_tasks[NUMBER_OF_SCHEDULER_TASKS] =
 Private const Scheduler_LogicTask * priv_curr_task_ptr = NULL;
 Private U16 priv_task_timer = 0u;
 Private Boolean priv_isInitComplete = FALSE;
+Private Boolean priv_isLogicPaused = FALSE;
 
 
 /* Should be called once at startup. */
@@ -97,6 +98,7 @@ void Scheduler_SetActiveModule(Scheduler_LogicModuleEnum task)
         priv_curr_task_ptr->stop_fptr();
     }
     priv_curr_task_ptr = &priv_logic_modules[task];
+    priv_isLogicPaused = FALSE;
     Interrupt_enableMaster();
     priv_curr_task_ptr->start_fptr();
 }
@@ -111,6 +113,14 @@ void Scheduler_StopActiveModule(void)
     priv_curr_task_ptr = NULL;
 }
 
+
+void Scheduler_SetActiveModulePause(Boolean pause)
+{
+    if (priv_curr_task_ptr != NULL)
+    {
+        priv_isLogicPaused = pause;
+    }
+}
 
 /* Lets assume this gets called every 50 ms, by the main.c lo prio interrupt. */
 void Scheduler_cyclic(void)
@@ -139,7 +149,11 @@ void Scheduler_cyclic(void)
             priv_task_timer = 0u;
             if (priv_curr_task_ptr->cyclic_fptr != NULL)
             {
-                priv_curr_task_ptr->cyclic_fptr();
+                /* Pause can happen for example because we are waiting for user input... */
+                if (!priv_isLogicPaused)
+                {
+                    priv_curr_task_ptr->cyclic_fptr();
+                }
             }
         }
     }
