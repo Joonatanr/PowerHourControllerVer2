@@ -384,7 +384,7 @@ Public void display_drawRectangle(U16 x, U16 y, U16 height, U16 width, U8 border
     else
     {
         /* We solve this by drawing 4 filled rectangles (the borders) */
-        /* TODO : Test this. */
+
         display_fillRectangle(x,
                               y,
                               borderWidth,
@@ -516,7 +516,7 @@ Private void drawPattern(Point * p, Size * s, const FillPattern * pattern_ptr)
     if ((p->x < NUMBER_OF_COLUMNS) && (p->y < NUMBER_OF_ROWS))
     {
         bottom_row = p->y + s->height - 1;
-        right_column = p->x + s->width;
+        right_column = p->x + s->width - 1;
 
         bottom_page = bottom_row >> 3u; //Divide with 8
         top_page = p->y >> 3u; //Divide with 8

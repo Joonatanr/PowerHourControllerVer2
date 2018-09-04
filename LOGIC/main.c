@@ -30,6 +30,9 @@ Private void startSnakeGame(void);
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
 Public TimerHandler timer_50msec_callback = timer_lo_prio;
 
+Private const char priv_version_string[] = "Machine 2.2";
+
+
 /* Settings Menu Items */
 Private const MenuItem SettingsMenuItemArray[] =
 {
@@ -122,21 +125,29 @@ Private void showStartScreen(void)
 #ifdef    DEBUG_SEQUENCE
 
     //Test setPixel function.
-    display_setPixel(10, 10, TRUE);
-    display_setPixel(20, 20, TRUE);
-    display_setPixel(30, 30, TRUE);
-    display_setPixel(40, 40, TRUE);
-    display_setPixel(50, 50, TRUE);
-    display_setPixel(60, 60, TRUE);
+    //display_setPixel(10, 10, TRUE);
+    //display_setPixel(20, 20, TRUE);
+    //display_setPixel(30, 30, TRUE);
+    //display_setPixel(40, 40, TRUE);
+    //display_setPixel(50, 50, TRUE);
+    //display_setPixel(60, 60, TRUE);
 
     //Test line drawing.
-    display_drawLine((Point){70,20}, (Point){90,20}, TRUE);
+    //display_drawLine((Point){70,20}, (Point){90,20}, TRUE);
 
-    delay_msec(5000);
+    //Test rectangle drawing.
+    //display_drawRectangle(0, 0, 10, 10, 1);
+    display_drawRectangle(0, 0, 6, 6, 2);
+    display_drawRectangle(24, 15, 20, 20, 3);
+
+    //display_fillRectangle(0, 0, 3, 2, PATTERN_BLACK);
+
+
+    delay_msec(10000);
 
 #endif
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);
-    display_drawStringCenter("Machine 2.1", 64u, 40u, FONT_LARGE_FONT, FALSE);
+    display_drawStringCenter(priv_version_string, 64u, 40u, FONT_LARGE_FONT, FALSE);
 }
 
 /* Starts the main Power Hour game. */
