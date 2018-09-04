@@ -354,6 +354,64 @@ Public void display_fillRectangle(U16 x, U16 y, U16 height, U16 width, FillPatte
 }
 
 
+Public void display_drawRectangle(U16 x, U16 y, U16 height, U16 width, U8 borderWidth)
+{
+    /* 1. Sanity check */
+    if ((x > NUMBER_OF_COLUMNS) || (y > NUMBER_OF_ROWS))
+    {
+        return;
+    }
+
+    if ((height == 0) || (width == 0u) || (borderWidth == 0u))
+    {
+        return;
+    }
+
+    /* 2. Check if we have a border width of 1. */
+
+    if (borderWidth == 1u)
+    {
+        Point xx = {.x = x,         .y = y          };
+        Point xy = {.x = x,         .y = y + height };
+        Point yx = {.x = x + width, .y = y          };
+        Point yy = {.x = x + width, .y = y + height };
+
+        display_drawLine(xx, xy, TRUE);
+        display_drawLine(xx, yx, TRUE);
+        display_drawLine(yx, yy, TRUE);
+        display_drawLine(xy, yy, TRUE);
+    }
+    else
+    {
+        /* We solve this by drawing 4 filled rectangles (the borders) */
+        /* TODO : Test this. */
+        display_fillRectangle(x,
+                              y,
+                              borderWidth,
+                              width,
+                              PATTERN_BLACK);
+
+        display_fillRectangle(x,
+                              y,
+                              height,
+                              borderWidth,
+                              PATTERN_BLACK);
+
+        display_fillRectangle(x + (width - borderWidth),
+                              y,
+                              height,
+                              borderWidth,
+                              PATTERN_BLACK);
+
+        display_fillRectangle(x,
+                              y + height - borderWidth,
+                              borderWidth,
+                              height,
+                              PATTERN_BLACK);
+    }
+}
+
+
 Public void display_clear(void)
 {
     U8 x, y;
