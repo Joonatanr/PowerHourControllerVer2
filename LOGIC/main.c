@@ -54,7 +54,7 @@ Private SelectionMenu SettingsMenu =
 Private const MenuItem StartMenuItemArray[] =
 {
    { .text = "Start Game",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function_ptr = startGameHandler    },
-   { .text = "Test Snake",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function_ptr = startSnakeGame      },
+   { .text = "Play Snake",  .Action = MENU_ACTION_FUNCTION    , .ActionArg.function_ptr = startSnakeGame      },
    { .text = "Settings",    .Action = MENU_ACTION_SUBMENU     , .ActionArg.subMenu_ptr = &SettingsMenu        },
    { .text = "Exit",        .Action = MENU_ACTION_NONE        , .ActionArg =  NULL                            },
 };

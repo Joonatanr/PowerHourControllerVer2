@@ -44,7 +44,7 @@ px  0 1 2 3 4 5 6 7 8 9 ...
 
 #define GAME_BORDER_WIDTH_PX   2u   /* Set this at 2 pixels.    */
 #define GAME_BORDER_AREA_Y_PX  64u  /* 64  pixels               */
-#define GAME_BORDER_AREA_X_PX  108u /* 108 pixels               */
+#define GAME_BORDER_AREA_X_PX  96u  /* 108 pixels               */
 
 #define DEFAULT_SNAKE_SPEED       4u /* Set at 400 ms intervals. */
 
@@ -280,15 +280,15 @@ Private void drawBorder(void)
     display_drawRectangle(0u, 0u, GAME_BORDER_AREA_Y_PX, GAME_BORDER_AREA_X_PX, GAME_BORDER_WIDTH_PX);
 
     /* Draw points area for testing. */
-    pointsRectangle.location.x = 109u;
+    pointsRectangle.location.x = GAME_BORDER_AREA_X_PX + 1u;
     pointsRectangle.location.y = 2u;
 
-    pointsRectangle.size.height = 20u;
-    pointsRectangle.size.width = NUMBER_OF_COLUMNS - 109u;
+    pointsRectangle.size.height = 16u;
+    pointsRectangle.size.width = NUMBER_OF_COLUMNS - GAME_BORDER_AREA_X_PX - 2u;
 
     display_drawTextBox(&pointsRectangle, "000", FONT_SMALL_FONT);
 
-    display_drawRectangle(107u, 0u, 64u, NUMBER_OF_COLUMNS - 107u, 1u);
+    display_drawRectangle(GAME_BORDER_AREA_X_PX, 0u, 64u, NUMBER_OF_COLUMNS - GAME_BORDER_AREA_X_PX, 1u);
 }
 
 
