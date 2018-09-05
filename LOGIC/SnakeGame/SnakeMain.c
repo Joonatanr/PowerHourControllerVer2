@@ -193,7 +193,7 @@ Public void snake_start(void)
 
 
 /* TODO : Current interval of 100ms is arbitrarily chosen. */
-Public void snake_cyclic100ms(void)
+Public void snake_cyclic50ms(void)
 {
     static U8 cycle_counter = 0u;
 
@@ -528,13 +528,27 @@ Private Boolean isCollision(void)
 Private void handleEating(void)
 {
     char scoreString[6];
+    char * ps = scoreString;
     /* Creates new food block randomly */
     createFood();
 
     /* Increment the score by 5 points */
     priv_score += 5u;
 
-    long2string(priv_score, scoreString);
+    /* Simple way of handling leading zeroes.. */
+    if (priv_score < 10u)
+    {
+        ps[0] = '0';
+        ps[1] = '0';
+        ps +=2;
+    }
+    else if(priv_score < 100u)
+    {
+        ps[0] = '0';
+        ps++;
+    }
+
+    long2string(priv_score, ps);
     display_drawTextBox(&pointsRectangle, scoreString, FONT_SMALL_FONT);
 }
 
