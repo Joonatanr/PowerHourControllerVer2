@@ -16,23 +16,23 @@
 /*
 This is the coordinate system used. Each game coordinate corresponds to 2x2 pixels.
 
-px   0 1 2 3 4 5 6 7 8 9 ...
-  crd 0   1   2   3   4
-0   * *|* *|* *|* *|
-1 0 * *|* *|* *|* *|
-    ---+---+---+---+
-2   * *|   |   |   |
-3 1 * *|   |   |   |
-    ---+---+---+---+
-4   * *|   |   |   |
-5 2 * *|   |   |   |
-    ---+---+---+---+
-6   * *|   |   |   |
-7 3 * *|   |   |   |
-    ---+---+---+---+
-8   * *|   |   |   |
-9 4 * *|   |   |   |
-    ---+---+---+---+
+px  0 1 2 3 4 5 6 7 8 9 ...
+  crd 0   1  2   3   4
+0   * *|* *|* *|* *|* *|
+1 0 * *|* *|* *|* *|* *|
+    ---+---+---+---+---+...
+2   * *|   |   |   |   |
+3 1 * *|   |   |   |   |
+    ---+---+---+---+---+...
+4   * *|   |   |   |   |
+5 2 * *|   |   |   |   |
+    ---+---+---+---+---+...
+6   * *|   |   |   |   |
+7 3 * *|   |   |   |   |
+    ---+---+---+---+---+...
+8   * *|   |   |   |   |
+9 4 * *|   |   |   |   |
+    ---+---+---+---+---+...
 ...
 
 */
@@ -41,14 +41,25 @@ px   0 1 2 3 4 5 6 7 8 9 ...
 
 /* This file will contain the long-planned Snake Game on the power hour machine...*/
 
-#define GAME_BORDER_WIDTH 2u     /* Set this at 2 pixels.    */
-#define GAME_BORDER_SIZE_Y  64u  /* 64  pixels               */
-#define GAME_BORDER_SIZE_X  108u /* 108 pixels               */
+#define GAME_BORDER_WIDTH_PX   2u   /* Set this at 2 pixels.    */
+#define GAME_BORDER_AREA_Y_PX  64u  /* 64  pixels               */
+#define GAME_BORDER_AREA_X_PX  108u /* 108 pixels               */
 
 #define SNAKE_SPEED       4u /* Set at 400 ms intervals. */
 
-#define MAX_COORD_X (GAME_BORDER_SIZE_X - 1u) / 2u
-#define MAX_COORD_Y (GAME_BORDER_SIZE_Y - 1u) / 2u
+/* Game area definitions begin here. Nothing is in pixels anymore. */
+#define GAME_BORDER_WIDTH GAME_BORDER_WIDTH_PX / 2u
+#define GAME_AREA_X_SIZE GAME_BORDER_AREA_X_PX / 2u
+#define GAME_AREA_Y_SIZE GAME_BORDER_AREA_Y_PX / 2u
+
+#define MAX_COORD_X GAME_AREA_X_SIZE - 1u
+#define MAX_COORD_Y GAME_AREA_Y_SIZE - 1u
+
+#define NUMBER_OF_GAME_SQUARES GAME_AREA_X_SIZE * GAME_AREA_Y_SIZE
+
+#define INITIAL_SNAKE_LENGTH 8u
+#define INITIAL_SNAKE_X 32u
+#define INITIAL_SNAKE_Y 16u
 
 typedef enum
 {
@@ -68,11 +79,23 @@ typedef struct __SnakeElement__
 } SnakeElement;
 
 
+/************************** Private variable declarations. *****************************/
+
 Private SnakeElement *  priv_head = NULL;
 Private SnakeElement *  priv_tail = NULL;
 
 Private Boolean priv_isDirSet = FALSE; /* Prevents from changing direction twice during the cycle. */
 Private Boolean priv_isGameOver = FALSE;
+
+/* Since we only store boolean values, then we use one byte for 8 rows. */
+Private U8 priv_game_squares[GAME_AREA_X_SIZE][GAME_AREA_Y_SIZE >> 3];
+
+/* Macros for accessing the priv_game_squares array */
+#define GET_BITMASK(b) (1u << ((b) % 8))
+#define GET_SQUARE_VALUE(x, y) (((priv_game_squares[(x)][(y) >> 3] &   GET_BITMASK((y))) > 0u) ? 1u : 0u)
+#define SET_SQUARE_VALUE(x, y)    priv_game_squares[(x)][(y) >> 3] |=  GET_BITMASK((y))
+#define CLR_SQUARE_VALUE(x, y)    priv_game_squares[(x)][(y) >> 3] &= ~GET_BITMASK((y))
+
 
 /************************** Private function forward declarations. *****************************/
 
@@ -84,8 +107,10 @@ Private Point getTailOfElement(const SnakeElement * elem);
 Private void drawBorder(void);
 Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack);
 Private void eraseTail(void);
+Private void moveHeadForward(void);
 
 Private Boolean isCollisionWithBorder(void);
+Private void handleGameOver(void);
 
 Private void HandleUpButton(void);
 Private void HandleDownButton(void);
@@ -96,12 +121,13 @@ Private void HandleLeftButton(void);
 
 Public void snake_init(void)
 {
-
+    /* Should this always be called before start??? */
 }
 
 Public void snake_start(void)
 {
     priv_isGameOver = FALSE;
+    memset(priv_game_squares, 0x00u, (GAME_BORDER_AREA_X_PX * (GAME_BORDER_AREA_Y_PX / 8)));
 
     /* Draw the background and border. */
     display_clear();
@@ -125,12 +151,20 @@ Public void snake_start(void)
 
     if (priv_head != NULL)
     {
-        priv_head->begin = (Point){ 32u, 16u };
+        U8 x;
+
+        priv_head->begin = (Point){ INITIAL_SNAKE_X, INITIAL_SNAKE_Y };
         priv_head->dir = DIR_RIGHT;
-        priv_head->length = 8u;
+        priv_head->length = INITIAL_SNAKE_LENGTH;
         priv_head->next = NULL;
 
         priv_tail = priv_head; //Initially only one segment.
+
+        /* Set up the game squares with the first segment. */
+        for (x = INITIAL_SNAKE_X; x > (INITIAL_SNAKE_X - INITIAL_SNAKE_LENGTH); x--)
+        {
+            SET_SQUARE_VALUE(x, INITIAL_SNAKE_Y);
+        }
     }
     else
     {
@@ -161,52 +195,20 @@ Public void snake_cyclic100ms(void)
         cycle_counter = 0u;
     }
 
-    /* 1. Erase previous tail segment */
+    /* 1. Move the head forward. */
+    moveHeadForward();
+
+    /* 2. Erase previous tail segment */
     eraseTail();
 
-    /* 2. Move head forward */
-    switch(priv_head->dir)
-    {
-    case DIR_UP:
-        priv_head->begin.y--;
-        break;
-    case DIR_DOWN:
-        priv_head->begin.y++;
-        break;
-    case DIR_LEFT:
-        priv_head->begin.x--;
-        break;
-    case DIR_RIGHT:
-        priv_head->begin.x++;
-        break;
-    default:
-        break;
-        //Should not happen.
-    }
-
-    /*3. Increase size of the head, decrease size of the tail. */
-    priv_tail->length--;
-    priv_head->length++;
-
-    if (priv_tail->length == 0u)
-    {
-        SnakeElement * prev = priv_tail;
-        priv_tail = priv_tail->next;
-        free(prev);
-    }
-
-    /* 4. Check for collisions */
-    /* TODO : This is a placeholder. */
+    /* 3. Check for collisions */
     if (isCollisionWithBorder())
     {
-#ifndef DISABLE_BUZZER
-        buzzer_playBeeps(2u);
-#endif
-        MessageBox_ShowWithOk("Game over!");
-        priv_isGameOver = TRUE;
+        handleGameOver();
         return;
     }
 
+    /* TODO : Check for collisions with self. */
 
     drawSnakeElement(priv_head, TRUE);
     drawSnakeElement(priv_tail, TRUE);
@@ -234,7 +236,7 @@ Public void snake_stop(void)
 Private void drawBorder(void)
 {
     Rectangle pointsRectangle;
-    display_drawRectangle(0u, 0u, GAME_BORDER_SIZE_Y, GAME_BORDER_SIZE_X, GAME_BORDER_WIDTH);
+    display_drawRectangle(0u, 0u, GAME_BORDER_AREA_Y_PX, GAME_BORDER_AREA_X_PX, GAME_BORDER_WIDTH_PX);
 
     /* Draw points area for testing. */
     pointsRectangle.location.x = 109u;
@@ -296,6 +298,48 @@ Private void eraseTail(void)
     display_setPixel(pxl.x + 1, pxl.y,     FALSE);
     display_setPixel(pxl.x,     pxl.y + 1, FALSE);
     display_setPixel(pxl.x + 1, pxl.y + 1, FALSE);
+
+    priv_tail->length--;
+
+    if (priv_tail->length == 0u)
+    {
+        SnakeElement * prev = priv_tail;
+        priv_tail = priv_tail->next;
+        free(prev);
+    }
+
+    /* Mark the square as no longer occupied. */
+    CLR_SQUARE_VALUE(tailPoint.x, tailPoint.y);
+}
+
+
+/* Move head segment forward */
+Private void moveHeadForward(void)
+{
+    switch(priv_head->dir)
+    {
+    case DIR_UP:
+        priv_head->begin.y--;
+        break;
+    case DIR_DOWN:
+        priv_head->begin.y++;
+        break;
+    case DIR_LEFT:
+        priv_head->begin.x--;
+        break;
+    case DIR_RIGHT:
+        priv_head->begin.x++;
+        break;
+    default:
+        break;
+        //Should not happen.
+    }
+
+    priv_head->length++;
+
+    /* Mark the new square as occupied */
+    /* It is possible that we just reached out of bounds... */
+    SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
 }
 
 
@@ -402,22 +446,22 @@ Private Boolean isCollisionWithBorder(void)
 {
     Boolean res = FALSE;
 
-    if (priv_head->begin.x < (GAME_BORDER_WIDTH / 2))
+    if (priv_head->begin.x < GAME_BORDER_WIDTH)
     {
         res = TRUE;
     }
 
-    if (priv_head->begin.x > (MAX_COORD_X - (GAME_BORDER_WIDTH / 2)))
+    if (priv_head->begin.x > (MAX_COORD_X - GAME_BORDER_WIDTH))
     {
         res = TRUE;
     }
 
-    if (priv_head->begin.y < (GAME_BORDER_WIDTH / 2))
+    if (priv_head->begin.y < GAME_BORDER_WIDTH)
     {
         res =  TRUE;
     }
 
-    if (priv_head->begin.y > (MAX_COORD_Y - (GAME_BORDER_WIDTH / 2)))
+    if (priv_head->begin.y > (MAX_COORD_Y - GAME_BORDER_WIDTH))
     {
         res = TRUE;
     }
@@ -425,6 +469,15 @@ Private Boolean isCollisionWithBorder(void)
     return res;
 }
 
+
+Private void handleGameOver(void)
+{
+#ifndef DISABLE_BUZZER
+        buzzer_playBeeps(2u);
+#endif
+        MessageBox_ShowWithOk("Game over!");
+        priv_isGameOver = TRUE;
+}
 
 
 /********** Button Handlers  ********/
