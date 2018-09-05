@@ -12,6 +12,7 @@
 #include "LOGIC/TextTools/MessageBox.h"
 #include "buzzer.h"
 #include "register.h"
+#include "misc.h"
 
 /*
 This is the coordinate system used. Each game coordinate corresponds to 2x2 pixels.
@@ -94,6 +95,8 @@ Private Boolean priv_isGameOver = FALSE;
 Private U8 priv_game_squares[GAME_SQUARE_ARR_X][GAME_SQUARE_ARR_Y];
 
 Private Point priv_food;
+Private U16 priv_score = 0u;
+Private Rectangle pointsRectangle;
 
 /* Macros for accessing the priv_game_squares array */
 #define GET_BITMASK(b) (1u << ((b) % 8))
@@ -115,6 +118,7 @@ Private void drawPoint(Point p, Boolean value);
 Private void eraseTail(void);
 Private void moveHeadForward(void);
 Private void createFood(void);
+Private void handleEating(void);
 Private Point getRandomFreePoint(void);
 
 Private Boolean isCollision(void);
@@ -135,6 +139,7 @@ Public void snake_init(void)
 Public void snake_start(void)
 {
     priv_isGameOver = FALSE;
+    priv_score = 0u;
     memset(priv_game_squares, 0x00u, (GAME_SQUARE_ARR_X * GAME_SQUARE_ARR_Y));
 
     /* Draw the background and border. */
@@ -206,11 +211,20 @@ Public void snake_cyclic100ms(void)
         cycle_counter = 0u;
     }
 
-    /* 1. Move the head forward. */
     moveHeadForward();
 
-    /* 2. Erase previous tail segment */
-    eraseTail();
+    /* Lets see if we can eat...*/
+    if( (priv_head->begin.x == priv_food.x ) &&
+        (priv_head->begin.y == priv_food.y ) )
+    {
+        /* We skip erasing the tail for this round to grow the snake. */
+        /* And we create a new food item somewhere. */
+        handleEating();
+    }
+    else
+    {
+        eraseTail();
+    }
 
     /* 3. Check for collisions */
     if (isCollision())
@@ -248,7 +262,6 @@ Public void snake_stop(void)
 
 Private void drawBorder(void)
 {
-    Rectangle pointsRectangle;
     display_drawRectangle(0u, 0u, GAME_BORDER_AREA_Y_PX, GAME_BORDER_AREA_X_PX, GAME_BORDER_WIDTH_PX);
 
     /* Draw points area for testing. */
@@ -497,6 +510,20 @@ Private Boolean isCollision(void)
 }
 
 
+Private void handleEating(void)
+{
+    char scoreString[6];
+    /* Creates new food block randomly */
+    createFood();
+
+    /* Increment the score by 5 points */
+    priv_score += 5u;
+
+    long2string(priv_score, scoreString);
+    display_drawTextBox(&pointsRectangle, scoreString, FONT_SMALL_FONT);
+}
+
+
 Private void createFood(void)
 {
     Point p = getRandomFreePoint();
@@ -520,8 +547,8 @@ Private Point getRandomFreePoint(void)
     /* We use 4 tries to get a free random point on the board. */
     for (ix = 0u; ix < 4u; ix++)
     {
-        x = generate_random_number(MAX_COORD_X);
-        y = generate_random_number(MAX_COORD_Y);
+        x = generate_random_number_rng(1u, MAX_COORD_X);
+        y = generate_random_number_rng(1u, MAX_COORD_Y);
 
         p.x = x;
         p.y = y;
@@ -546,9 +573,9 @@ Private Point getRandomFreePoint(void)
     }
 
     /* Very special case, we have to start from the beginning... */
-    for (p.x = 0u; p.x < GAME_AREA_X_SIZE; p.x++)
+    for (p.x = 1u; p.x < GAME_AREA_X_SIZE; p.x++)
     {
-        for (p.y = 0u; p.y < GAME_AREA_Y_SIZE; p.y++)
+        for (p.y = 1u; p.y < GAME_AREA_Y_SIZE; p.y++)
         {
             if (GET_SQUARE_VALUE(p.x, p.y) == 0u)
             {

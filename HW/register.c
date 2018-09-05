@@ -104,6 +104,21 @@ Public void delay_msec(U16 msec)
 }
 
 
+Public U16 generate_random_number_rng(U16 min, U16 max)
+{
+    U16 range = max - min;
+    U16 res = 0u;
+
+    if (range > 0u)
+    {
+        res = generate_random_number(range);
+        res += min;
+    }
+
+    return res;
+}
+
+
 Public U16 generate_random_number(U16 max)
 {
     static U16 priv_seed = 0u;
