@@ -6,6 +6,7 @@
  */
 
 #include "SnakeMain.h"
+#include "SnakeExtra.h"
 #include "display_drv.h"
 #include "buttons.h"
 #include <stdlib.h>
@@ -39,6 +40,7 @@ px  0 1 2 3 4 5 6 7 8 9 ...
 */
 
 #define DISABLE_BUZZER
+#define ENABLE_EXTRA
 
 /* This file will contain the long-planned Snake Game on the power hour machine...*/
 
@@ -90,6 +92,22 @@ Private SnakeElement *  priv_tail = NULL;
 Private Boolean priv_isDirSet = FALSE; /* Prevents from changing direction twice during the cycle. */
 Private Boolean priv_isGameOver = FALSE;
 
+#ifdef ENABLE_EXTRA
+Private Rectangle priv_xRect =
+{
+     .location =
+     {
+      .x = GAME_BORDER_AREA_X_PX + 1u,
+      .y = 20u
+     },
+     .size =
+     {
+       .width = NUMBER_OF_COLUMNS - GAME_BORDER_AREA_X_PX - 2u,
+       .height = 43u
+     }
+};
+#endif
+
 /* Since we only store boolean values, then we use one byte for 8 rows. */
 #define GAME_SQUARE_ARR_X GAME_AREA_X_SIZE
 #define GAME_SQUARE_ARR_Y GAME_AREA_Y_SIZE >> 3
@@ -114,7 +132,7 @@ Private void setSnakeDirection(SnakeDirection dir);
 Private Point getTailOfElement(const SnakeElement * elem);
 
 /* Drawing functions. */
-Private void drawBorder(void);
+Private void drawBackGround(void);
 Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack);
 Private void drawPoint(Point p, Boolean value);
 Private void eraseTail(void);
@@ -146,7 +164,7 @@ Public void snake_start(void)
 
     /* Draw the background and border. */
     display_clear();
-    drawBorder();
+    drawBackGround();
 
     /* Subscribe to buttons. */
     buttons_unsubscribeAll();
@@ -189,6 +207,13 @@ Public void snake_start(void)
         /* TODO : Create proper error manager.*/
         MessageBox_Show("Memory fault", 20000u);
     }
+
+#ifdef ENABLE_EXTRA
+    {
+        SnakeExtra_setRectangle(&priv_xRect);
+        SnakeExtra_start();
+    }
+#endif
 }
 
 
@@ -275,7 +300,7 @@ Public void snake_setSpeed(U16 speed)
 
 /************************** Private function definitions. *****************************/
 
-Private void drawBorder(void)
+Private void drawBackGround(void)
 {
     display_drawRectangle(0u, 0u, GAME_BORDER_AREA_Y_PX, GAME_BORDER_AREA_X_PX, GAME_BORDER_WIDTH_PX);
 
@@ -550,6 +575,10 @@ Private void handleEating(void)
 
     long2string(priv_score, ps);
     display_drawTextBox(&pointsRectangle, scoreString, FONT_SMALL_FONT);
+
+#ifdef ENABLE_EXTRA
+    SnakeExtraIncreaseScore(priv_score);
+#endif
 }
 
 
