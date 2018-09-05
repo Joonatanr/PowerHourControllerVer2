@@ -90,6 +90,8 @@ Private Boolean priv_isGameOver = FALSE;
 /* Since we only store boolean values, then we use one byte for 8 rows. */
 Private U8 priv_game_squares[GAME_AREA_X_SIZE][GAME_AREA_Y_SIZE >> 3];
 
+Private Point priv_food;
+
 /* Macros for accessing the priv_game_squares array */
 #define GET_BITMASK(b) (1u << ((b) % 8))
 #define GET_SQUARE_VALUE(x, y) (((priv_game_squares[(x)][(y) >> 3] &   GET_BITMASK((y))) > 0u) ? 1u : 0u)
@@ -106,10 +108,13 @@ Private Point getTailOfElement(const SnakeElement * elem);
 /* Drawing functions. */
 Private void drawBorder(void);
 Private void drawSnakeElement(SnakeElement * elem, Boolean isBlack);
+Private void drawPoint(Point p, Boolean value);
 Private void eraseTail(void);
 Private void moveHeadForward(void);
+Private void createFood(void);
+Private Point getRandomFreePoint(void);
 
-Private Boolean isCollisionWithBorder(void);
+Private Boolean isCollision(void);
 Private void handleGameOver(void);
 
 Private void HandleUpButton(void);
@@ -165,6 +170,9 @@ Public void snake_start(void)
         {
             SET_SQUARE_VALUE(x, INITIAL_SNAKE_Y);
         }
+
+        /* Set up the first food element. */
+        createFood();
     }
     else
     {
@@ -202,14 +210,13 @@ Public void snake_cyclic100ms(void)
     eraseTail();
 
     /* 3. Check for collisions */
-    if (isCollisionWithBorder())
+    if (isCollision())
     {
         handleGameOver();
         return;
     }
 
-    /* TODO : Check for collisions with self. */
-
+    /* TODO : We do not have to redraw both segments each time... */
     drawSnakeElement(priv_head, TRUE);
     drawSnakeElement(priv_tail, TRUE);
 
@@ -285,19 +292,26 @@ Private void setSnakeDirection(SnakeDirection request)
 }
 
 
+/* This is needed, because we use 4 pixels for 1 point. */
+Private void drawPoint(Point p, Boolean value)
+{
+    Point pxl;
+
+    pxl.x = p.x * 2;
+    pxl.y = p.y * 2;
+
+    display_setPixel(pxl.x,     pxl.y,     value);
+    display_setPixel(pxl.x + 1, pxl.y,     value);
+    display_setPixel(pxl.x,     pxl.y + 1, value);
+    display_setPixel(pxl.x + 1, pxl.y + 1, value);
+}
+
+
 /* Erase the last segment of the tail */
 Private void eraseTail(void)
 {
     Point tailPoint = getTailOfElement(priv_tail);
-    Point pxl;
-
-    pxl.x = tailPoint.x * 2;
-    pxl.y = tailPoint.y * 2;
-
-    display_setPixel(pxl.x,     pxl.y,     FALSE);
-    display_setPixel(pxl.x + 1, pxl.y,     FALSE);
-    display_setPixel(pxl.x,     pxl.y + 1, FALSE);
-    display_setPixel(pxl.x + 1, pxl.y + 1, FALSE);
+    drawPoint(tailPoint, FALSE);
 
     priv_tail->length--;
 
@@ -338,7 +352,6 @@ Private void moveHeadForward(void)
     priv_head->length++;
 
     /* Mark the new square as occupied */
-    /* It is possible that we just reached out of bounds... */
     SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
 }
 
@@ -442,10 +455,11 @@ Private Point getTailOfElement(const SnakeElement * elem)
 }
 
 
-Private Boolean isCollisionWithBorder(void)
+Private Boolean isCollision(void)
 {
     Boolean res = FALSE;
 
+    /* Check for collision with border. */
     if (priv_head->begin.x < GAME_BORDER_WIDTH)
     {
         res = TRUE;
@@ -466,7 +480,78 @@ Private Boolean isCollisionWithBorder(void)
         res = TRUE;
     }
 
+    /* Check for collision with objects or snake itself. */
+    if (GET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y) == 1u)
+    {
+        res = TRUE;
+    }
+
     return res;
+}
+
+
+Private void createFood(void)
+{
+    Point p = getRandomFreePoint();
+
+    if ((p.x < GAME_AREA_X_SIZE) && (p.y < GAME_AREA_Y_SIZE))
+    {
+        priv_food.x = p.x;
+        priv_food.y = p.y;
+
+        drawPoint(p, TRUE);
+    }
+}
+
+
+Private Point getRandomFreePoint(void)
+{
+    U16 x, y, ix;
+
+    Point p;
+
+    /* We use 4 tries to get a free random point on the board. */
+    for (ix = 0u; ix < 4u; ix++)
+    {
+        x = generate_random_number(MAX_COORD_X);
+        y = generate_random_number(MAX_COORD_Y);
+
+        p.x = x;
+        p.y = y;
+
+        if (GET_SQUARE_VALUE(p.x, p.y) == 0u)
+        {
+            return p;
+        }
+    }
+
+    /* Looks like all were full... */
+    /* Lets search for the next free point */
+    for (; p.x < GAME_AREA_X_SIZE; p.x++)
+    {
+        for (; p.y < GAME_AREA_Y_SIZE; p.y++)
+        {
+            if (GET_SQUARE_VALUE(p.x, p.y) == 0u)
+            {
+                return p;
+            }
+        }
+    }
+
+    /* Very special case, we have to start from the beginning... */
+    for (p.x = 0u; p.x < GAME_AREA_X_SIZE; p.x++)
+    {
+        for (p.y = 0u; p.y < GAME_AREA_Y_SIZE; p.y++)
+        {
+            if (GET_SQUARE_VALUE(p.x, p.y) == 0u)
+            {
+                return p;
+            }
+        }
+    }
+
+    /* Really should not end up here :) */
+    return p;
 }
 
 
