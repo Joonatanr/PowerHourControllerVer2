@@ -219,6 +219,9 @@ Public void snake_cyclic100ms(void)
         return;
     }
 
+    /* Mark the head new location as occupied */
+    SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
+
     /* TODO : We do not have to redraw both segments each time... */
     drawSnakeElement(priv_head, TRUE);
     drawSnakeElement(priv_tail, TRUE);
@@ -355,7 +358,8 @@ Private void moveHeadForward(void)
     priv_head->length++;
 
     /* Mark the new square as occupied */
-    SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
+    //SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
+    /* Cannot do that here as that would cause collision with self. */
 }
 
 
