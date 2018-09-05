@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include "LOGIC/TextTools/MessageBox.h"
 #include "buzzer.h"
-
+#include "register.h"
 
 /*
 This is the coordinate system used. Each game coordinate corresponds to 2x2 pixels.
@@ -88,7 +88,10 @@ Private Boolean priv_isDirSet = FALSE; /* Prevents from changing direction twice
 Private Boolean priv_isGameOver = FALSE;
 
 /* Since we only store boolean values, then we use one byte for 8 rows. */
-Private U8 priv_game_squares[GAME_AREA_X_SIZE][GAME_AREA_Y_SIZE >> 3];
+#define GAME_SQUARE_ARR_X GAME_AREA_X_SIZE
+#define GAME_SQUARE_ARR_Y GAME_AREA_Y_SIZE >> 3
+
+Private U8 priv_game_squares[GAME_SQUARE_ARR_X][GAME_SQUARE_ARR_Y];
 
 Private Point priv_food;
 
@@ -132,7 +135,7 @@ Public void snake_init(void)
 Public void snake_start(void)
 {
     priv_isGameOver = FALSE;
-    memset(priv_game_squares, 0x00u, (GAME_BORDER_AREA_X_PX * (GAME_BORDER_AREA_Y_PX / 8)));
+    memset(priv_game_squares, 0x00u, (GAME_SQUARE_ARR_X * GAME_SQUARE_ARR_Y));
 
     /* Draw the background and border. */
     display_clear();
