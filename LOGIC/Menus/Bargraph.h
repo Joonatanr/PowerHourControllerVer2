@@ -18,6 +18,7 @@ typedef struct __Bargraph__
     U16 value;
     U16 max_value;
     U16 min_value;
+    U16 increment;
     struct _Selection_Menu_ * parent;
     char * text;
     bargraph_func value_changed;
@@ -25,6 +26,7 @@ typedef struct __Bargraph__
 
 extern Bargraph_T TEST_BARGRAPH;
 extern Bargraph_T BRIGHTNESS_BARGRAPH;
+extern Bargraph_T SNAKE_SPEEED_BARGRAPH;
 
 extern void enterBarGraph(Bargraph_T * bar);
 

@@ -10,6 +10,7 @@
 #include "display_drv.h"
 #include "buttons.h"
 #include "backlight.h"
+#include <LOGIC/SnakeGame/SnakeMain.h>
 
 #define BARGRAPH_BEGIN_X    14u
 #define BARGRAPH_WIDTH     100u
@@ -67,6 +68,7 @@ Public Bargraph_T TEST_BARGRAPH =
 {
      .max_value = 100u,
      .min_value = 0u,
+     .increment = 10u,
      .value = 50u,
      .parent = NULL,
      .text = "Test Bar",
@@ -77,10 +79,22 @@ Public Bargraph_T BRIGHTNESS_BARGRAPH =
 {
      .max_value = 100u,
      .min_value = 0u,
+     .increment = 5u,
      .value = 60u,
      .parent = NULL,
      .text = "Brightness",
      .value_changed = backlight_set_level,
+};
+
+Public Bargraph_T SNAKE_SPEEED_BARGRAPH =
+{
+     .max_value = 5u,
+     .min_value = 1u,
+     .increment = 1u,
+     .value = 2u,
+     .parent = NULL,
+     .text = "Snake speed",
+     .value_changed = snake_setSpeed,
 };
 
 /*******************/
@@ -173,7 +187,7 @@ Private void handleButtonUp(void)
 {
     if (priv_active_bar->value < priv_active_bar->max_value)
     {
-        priv_active_bar->value++;
+        priv_active_bar->value += priv_active_bar->increment;
     }
 
     //Update the displayed data.
@@ -184,7 +198,7 @@ Private void handleButtonDown(void)
 {
     if (priv_active_bar->value > priv_active_bar->min_value)
     {
-        priv_active_bar->value--;
+        priv_active_bar->value -= priv_active_bar->increment;
     }
 
     //Update the displayed data.

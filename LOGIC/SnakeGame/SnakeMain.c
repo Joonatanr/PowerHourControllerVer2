@@ -46,7 +46,7 @@ px  0 1 2 3 4 5 6 7 8 9 ...
 #define GAME_BORDER_AREA_Y_PX  64u  /* 64  pixels               */
 #define GAME_BORDER_AREA_X_PX  108u /* 108 pixels               */
 
-#define SNAKE_SPEED       4u /* Set at 400 ms intervals. */
+#define DEFAULT_SNAKE_SPEED       4u /* Set at 400 ms intervals. */
 
 /* Game area definitions begin here. Nothing is in pixels anymore. */
 #define GAME_BORDER_WIDTH GAME_BORDER_WIDTH_PX / 2u
@@ -81,6 +81,8 @@ typedef struct __SnakeElement__
 
 
 /************************** Private variable declarations. *****************************/
+
+Private U8 priv_snake_speed = DEFAULT_SNAKE_SPEED;
 
 Private SnakeElement *  priv_head = NULL;
 Private SnakeElement *  priv_tail = NULL;
@@ -202,7 +204,7 @@ Public void snake_cyclic100ms(void)
         return;
     }
 
-    if (++cycle_counter <= SNAKE_SPEED)
+    if (++cycle_counter <= priv_snake_speed)
     {
         return;
     }
@@ -256,6 +258,19 @@ Public void snake_stop(void)
         elem_ptr = elem_ptr->next;
         free(prev);
     }
+}
+
+/* Currently can be between 1-5 */
+Public void snake_setSpeed(U16 speed)
+{
+    if (speed > 5u)
+    {
+        return;
+    }
+
+    speed--;
+
+    priv_snake_speed = (5u - speed);
 }
 
 /************************** Private function definitions. *****************************/
@@ -547,8 +562,8 @@ Private Point getRandomFreePoint(void)
     /* We use 4 tries to get a free random point on the board. */
     for (ix = 0u; ix < 4u; ix++)
     {
-        x = generate_random_number_rng(1u, MAX_COORD_X);
-        y = generate_random_number_rng(1u, MAX_COORD_Y);
+        x = generate_random_number_rng(1u, MAX_COORD_X - 1u);
+        y = generate_random_number_rng(1u, MAX_COORD_Y - 1u);
 
         p.x = x;
         p.y = y;

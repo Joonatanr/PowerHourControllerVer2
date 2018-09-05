@@ -14,6 +14,7 @@ extern void snake_init(void);
 extern void snake_start(void);
 extern void snake_cyclic100ms(void);
 extern void snake_stop(void);
+extern void snake_setSpeed(U16 speed);
 
 /* TODO : This should be made into a general implementation for returning to the main menu. */
 extern void returnToMain(void);
