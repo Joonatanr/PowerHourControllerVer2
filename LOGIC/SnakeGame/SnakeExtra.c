@@ -8,6 +8,7 @@
 
 #include "SnakeExtra.h"
 #include "display_drv.h"
+#include "buzzer.h"
 
 /* This contains all the stuff that is not related directly to the snake game itself.*/
 
@@ -54,6 +55,8 @@ Public void SnakeExtraIncreaseScore(U16 score)
                            FALSE);
 
         display_drawTextBox(&textRect, "SHOT!", FONT_SMALL_FONT);
+
+        buzzer_playBeeps(2u);
 
         clear_flag = TRUE;
     }
