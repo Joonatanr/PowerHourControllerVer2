@@ -619,9 +619,9 @@ Private Point getRandomFreePoint(void)
 
     /* Looks like all were full... */
     /* Lets search for the next free point */
-    for (; p.x < GAME_AREA_X_SIZE; p.x++)
+    for (; p.x < MAX_COORD_X; p.x++)
     {
-        for (; p.y < GAME_AREA_Y_SIZE; p.y++)
+        for (; p.y < MAX_COORD_Y; p.y++)
         {
             if (GET_SQUARE_VALUE(p.x, p.y) == 0u)
             {
@@ -631,9 +631,9 @@ Private Point getRandomFreePoint(void)
     }
 
     /* Very special case, we have to start from the beginning... */
-    for (p.x = 1u; p.x < GAME_AREA_X_SIZE; p.x++)
+    for (p.x = 1u; p.x < MAX_COORD_X; p.x++)
     {
-        for (p.y = 1u; p.y < GAME_AREA_Y_SIZE; p.y++)
+        for (p.y = 1u; p.y < MAX_COORD_Y; p.y++)
         {
             if (GET_SQUARE_VALUE(p.x, p.y) == 0u)
             {
