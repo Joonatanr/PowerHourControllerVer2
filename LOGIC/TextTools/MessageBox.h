@@ -13,4 +13,7 @@
 extern void MessageBox_Show(const char * text, U16 period);
 extern void MessageBox_ShowWithOk(const char * text);
 
+extern void MessageBox_init(void);
+extern void MessageBox_cyclic100msec(void);
+
 #endif /* LOGIC_TEXTTOOLS_MESSAGEBOX_H_ */

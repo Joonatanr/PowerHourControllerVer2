@@ -15,23 +15,39 @@
 #define MSGBOX_FONT FONT_MEDIUM_FONT
 //#define MSGBOX_FONT FONT_SMALL_FONT
 
-#define MSGBOX_MIN_HEIGHT 25u
-#define MSGBOX_MIN_WIDTH  35u
+#define MSGBOX_MIN_HEIGHT   25u
+#define MSGBOX_MIN_WIDTH    35u
+#define MSGBOX_MARGIN       10u
+#define BUTTON_AREA_HEIGHT  18u
 
-#define MSGBOX_MARGIN     10u
+typedef enum
+{
+    STATE_IDLE,
+    STATE_PENDING,
+    STATE_SHOWING,
+    NUMBER_OF_MSGBOX_STATES
+} MsgBox_State;
 
-#define BUTTON_AREA_HEIGHT 18u
+typedef enum
+{
+    TYPE_TEXT,
+    TYPE_OK,
+    NUMBER_OF_TYPES
+} MsgBox_Type;
 
 /**************************** Private function forward declarations **************************/
 
 Private void drawMessageBox(const char * text, Boolean includeButtonArea);
 Private void drawButton(const char * text, U8 xloc);
 Private Size getMessageSize(const char * text);
-Private void clearBox(void);
+Private void clearBoxDisplay(void);
 Private void handleOkPress(void);
+Private void closeMessageBox(void);
 
 Private Rectangle priv_msg_box;
 
+/* Variables for storing previously displayed image. */
+/* TODO : Implement this. */
 Private U8 priv_prev_image_data[NUMBER_OF_COLUMNS * NUMBER_OF_PAGES];
 
 Private Bitmap priv_prev_image =
@@ -41,35 +57,82 @@ Private Bitmap priv_prev_image =
      .width = 0u
 };
 
+/* Flags for setting up a displayed messagebox. */
+Private MsgBox_State priv_state;
+Private MsgBox_Type  priv_type;
+Private char         priv_text[64];
+Private U16          priv_duration_period;
 
 /**************************** Public function definitions **************************/
 
-/* TODO : Rework this... */
+Public void MessageBox_init(void)
+{
+    priv_state = STATE_IDLE;
+}
+
+
+Public void MessageBox_cyclic100msec(void)
+{
+    if (priv_duration_period > 0u)
+    {
+        priv_duration_period--;
+    }
+
+    switch(priv_state)
+    {
+        case STATE_PENDING:
+            switch(priv_type)
+            {
+            case TYPE_TEXT:
+                drawMessageBox(priv_text, FALSE);
+                break;
+            case TYPE_OK:
+                drawMessageBox(priv_text, TRUE);
+                buttons_unsubscribeAll();
+                buttons_subscribeListener(OK_BUTTON , handleOkPress);
+
+                drawMessageBox(priv_text, TRUE);
+                drawButton("OK", 63u);
+                break;
+            default:
+                /* Should not happen. */
+                break;
+            }
+
+            /* We pause the active module until messagebox has been closed. */
+            Scheduler_SetActiveModulePause(TRUE);
+            priv_state = STATE_SHOWING;
+            break;
+
+        case STATE_SHOWING:
+            if ((priv_type == TYPE_TEXT) && (priv_duration_period == 0u))
+            {
+                closeMessageBox();
+            }
+            break;
+        case STATE_IDLE:
+        default:
+            break;
+    }
+}
+
+
 Public void MessageBox_Show(const char * text, U16 period)
 {
-    drawMessageBox(text, FALSE);
-    delay_msec(period); //This won't work because it will freeze up the thread...
-    clearBox();
-
-    /* Restore previous image. */
-    display_drawBitmap(&priv_prev_image,
-                       priv_msg_box.location.x,
-                       priv_msg_box.location.y, FALSE);
+    strcpy(priv_text, text);
+    priv_duration_period = period;
+    priv_state = STATE_PENDING;
+    priv_type = TYPE_TEXT;
 }
 
 /* TODO : Add also option for cancel button and to get info on user feedback. */
+/* TODO : Refactor this to use cyclic */
 Public void MessageBox_ShowWithOk(const char * text)
 {
-    buttons_unsubscribeAll();
-    buttons_subscribeListener(OK_BUTTON , handleOkPress);
-
-    drawMessageBox(text, TRUE);
-    drawButton("OK", 63u);
-
-    //while(!priv_is_ok_pressed); Won't work because we currently only have 1 thread...
-
-    /* So we pause the active module until OK has been pressed. */
-    Scheduler_SetActiveModulePause(TRUE);
+    strcpy(priv_text, text);
+    priv_duration_period = 0u;
+    priv_state = STATE_PENDING;
+    priv_type = TYPE_OK;
 }
 
 /**************************** Private function definitions **************************/
@@ -153,7 +216,7 @@ Private void drawButton(const char * text, U8 xloc)
 
 
 /* Should be called at the end to clear up the box. */
-Private void clearBox(void)
+Private void clearBoxDisplay(void)
 {
     /* TODO : Should record display buffer before opening box, and then restore that here... */
     display_fillRectangle(priv_msg_box.location.x,
@@ -200,5 +263,14 @@ Private Size getMessageSize(const char * text)
 
 Private void handleOkPress(void)
 {
+    /* TODO : Should also handle OK callback. */
+    closeMessageBox();
+}
+
+
+Private void closeMessageBox(void)
+{
     Scheduler_SetActiveModulePause(FALSE);
+    clearBoxDisplay();
+    priv_state = STATE_IDLE;
 }
