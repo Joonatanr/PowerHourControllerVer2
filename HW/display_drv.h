@@ -57,6 +57,8 @@ extern void display_drawRectangle(U16 x, U16 y, U16 height, U16 width, U8 border
 extern void display_drawBitmap(const Bitmap * bmp, U16 x, U16 y, Boolean isInverted);
 extern void display_drawBitmapCenter(const Bitmap * bmp, U16 centerPoint, U16 y, Boolean isInverted);
 
+extern void display_getDisplayedImage(Rectangle * rect, U8 * dest);
+
 extern void display_clear(void);
 extern void display_setPixel(U8 x, U8 y, Boolean val);
 extern void display_drawLine(Point begin, Point end, Boolean isBlack);

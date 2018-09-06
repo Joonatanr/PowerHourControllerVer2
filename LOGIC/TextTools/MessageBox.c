@@ -32,6 +32,15 @@ Private void handleOkPress(void);
 
 Private Rectangle priv_msg_box;
 
+Private U8 priv_prev_image_data[NUMBER_OF_COLUMNS * NUMBER_OF_PAGES];
+
+Private Bitmap priv_prev_image =
+{
+     .bmp_data = priv_prev_image_data,
+     .height = 0u,
+     .width = 0u
+};
+
 
 /**************************** Public function definitions **************************/
 
@@ -39,8 +48,13 @@ Private Rectangle priv_msg_box;
 Public void MessageBox_Show(const char * text, U16 period)
 {
     drawMessageBox(text, FALSE);
-    delay_msec(period);
+    delay_msec(period); //This won't work because it will freeze up the thread...
     clearBox();
+
+    /* Restore previous image. */
+    display_drawBitmap(&priv_prev_image,
+                       priv_msg_box.location.x,
+                       priv_msg_box.location.y, FALSE);
 }
 
 /* TODO : Add also option for cancel button and to get info on user feedback. */
@@ -83,7 +97,14 @@ Private void drawMessageBox(const char * text, Boolean includeButtonArea)
 
     box.location = rectLocation;
     box.size = rectSize;
-
+#if 0
+    //Still under test.
+    /* Copy previous image to buffer... */
+    display_getDisplayedImage(&box, priv_prev_image_data);
+    priv_prev_image.height = box.size.height;
+    priv_prev_image.width = box.size.width;
+#endif
+    /* Draw messagebox. */
     if (includeButtonArea)
     {
         box.size.height -= BUTTON_AREA_HEIGHT;

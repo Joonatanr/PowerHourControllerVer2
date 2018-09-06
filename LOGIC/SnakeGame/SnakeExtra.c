@@ -9,6 +9,7 @@
 #include "SnakeExtra.h"
 #include "display_drv.h"
 #include "buzzer.h"
+#include "LOGIC/TextTools/MessageBox.h"
 
 /* This contains all the stuff that is not related directly to the snake game itself.*/
 
@@ -31,6 +32,7 @@ Public void SnakeExtra_start(void)
                           priv_my_rect->size.width,
                           PATTERN_GRAY);
     */
+    //MessageBox_Show("Test", 3000u);
 }
 
 /* Really basic stuff for now.*/

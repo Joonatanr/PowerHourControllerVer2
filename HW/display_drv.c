@@ -515,6 +515,30 @@ Public U16 display_getStringWidth(const char * str, FontType font)
     return width;
 }
 
+#if 0
+/* This is still under test. */
+Public void display_getDisplayedImage(Rectangle * rect, U8 * dest)
+{
+    U8 x;
+    U8 page, last_page;
+    U8 * px = dest;
+    U8 y_offset = rect->location.y % 8u;
+
+    page = rect->location.y >> 3u;
+    last_page = page + (rect->size.height >> 3u);
+
+    for (x = rect->location.x; x < (rect->location.x + rect->size.width); x++)
+    {
+        for (; page <= last_page; page++)
+        {
+            *px = (U8)priv_display_buffer[x][page] << y_offset;
+            *px |= (U8)priv_display_buffer[x][page + 1u] << y_offset;
+            px++;
+        }
+    }
+}
+#endif
+
 /*****************************************************************************************************
  *
  * Private Functions
