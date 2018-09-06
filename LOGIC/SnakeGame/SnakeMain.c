@@ -240,6 +240,16 @@ Public void snake_cyclic50ms(void)
 
     moveHeadForward();
 
+    /* Check for collisions */
+    if (isCollision())
+    {
+        handleGameOver();
+        return;
+    }
+
+    /* Mark the head new location as occupied */
+    SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
+
     /* Lets see if we can eat...*/
     if( (priv_head->begin.x == priv_food.x ) &&
         (priv_head->begin.y == priv_food.y ) )
@@ -252,16 +262,6 @@ Public void snake_cyclic50ms(void)
     {
         eraseTail();
     }
-
-    /* 3. Check for collisions */
-    if (isCollision())
-    {
-        handleGameOver();
-        return;
-    }
-
-    /* Mark the head new location as occupied */
-    SET_SQUARE_VALUE(priv_head->begin.x, priv_head->begin.y);
 
     /* TODO : We do not have to redraw both segments each time... */
     drawSnakeElement(priv_head, TRUE);
