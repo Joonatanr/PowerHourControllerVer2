@@ -97,6 +97,7 @@ Public void register_enable_low_powermode(void)
     }
 }
 
+#pragma FUNCTION_OPTIONS(delay_msec, "--opt_level=off")
 Public void delay_msec(U16 msec)
 {
     priv_delay_counter = msec / 10;
