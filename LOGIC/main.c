@@ -16,8 +16,9 @@
 #include "backlight.h"
 #include "Menus/menu.h"
 #include "Scheduler.h"
+#include "speaker.h"
 
-//#define DEBUG_SEQUENCE
+#define DEBUG_SEQUENCE
 
 Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
@@ -148,9 +149,11 @@ Private void showStartScreen(void)
     //display_drawRectangle(24, 15, 20, 20, 3);
 
     //display_fillRectangle(0, 0, 3, 2, PATTERN_BLACK);
-    MessageBox_ShowWithOk("Hello World!\n Power Hour");
+    //MessageBox_ShowWithOk("Hello World!\n Power Hour");
 
-    //delay_msec(10000);
+    speaker_test();
+
+    delay_msec(10000);
 
 #endif
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);

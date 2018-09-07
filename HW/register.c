@@ -11,6 +11,7 @@
 #include "buzzer.h"
 #include "buttons.h"
 #include "backlight.h"
+#include "speaker.h"
 #include <stdlib.h>
 
 //Hi priority timer runs at 10msec interval (might need to be faster)
@@ -79,6 +80,9 @@ Public void register_init(void)
 
     //Initialise display backlight.
     backlight_init();
+
+    //Initialize speaker.
+    speaker_init();
 
     //Not quite sure what this does yet.
     MAP_Interrupt_enableSleepOnIsrExit();
