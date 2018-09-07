@@ -145,9 +145,7 @@ Private void drawBarGraph(void)
     display_fillRectangle(BARGRAPH_BEGIN_X, BARGRAPH_OFFSET_Y , BARGRAPH_HEIGHT, percentage, PATTERN_BLACK);
 
     //Draw the number.
-    /* TODO : We should clear the previous number, but should do initial test before implementing this. */
     long2string(priv_active_bar->value, priv_buf);
-
     display_drawTextBox(&priv_number_box, priv_buf, FONT_MEDIUM_FONT);
 }
 

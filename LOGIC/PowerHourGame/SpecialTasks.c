@@ -60,32 +60,32 @@ Private SpecialTaskFunc priv_selected_task_ptr;
 /* TODO : Generate more tasks. */
 Private Task_T priv_TextArrayGirls[] =
 {
-     { "The girl with ",     "the fanciest clothes"  , "drinks 2x"         , .counter = 0u  },
-     { "The girl with  ",    "the largest boobs"     , "drinks 2x"         , .counter = 0u  },
-     { NULL,                 "Only girls drink"      , NULL                , .counter = 0u  },
-     { "Girls",              "I have never ever"     , NULL                , .counter = 0u  },
-     { "The girl with ",     "the sexiest voice"     , "drinks 2x "        , .counter = 0u  },
-     { "All girls lose" ,    "One Item of Clothing"  , NULL                , .counter = 0u  },
-     { "Girls drink",        "without "      ,         "using hands"       , .counter = 0u  },
-     { "Choose one girl",    "who drinks 3x ",         NULL                , .counter = 0u  },
-     { "All bad girls",      "drink 2x ",              NULL                , .counter = 0u  },
-     { "The girl with",      "the longest hair ",      "drinks a shot"     , .counter = 0u  },
-     { "All blondes",        "drink 2x ",              NULL                , .counter = 0u  },
-     { "All brunettes",      "drink 2x ",              NULL                , .counter = 0u  },
+     { "The girl with ",     "the fanciest clothes"  , "drinks 2x"         , .counter = 0u  }, /* 1  */
+     { "The girl with  ",    "the largest boobs"     , "drinks 2x"         , .counter = 0u  }, /* 2  */
+     { NULL,                 "Only girls drink"      , NULL                , .counter = 0u  }, /* 3  */
+     { "Girls",              "I have never ever"     , NULL                , .counter = 0u  }, /* 4  */
+     { "The girl with ",     "the sexiest voice"     , "drinks 2x "        , .counter = 0u  }, /* 5  */
+     { "All girls lose" ,    "One Item of Clothing"  , NULL                , .counter = 0u  }, /* 6  */
+     { "Girls drink",        "without "      ,         "using hands"       , .counter = 0u  }, /* 7  */
+     { "Choose one girl",    "who drinks 3x ",         NULL                , .counter = 0u  }, /* 8  */
+     { "All bad girls",      "drink 2x ",              NULL                , .counter = 0u  }, /* 10 */
+     { "The girl with",      "the longest hair ",      "drinks a shot"     , .counter = 0u  }, /* 11 */
+     { "All blondes",        "drink 2x ",              NULL                , .counter = 0u  }, /* 12 */
+     { "All brunettes",      "drink 2x ",              NULL                , .counter = 0u  }, /* 13 */
 };
 
 Private Task_T priv_TextArrayGuys[] =
 {
-     {  NULL                    , "Only guys drink",            NULL          , .counter = 0u  },
-     {  "Guys drink"            , "without",                    "using hands" , .counter = 0u  },
-     {  "The toughest guy"      , "drinks 3x",                  NULL          , .counter = 0u  },
-     {  "The biggest playboy"   , "drinks 3x",                  NULL          , .counter = 0u  },
-     {  "All guys lose"         , "One Item of Clothing",       NULL          , .counter = 0u  },
-     {  "Guys"                  , "Never have I ever",          NULL          , .counter = 0u  },
-     {  NULL                    , "Guys must sing",         "a song together" , .counter = 0u  },
-     {  "Last guy to put his"   , "finger on his nose",        "drinks 2x"    , .counter = 0u  },
-     {  "Choose one guy"        , "who drinks 3x ",             NULL          , .counter = 0u  },
-     {  "The guy with the"      , "biggest balls",            "drinks vodka"  , .counter = 0u  },
+     {  NULL                    , "Only guys drink",            NULL          , .counter = 0u  }, /* 1  */
+     {  "Guys drink"            , "without",                    "using hands" , .counter = 0u  }, /* 2  */
+     {  "The toughest guy"      , "drinks 3x",                  NULL          , .counter = 0u  }, /* 3  */
+     {  "The biggest playboy"   , "drinks 3x",                  NULL          , .counter = 0u  }, /* 4  */
+     {  "All guys lose"         , "One Item of Clothing",       NULL          , .counter = 0u  }, /* 5  */
+     {  "Guys"                  , "Never have I ever",          NULL          , .counter = 0u  }, /* 6  */
+     {  NULL                    , "Guys must sing",         "a song together" , .counter = 0u  }, /* 7  */
+     {  "Last guy to put his"   , "finger on his nose",        "drinks 2x"    , .counter = 0u  }, /* 8  */
+     {  "Choose one guy"        , "who drinks 3x ",             NULL          , .counter = 0u  }, /* 9  */
+     {  "The guy with the"      , "biggest balls",            "drinks vodka"  , .counter = 0u  }, /* 10 */
 };
 
 
