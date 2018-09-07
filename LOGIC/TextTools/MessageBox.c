@@ -134,7 +134,6 @@ Public void MessageBox_Show(const char * text, U16 period)
 }
 
 /* TODO : Add also option for cancel button and to get info on user feedback. */
-/* TODO : Refactor this to use cyclic */
 Public void MessageBox_ShowWithOk(const char * text)
 {
     strcpy(priv_text, text);

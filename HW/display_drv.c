@@ -431,7 +431,6 @@ Public void display_clear(void)
 /* Sets or clears a single pixel. */
 Public void display_setPixel(U8 x, U8 y, Boolean val)
 {
-    /* TODO : Test this                   */
     /* TODO : Add some proper bit macros. */
 
     if ((x < NUMBER_OF_COLUMNS) && (y < NUMBER_OF_ROWS))
@@ -554,9 +553,13 @@ Private void drawPattern(Point * p, Size * s, const FillPattern * pattern_ptr)
     U8 left_segment, right_segment, ix;
     U8 pattern_segment = 0u;
 
-    //TODO : Might need to check if patternType is in range.
     const U8 * data;
     U8 value;
+
+    if (pattern_ptr->id >= NUMBER_OF_PATTERNS)
+    {
+        return;
+    }
 
     data = pattern_ptr->pattern;
 
