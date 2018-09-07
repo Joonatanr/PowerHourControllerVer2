@@ -63,18 +63,6 @@ Private const Bitmap downArrowBitmap =
 /******************/
 
 /* Lets define all available scrollbars here as public variables. */
-
-Public Bargraph_T TEST_BARGRAPH =
-{
-     .max_value = 100u,
-     .min_value = 0u,
-     .increment = 10u,
-     .value = 50u,
-     .parent = NULL,
-     .text = "Test Bar",
-     .value_changed = NULL,
-};
-
 Public Bargraph_T BRIGHTNESS_BARGRAPH =
 {
      .max_value = 100u,

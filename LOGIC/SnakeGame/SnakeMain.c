@@ -143,6 +143,7 @@ Private Point getRandomFreePoint(void);
 
 Private Boolean isCollision(void);
 Private void handleGameOver(void);
+Private void handleMessageBoxResponse(MsgBox_Response resp);
 
 Private void HandleUpButton(void);
 Private void HandleDownButton(void);
@@ -652,8 +653,20 @@ Private void handleGameOver(void)
 #ifndef DISABLE_BUZZER
         buzzer_playBeeps(2u);
 #endif
+        MessageBox_SetResponseHandler(handleMessageBoxResponse);
         MessageBox_ShowWithOk("Game over!");
         priv_isGameOver = TRUE;
+}
+
+
+Private void handleMessageBoxResponse(MsgBox_Response resp)
+{
+    /* In reality this is the only type of response that we can get. */
+    /* This is really just for testing right now... */
+    if (resp == RESPONSE_OK)
+    {
+        buzzer_playBeeps(1u);
+    }
 }
 
 

@@ -31,14 +31,13 @@ Private void startSnakeGame(void);
 Public TimerHandler timer_10msec_callback = timer_hi_prio;
 Public TimerHandler timer_50msec_callback = timer_lo_prio;
 
-Private const char priv_version_string[] = "Machine 2.2";
+Private const char priv_version_string[] = "Machine 2.3";
 
 
 /* Settings Menu Items */
 Private const MenuItem SettingsMenuItemArray[] =
 {
    { .text = "Brightness",    .Action = MENU_ACTION_WIDGET  , .ActionArg.bargraph_ptr = &BRIGHTNESS_BARGRAPH   },
-   { .text = "Test",          .Action = MENU_ACTION_WIDGET  , .ActionArg.bargraph_ptr = &TEST_BARGRAPH         },
    { .text = "Snake speed",   .Action = MENU_ACTION_WIDGET  , .ActionArg.bargraph_ptr = &SNAKE_SPEEED_BARGRAPH },
 };
 

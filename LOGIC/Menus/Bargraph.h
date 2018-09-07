@@ -24,7 +24,6 @@ typedef struct __Bargraph__
     bargraph_func value_changed;
 } Bargraph_T;
 
-extern Bargraph_T TEST_BARGRAPH;
 extern Bargraph_T BRIGHTNESS_BARGRAPH;
 extern Bargraph_T SNAKE_SPEEED_BARGRAPH;
 

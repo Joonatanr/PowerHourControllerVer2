@@ -58,10 +58,11 @@ Private Bitmap priv_prev_image =
 };
 
 /* Flags for setting up a displayed messagebox. */
-Private MsgBox_State priv_state;
-Private MsgBox_Type  priv_type;
-Private char         priv_text[64];
-Private U16          priv_duration_period;
+Private MsgBox_State            priv_state;
+Private MsgBox_Type             priv_type;
+Private char                    priv_text[64];
+Private U16                     priv_duration_period;
+Private MsgBoxResponseHandler   priv_response_handler = NULL;
 
 /**************************** Public function definitions **************************/
 
@@ -114,6 +115,13 @@ Public void MessageBox_cyclic100msec(void)
         default:
             break;
     }
+}
+
+
+/* Sets callback for messagebox response. */
+Public void MessageBox_SetResponseHandler(MsgBoxResponseHandler handler)
+{
+    priv_response_handler = handler;
 }
 
 
@@ -263,13 +271,19 @@ Private Size getMessageSize(const char * text)
 
 Private void handleOkPress(void)
 {
-    /* TODO : Should also handle OK callback. */
     closeMessageBox();
+    /* Lets call this last, so that the active module can draw something on the display etc... */
+    if (priv_response_handler != NULL)
+    {
+        priv_response_handler(RESPONSE_OK);
+    }
 }
 
 
 Private void closeMessageBox(void)
 {
+    /* TODO : Also draw the previous image, so it does not get lost. */
+
     Scheduler_SetActiveModulePause(FALSE);
     clearBoxDisplay();
     priv_state = STATE_IDLE;

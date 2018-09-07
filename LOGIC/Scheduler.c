@@ -101,6 +101,7 @@ void Scheduler_SetActiveModule(Scheduler_LogicModuleEnum task)
     }
     priv_curr_task_ptr = &priv_logic_modules[task];
     priv_isLogicPaused = FALSE;
+    MessageBox_SetResponseHandler(NULL); //We make sure that the previous handler does not remain and cause any problems...
     Interrupt_enableMaster();
     priv_curr_task_ptr->start_fptr();
 }
