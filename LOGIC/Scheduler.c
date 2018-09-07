@@ -27,7 +27,7 @@ Private void timer_1sec(void);
 /* NB! Currently period has to be divisible by 50. Might want to change this. */
 
 /* Ok : Idea is this that this array contains the tasks, of which only one can be active at a time. */
-Private const Scheduler_LogicTask priv_logic_modules[NUMBER_OF_LOGIC_MODULES] =
+Private const Scheduler_LogicTask priv_application_modules[NUMBER_OF_APPLICATIONS] =
 {
      { .period = 1000u, .init_fptr = clockDisplay_init, .start_fptr = clockDisplay_start, .cyclic_fptr = clockDisplay_cyclic1000msec, .stop_fptr = clockDisplay_stop },
      { .period = 50u,   .init_fptr = snake_init,        .start_fptr = snake_start,        .cyclic_fptr = snake_cyclic50ms,            .stop_fptr = snake_stop        }
@@ -48,21 +48,21 @@ Private const Scheduler_LogicTask priv_tasks[NUMBER_OF_SCHEDULER_TASKS] =
 
 
 /*************  Private variable declarations.  **************/
-Private const Scheduler_LogicTask * priv_curr_task_ptr = NULL;
+Private const Scheduler_LogicTask * priv_curr_app_ptr = NULL;
 Private U16 priv_task_timer = 0u;
 Private Boolean priv_isInitComplete = FALSE;
-Private Boolean priv_isLogicPaused = FALSE;
+Private Boolean priv_isAppPaused = FALSE;
 
 
 /* Should be called once at startup. */
 void Scheduler_initTasks(void)
 {
     U8 ix;
-    for (ix = 0u; ix < NUMBER_OF_ITEMS(priv_logic_modules); ix++)
+    for (ix = 0u; ix < NUMBER_OF_ITEMS(priv_application_modules); ix++)
     {
-        if (priv_logic_modules[ix].init_fptr != NULL)
+        if (priv_application_modules[ix].init_fptr != NULL)
         {
-            priv_logic_modules[ix].init_fptr();
+            priv_application_modules[ix].init_fptr();
         }
     }
 
@@ -92,36 +92,37 @@ void Scheduler_StartTasks(void)
 }
 
 
-void Scheduler_SetActiveModule(Scheduler_LogicModuleEnum task)
+void Scheduler_SetActiveApplication(Scheduler_LogicModuleEnum task)
 {
     Interrupt_disableMaster();
-    if (priv_curr_task_ptr != NULL)
+    if (priv_curr_app_ptr != NULL)
     {
-        priv_curr_task_ptr->stop_fptr();
+        priv_curr_app_ptr->stop_fptr();
     }
-    priv_curr_task_ptr = &priv_logic_modules[task];
-    priv_isLogicPaused = FALSE;
+    priv_curr_app_ptr = &priv_application_modules[task];
+    priv_isAppPaused = FALSE;
     MessageBox_SetResponseHandler(NULL); //We make sure that the previous handler does not remain and cause any problems...
+    priv_curr_app_ptr->init_fptr();
     Interrupt_enableMaster();
-    priv_curr_task_ptr->start_fptr();
+    priv_curr_app_ptr->start_fptr();
 }
 
 
-void Scheduler_StopActiveModule(void)
+void Scheduler_StopActiveApplication(void)
 {
-    if (priv_curr_task_ptr != NULL)
+    if (priv_curr_app_ptr != NULL)
     {
-        priv_curr_task_ptr->stop_fptr();
+        priv_curr_app_ptr->stop_fptr();
     }
-    priv_curr_task_ptr = NULL;
+    priv_curr_app_ptr = NULL;
 }
 
 
-void Scheduler_SetActiveModulePause(Boolean pause)
+void Scheduler_SetActiveApplicationPause(Boolean pause)
 {
-    if (priv_curr_task_ptr != NULL)
+    if (priv_curr_app_ptr != NULL)
     {
-        priv_isLogicPaused = pause;
+        priv_isAppPaused = pause;
     }
 }
 
@@ -143,19 +144,19 @@ void Scheduler_cyclic(void)
     }
 
     /* Deal with the current active logical module. */
-    if (priv_curr_task_ptr != NULL)
+    if (priv_curr_app_ptr != NULL)
     {
         /* TODO : Review this, it will not work with a period of for example 20 .*/
         /* Might be good enough for testing. */
-        if ((priv_task_timer % priv_curr_task_ptr->period) == 0u)
+        if ((priv_task_timer % priv_curr_app_ptr->period) == 0u)
         {
             priv_task_timer = 0u;
-            if (priv_curr_task_ptr->cyclic_fptr != NULL)
+            if (priv_curr_app_ptr->cyclic_fptr != NULL)
             {
                 /* Pause can happen for example because we are waiting for user input... */
-                if (!priv_isLogicPaused)
+                if (!priv_isAppPaused)
                 {
-                    priv_curr_task_ptr->cyclic_fptr();
+                    priv_curr_app_ptr->cyclic_fptr();
                 }
             }
         }

@@ -16,9 +16,9 @@ typedef void (*Scheduler_TaskFunc)(void);
 
 typedef enum
 {
-    TASK_CYCLIC1000MS_CLOCKDP, /* Main PH game, TODO : Rename this from clock display, as it is incorrect. */
-    TASK_CYCLIC100MS_SNAKE,    /* Secondary snake game... TODO : Implement this. */
-    NUMBER_OF_LOGIC_MODULES
+    APPLICATION_POWER_HOUR, /* Main PH game, TODO : Rename this from clock display, as it is incorrect. */
+    APPLICATION_SNAKE,    /* Secondary snake game... TODO : Implement this. */
+    NUMBER_OF_APPLICATIONS
 } Scheduler_LogicModuleEnum;
 
 /* TODO : Add all cyclic tasks here that run from lo prio interrupt. */
@@ -46,8 +46,8 @@ extern void Scheduler_initTasks(void);
 extern void Scheduler_cyclic(void);
 extern void Scheduler_StartTasks(void);
 
-extern void Scheduler_SetActiveModule(Scheduler_LogicModuleEnum task);
-extern void Scheduler_StopActiveModule(void);
-extern void Scheduler_SetActiveModulePause(Boolean pause);
+extern void Scheduler_SetActiveApplication(Scheduler_LogicModuleEnum task);
+extern void Scheduler_StopActiveApplication(void);
+extern void Scheduler_SetActiveApplicationPause(Boolean pause);
 
 #endif /* LOGIC_SCHEDULER_H_ */

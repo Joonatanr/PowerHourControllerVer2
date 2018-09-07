@@ -99,7 +99,7 @@ void main(void)
 
 void returnToMain(void)
 {
-    Scheduler_StopActiveModule();
+    Scheduler_StopActiveApplication();
     menu_enterMenu(&StartMenu);
 }
 
@@ -160,12 +160,12 @@ Private void showStartScreen(void)
 /* Starts the main Power Hour game. */
 Private void startGameHandler(void)
 {
-    Scheduler_SetActiveModule(TASK_CYCLIC1000MS_CLOCKDP);
+    Scheduler_SetActiveApplication(APPLICATION_POWER_HOUR);
 }
 
 /* Starts the snake game. */
 Private void startSnakeGame(void)
 {
-    Scheduler_SetActiveModule(TASK_CYCLIC100MS_SNAKE);
+    Scheduler_SetActiveApplication(APPLICATION_SNAKE);
 }
 

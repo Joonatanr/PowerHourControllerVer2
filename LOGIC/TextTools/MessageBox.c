@@ -101,7 +101,7 @@ Public void MessageBox_cyclic100msec(void)
             }
 
             /* We pause the active module until messagebox has been closed. */
-            Scheduler_SetActiveModulePause(TRUE);
+            Scheduler_SetActiveApplicationPause(TRUE);
             priv_state = STATE_SHOWING;
             break;
 
@@ -284,7 +284,7 @@ Private void closeMessageBox(void)
 {
     /* TODO : Also draw the previous image, so it does not get lost. */
 
-    Scheduler_SetActiveModulePause(FALSE);
+    Scheduler_SetActiveApplicationPause(FALSE);
     clearBoxDisplay();
     priv_state = STATE_IDLE;
 }

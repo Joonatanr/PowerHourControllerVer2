@@ -154,15 +154,13 @@ Private void HandleLeftButton(void);
 
 Public void snake_init(void)
 {
-    /* Should this always be called before start??? */
+    priv_isGameOver = FALSE;
+    priv_score = 0u;
+    memset(priv_game_squares, 0x00u, (GAME_SQUARE_ARR_X * GAME_SQUARE_ARR_Y));
 }
 
 Public void snake_start(void)
 {
-    priv_isGameOver = FALSE;
-    priv_score = 0u;
-    memset(priv_game_squares, 0x00u, (GAME_SQUARE_ARR_X * GAME_SQUARE_ARR_Y));
-
     /* Draw the background and border. */
     display_clear();
     drawBackGround();
