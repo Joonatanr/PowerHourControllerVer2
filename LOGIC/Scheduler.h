@@ -16,12 +16,11 @@ typedef void (*Scheduler_TaskFunc)(void);
 
 typedef enum
 {
-    APPLICATION_POWER_HOUR, /* Main PH game, TODO : Rename this from clock display, as it is incorrect. */
-    APPLICATION_SNAKE,    /* Secondary snake game... TODO : Implement this. */
+    APPLICATION_POWER_HOUR,
+    APPLICATION_SNAKE,
     NUMBER_OF_APPLICATIONS
 } Scheduler_LogicModuleEnum;
 
-/* TODO : Add all cyclic tasks here that run from lo prio interrupt. */
 typedef enum
 {
     TASK_CYCLIC1000MS_DEBUG_LED,
