@@ -26,13 +26,36 @@ Private Timer_A_PWMConfig priv_pwmConfig =
         0
 };
 
-#define A4_NOTE 440u
-#define B4_NOTE 494u
-#define F4_UP_NOTE 370u
-#define G4_NOTE 392u
+#define C5_NOTE     523u
+#define B4_NOTE     494u
+#define A4_NOTE     440u
 
-#define E4_NOTE 324u
-#define D4_NOTE 288u
+#define G4_NOTE     392u
+#define F4_UP_NOTE  370u
+#define E4_NOTE     324u
+#define D4_NOTE     288u
+#define C4_NOTE     262u /* Note to self - The octave changes at C. */
+#define B3_NOTE     247u
+
+
+/*
+ * --------------------------------------------------   A5
+ *                                                      G5
+ * -------------------------------0------------------   F5
+ *                             0                        E5
+ * -------------------------0------------------------   D5
+ *                       0                              C5
+ * -------------------0------------------------------   B4
+ *                 0                                    A4
+ * -------------0------------------------------------   G4
+ *           0                                          F4
+ * --------0-----------------------------------------   E4
+ *      0                                               D4
+ *---0---                                               C4
+ *
+ * */
+
+
 
 /* Private type definitions */
 typedef enum
@@ -75,6 +98,10 @@ Public void speaker_init(void)
             GPIO_PRIMARY_MODULE_FUNCTION);
 }
 
+Private const Note_T roll_me_over[] =
+{
+     { },
+};
 
 Private const Note_T sample_music[] =
 {
