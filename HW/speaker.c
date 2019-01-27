@@ -26,6 +26,9 @@ Private Timer_A_PWMConfig priv_pwmConfig =
         0
 };
 
+#define F5_NOTE     698u
+#define E5_NOTE     659u
+#define D5_NOTE     587u
 #define C5_NOTE     523u
 #define B4_NOTE     494u
 #define A4_NOTE     440u
@@ -39,8 +42,8 @@ Private Timer_A_PWMConfig priv_pwmConfig =
 
 
 /*
- * --------------------------------------------------   A5
- *                                                      G5
+ * --0--                                                A5
+ *                                    0                 G5
  * -------------------------------0------------------   F5
  *                             0                        E5
  * -------------------------0------------------------   D5
@@ -100,7 +103,26 @@ Public void speaker_init(void)
 
 Private const Note_T roll_me_over[] =
 {
-     { },
+     { .length = QUARTER,   .frequency = G4_NOTE        },
+
+     { .length = EIGHTH,    .frequency = C5_NOTE, .add_break = TRUE },
+     { .length = EIGHTH,    .frequency = C5_NOTE, .add_break = TRUE },
+     { .length = EIGHTH,    .frequency = C5_NOTE, .add_break = TRUE },
+     { .length = EIGHTH,    .frequency = C5_NOTE, .add_break = TRUE },
+
+     { .length = QUARTER,   .frequency = C5_NOTE, .add_break = TRUE },
+
+     { .length = EIGHTH,    .frequency = D5_NOTE},
+     { .length = EIGHTH,    .frequency = C5_NOTE},
+     { .length = EIGHTH,    .frequency = B4_NOTE},
+     { .length = EIGHTH,    .frequency = A4_NOTE},
+
+     { .length = EIGHTH,    .frequency = B4_NOTE},
+     { .length = EIGHTH,    .frequency = C5_NOTE},
+     { .length = QUARTER,   .frequency = D5_NOTE},
+
+     { .length = EIGHTH,    .frequency = C5_NOTE, .add_break = TRUE},
+     { .length = EIGHTH,    .frequency = C5_NOTE, .add_break = TRUE},
 };
 
 Private const Note_T sample_music[] =
