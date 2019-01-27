@@ -153,7 +153,7 @@ Private void showStartScreen(void)
 
     speaker_test();
 
-    delay_msec(10000);
+    delay_msec(1000);
 
 #endif
     display_drawStringCenter("Power Hour", 64u, 20u, FONT_LARGE_FONT, FALSE);
