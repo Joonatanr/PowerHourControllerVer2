@@ -25,6 +25,7 @@ Public Boolean parseRectangle(char * src, Rectangle * dest);
 Public U8 addchar (char * str, char c);
 Public U8 addstr (char * str1, const char * str2);
 Public U8 long2string (long nr, char *s);
+Public U8 hex2string(unsigned int hex, char *dest);
 
 extern char sY[TXT_BUF_LEN];
 

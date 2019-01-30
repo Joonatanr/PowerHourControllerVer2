@@ -19,5 +19,6 @@ extern void comm_send_number(long nr);
 extern void comm_send_rn(void);
 extern void uart_init(void);
 extern void uart_cyclic(void);
+extern void uprintf(const char * str, ...);
 
 #endif /* HW_COMM_H_ */

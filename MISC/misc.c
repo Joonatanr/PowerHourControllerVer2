@@ -186,6 +186,32 @@ Public U8 long2string (long nr, char *dest)
   return imax;
 }
 
+Public U8 hex2string(unsigned int hex, char *dest)
+{
+    char c;
+    char *ps = dest;
+    unsigned char nibble;
+
+    do
+    {
+        nibble = hex & 0x0000000fu;
+        if (nibble <= 9u)
+        {
+            c = '0' + nibble;
+        }
+        else
+        {
+            c = 'A' + (nibble - 10);
+        }
+        *ps = c;
+        ps++;
+        hex = hex >> 4u;
+    }
+    while(hex > 0);
+
+    return 0;
+}
+
 
 
 

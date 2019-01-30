@@ -175,3 +175,57 @@ Public void uart_cyclic(void)
 }
 
 
+Public void uprintf(const char * str, ...)
+{
+    va_list arg;
+    va_start(arg, str);
+
+    const char *ps;
+    char c;
+    int i;
+    char *s;
+
+    for (ps = str; *ps != '\0'; ps++)
+    {
+        if( *ps != '%' )
+        {
+            comm_send_char(*ps);
+        }
+        else
+        {
+            ps++;
+
+            /* Currently supporting most of the basic options of printf... */
+            /* TODO : Test this function. */
+            switch (*ps)
+            {
+            case 'c':
+                c = va_arg(arg, char);
+                comm_send_char(c);
+                break;
+            case 'd':
+                i = va_arg(arg, int);
+                long2string(i, sY);
+                comm_send_str(sY);
+                break;
+            case 's':
+                s = va_arg(arg, char *);
+                comm_send_str(s);
+                break;
+            case 'x':
+                i = va_arg(arg, unsigned int);
+                hex2string(i, sY);
+                comm_send_str(sY);
+                break;
+            default:
+                    /* TODO: Consider error case... */
+                break;
+            }
+        }
+    }
+
+    va_end(arg);
+}
+
+
+
