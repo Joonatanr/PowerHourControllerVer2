@@ -26,6 +26,7 @@ Private const Timer_A_UpModeConfig hi_prio_timer_config =
 };
 
 
+/* TODO : Move this to 32-bit timer so that we can free another timer to use for SD-card. */
 //Lo priority timer runs at 50msec interval
 Private const Timer_A_UpModeConfig lo_prio_timer_config =
 {
