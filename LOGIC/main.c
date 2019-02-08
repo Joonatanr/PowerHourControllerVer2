@@ -18,7 +18,7 @@
 #include "Scheduler.h"
 #include "speaker.h"
 
-#define DEBUG_SEQUENCE
+//#define DEBUG_SEQUENCE
 
 Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
@@ -150,7 +150,7 @@ Private void showStartScreen(void)
 
     //display_fillRectangle(0, 0, 3, 2, PATTERN_BLACK);
     //MessageBox_ShowWithOk("Hello World!\n Power Hour");
-
+    display_drawStringCenter("Sound Test", 64u, 20u, FONT_LARGE_FONT, FALSE);
     speaker_test();
 
     delay_msec(1000);
