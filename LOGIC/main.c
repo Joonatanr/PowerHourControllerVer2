@@ -18,7 +18,7 @@
 #include "Scheduler.h"
 #include "speaker.h"
 
-//#define DEBUG_SEQUENCE
+#define DEBUG_SEQUENCE
 
 Private void timer_hi_prio(void);
 Private void timer_lo_prio(void);
