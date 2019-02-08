@@ -117,16 +117,16 @@ Private const Note_T roll_me_over[] =
      { 3 ,C4_NOTE, TRUE },
 
      { 2, C4_NOTE, TRUE },
-     { 4, C4_NOTE, TRUE },
+     { 5, C4_NOTE, TRUE },
 
-     { 3, B3_NOTE, TRUE },
+     { 4, B3_NOTE, TRUE },
      { 2, C4_NOTE, TRUE },
      { 3, D4_NOTE, TRUE },
 
      { 2, A3_NOTE, TRUE },
      { 3, A3_NOTE, TRUE },
      { 2, A3_NOTE, TRUE },
-     { 4, A3_NOTE, TRUE },
+     { 5, A3_NOTE, TRUE },
 
      { 3, A3_NOTE, TRUE  },
      { 2, A3_NOTE, FALSE },
@@ -143,7 +143,7 @@ Private const Note_T roll_me_over[] =
      { 2, B3_NOTE, FALSE  },
      { 3, C4_NOTE, FALSE  },
 
-     { 4, 0, FALSE },
+     { 12, 0, FALSE },
 
  //Chorus...
      { 4, G4_NOTE, TRUE   },
